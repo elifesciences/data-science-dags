@@ -21,6 +21,8 @@ JUPYTER_RUN = $(JUPYTER_DOCKER_COMPOSE) run --rm jupyter
 PROJECT_FOLDER = /home/jovyan/data-science-dags
 DEV_RUN = $(JUPYTER_DOCKER_COMPOSE) run --workdir=$(PROJECT_FOLDER) --rm jupyter
 
+OUTPUT_DATASET = data_science
+
 ARGS =
 
 
@@ -75,6 +77,13 @@ dev-jupyter-configure:
 
 dev-jupyter-start: .require-jupyter-vars dev-jupyter-configure
 	$(VENV)/bin/jupyter lab -y --port=$(DATA_SCIENCE_DAGS_JUPYTER_PORT)
+
+
+dev-run-sample-notebook:
+	$(PYTHON) -m papermill.cli \
+		./notebooks/example.ipynb \
+		/tmp/example-output.ipynb \
+		-p output_dataset $(OUTPUT_DATASET)
 
 
 jupyter-build:
