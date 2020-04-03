@@ -1,4 +1,4 @@
-FROM jupyter/minimal-notebook:9e8682c9ea54
+FROM jupyter/minimal-notebook:dc9744740e12
 
 USER root
 
@@ -34,3 +34,6 @@ COPY tests ./tests
 WORKDIR ${PROJECT_FOLDER}/notebooks
 
 USER root
+
+ENV CHOWN_HOME=yes
+ENV CHOWN_HOME_OPTS=-R
