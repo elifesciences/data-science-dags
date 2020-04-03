@@ -1,0 +1,14 @@
+venv
+build
+data
+.temp
+temp
+*.egg-info
+
+.ipynb_checkpoints
+.pytest_cache
+
+notebooks/data
+
+*.pyc
+**/*.pyc
