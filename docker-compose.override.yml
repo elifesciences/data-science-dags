@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  jupyter:
+    environment:
+      - NB_UID=${USER_ID}
+      - NB_GID=${GROUP_ID}
+    volumes:
+      - .:/home/jovyan/data-science-dags
+      - ~/.config/gcloud:/home/jovyan/.config/gcloud
