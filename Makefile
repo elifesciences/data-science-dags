@@ -22,7 +22,7 @@ JUPYTER_DOCKER_COMPOSE = USER_ID="$(USER_ID)" GROUP_ID="$(GROUP_ID)" \
 JUPYTER_RUN = $(JUPYTER_DOCKER_COMPOSE) run --rm jupyter
 
 PROJECT_FOLDER = /home/jovyan/data-science-dags
-DEV_RUN = $(JUPYTER_DOCKER_COMPOSE) run --workdir=$(PROJECT_FOLDER) --rm jupyter
+DEV_RUN = $(JUPYTER_DOCKER_COMPOSE) run --rm airflow-dev
 
 OUTPUT_DATASET = data_science
 
@@ -168,6 +168,10 @@ airflow-build:
 
 airflow-dev-build:
 	$(AIRFLOW_DOCKER_COMPOSE) build airflow-dev
+
+
+airflow-dev-shell:
+	$(AIRFLOW_DOCKER_COMPOSE) run --rm airflow-dev bash
 
 
 airflow-print-url:
