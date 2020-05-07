@@ -26,10 +26,7 @@ ARG install_dev=y
 COPY requirements.dev.txt ./
 RUN if [ "${install_dev}" = "y" ]; then pip install --user -r requirements.dev.txt; fi
 
-COPY data_science_dags ./data_science_dags
-
-COPY .flake8 .pylintrc pytest.ini ./
-COPY tests ./tests
+COPY data_science_pipeline ./data_science_pipeline
 
 WORKDIR ${PROJECT_FOLDER}/notebooks
 

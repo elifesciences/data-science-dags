@@ -1,0 +1,53 @@
+FROM puckel/docker-airflow:1.10.4
+ARG install_dev
+
+USER root
+
+RUN apt update && apt install sudo -yqq
+RUN usermod -aG sudo airflow
+RUN echo "airflow ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+RUN sed -i 's/LocalExecutor/SequentialExecutor/' /entrypoint.sh
+COPY requirements.dag.txt ./
+RUN pip install --upgrade -r requirements.dag.txt
+
+COPY requirements.build.txt ./
+RUN pip install -r requirements.build.txt
+
+COPY requirements.jupyter.txt ./
+RUN pip install -r requirements.jupyter.txt
+
+COPY requirements.notebook.txt ./
+RUN pip install -r requirements.notebook.txt \
+  && jupyter nbextension enable --py widgetsnbextension
+
+USER airflow
+COPY --chown=airflow:airflow requirements.dev.txt ./
+RUN if [ "${install_dev}" = "y" ]; then pip install --user -r requirements.dev.txt; fi
+
+ENV PATH /usr/local/airflow/.local/bin:$PATH
+
+RUN mkdir /usr/local/airflow/applications_file_directory
+ENV AIRFLOW_APPLICATIONS_DIRECTORY_PATH /usr/local/airflow/applications_file_directory
+
+COPY --chown=airflow:airflow data_science_pipeline ./data_science_pipeline
+COPY --chown=airflow:airflow dags ./dags
+COPY --chown=airflow:airflow setup.py ./setup.py
+
+RUN pip install -e . --user --no-dependencies
+
+COPY .pylintrc .flake8 ./
+COPY --chown=airflow:airflow tests ./tests
+COPY --chown=airflow:airflow run_test.sh ./
+
+RUN if [ "${install_dev}" = "y" ]; then chmod +x run_test.sh; fi
+
+COPY --chown=airflow:airflow worker.sh ./
+RUN chmod +x worker.sh
+
+COPY notebooks/example.ipynb ./applications_file_directory/notebooks/example.ipynb
+
+RUN mkdir -p $AIRFLOW_HOME/serve
+RUN ln -s $AIRFLOW_HOME/logs $AIRFLOW_HOME/serve/log
+
+ENTRYPOINT []
