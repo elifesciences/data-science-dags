@@ -1,6 +1,5 @@
 DOCKER_COMPOSE_DEV = docker-compose
 DOCKER_COMPOSE_CI = docker-compose -f docker-compose.yml
-DOCKER_COMPOSE_AIRFLOW_DEV = docker-compose -f docker-compose.yml -f docker-compose.airflow.dev.override.yml
 DOCKER_COMPOSE = $(DOCKER_COMPOSE_DEV)
 
 VENV = venv
@@ -160,19 +159,19 @@ test: lint pytest
 
 
 airflow-build:
-	$(DOCKER_COMPOSE_AIRFLOW_DEV) build airflow-image
+	$(DOCKER_COMPOSE) build airflow-image
 
 
 airflow-dev-build:
-	$(DOCKER_COMPOSE_AIRFLOW_DEV) build airflow-dev
+	$(DOCKER_COMPOSE) build airflow-dev
 
 
 airflow-start: airflow-build
-	$(DOCKER_COMPOSE_AIRFLOW_DEV) up --scale dask-worker=1 scheduler
+	$(DOCKER_COMPOSE) up --scale dask-worker=1 scheduler
 
 
 airflow-stop:
-	$(DOCKER_COMPOSE_AIRFLOW_DEV) down
+	$(DOCKER_COMPOSE) down
 
 
 ci-test-exclude-e2e:

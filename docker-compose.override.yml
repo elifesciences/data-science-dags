@@ -1,6 +1,28 @@
 version: '3.4'
 
 services:
+  webserver:
+    ports:
+      - "8080:8080"
+    volumes:
+      - ~/.config/gcloud/application_default_credentials.json:/tmp/credentials.json
+      - ~/.aws/credentials:/usr/local/airflow/.aws/credentials
+
+  scheduler:
+    volumes:
+      - ~/.config/gcloud/application_default_credentials.json:/tmp/credentials.json
+      - ~/.aws/credentials:/usr/local/airflow/.aws/credentials
+
+  dask-worker:
+    volumes:
+      - ~/.config/gcloud/application_default_credentials.json:/tmp/credentials.json
+      - ~/.aws/credentials:/usr/local/airflow/.aws/credentials
+
+  test-client:
+    volumes:
+      - ~/.config/gcloud/application_default_credentials.json:/tmp/credentials.json
+      - ~/.aws/credentials:/usr/local/airflow/.aws/credentials
+
   jupyter:
     environment:
       - NB_UID=${USER_ID}
