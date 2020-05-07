@@ -15,9 +15,6 @@ ENV PATH=/home/jovyan/.local/bin:${PATH}
 COPY requirements.build.txt ./
 RUN pip install -r requirements.build.txt
 
-COPY requirements.dag.txt ./
-RUN pip install -r requirements.dag.txt
-
 COPY requirements.notebook.txt ./
 RUN pip install -r requirements.notebook.txt \
   && jupyter nbextension enable --py widgetsnbextension
@@ -29,11 +26,7 @@ ARG install_dev=y
 COPY requirements.dev.txt ./
 RUN if [ "${install_dev}" = "y" ]; then pip install --user -r requirements.dev.txt; fi
 
-COPY dags ./dags
 COPY data_science_pipeline ./data_science_pipeline
-
-COPY .flake8 .pylintrc pytest.ini ./
-COPY tests ./tests
 
 WORKDIR ${PROJECT_FOLDER}/notebooks
 
