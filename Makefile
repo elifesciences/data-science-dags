@@ -43,6 +43,7 @@ venv-create:
 
 
 dev-install:
+	$(PIP) install -r requirements.build.txt
 	$(PIP) install -r requirements.dev.txt
 	$(PIP) install -r requirements.jupyter.txt
 	$(PIP) install -r requirements.notebook.txt
