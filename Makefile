@@ -173,8 +173,16 @@ airflow-print-url:
 	@echo "airflow url: http://localhost:$(DATA_SCIENCE_DAGS_AIRFLOW_PORT)"
 
 
+airflow-dask-worker-shell:
+	$(AIRFLOW_DOCKER_COMPOSE) run --rm dask-worker bash
+
+
+airflow-dask-worker-exec:
+	$(AIRFLOW_DOCKER_COMPOSE) exec dask-worker bash
+
+
 airflow-logs:
-	$(AIRFLOW_DOCKER_COMPOSE) logs -f scheduler webserver
+	$(AIRFLOW_DOCKER_COMPOSE) logs -f scheduler webserver dask-worker
 
 
 airflow-start:

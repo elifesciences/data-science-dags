@@ -17,6 +17,7 @@ services:
     volumes:
       - ~/.config/gcloud/application_default_credentials.json:/tmp/credentials.json
       - ~/.aws/credentials:/usr/local/airflow/.aws/credentials
+      - ./notebooks:/usr/local/airflow/applications_file_directory/notebooks
 
   test-client:
     volumes:
