@@ -33,6 +33,18 @@ services:
     command: /bin/sh -c exit 0
     entrypoint: []
 
+  airflow-dev:
+    environment:
+      - DEPLOYMENT_ENV=ci
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+      args:
+        install_dev: y
+    image:  elifesciences/data-science-airflow-dag-dev:${IMAGE_TAG}
+    command: /bin/sh -c exit 0
+    entrypoint: []
+
   webserver:
     depends_on:
       - postgres

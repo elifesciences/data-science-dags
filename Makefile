@@ -112,7 +112,7 @@ jupyter-print-url:
 	@echo "jupyter url: http://localhost:$(DATA_SCIENCE_DAGS_JUPYTER_PORT)"
 
 
-jupyter-start: build-image
+jupyter-start:
 	$(JUPYTER_DOCKER_COMPOSE) up -d jupyter
 	@$(MAKE) jupyter-print-url
 
@@ -158,16 +158,33 @@ lint: flake8 pylint
 
 test: lint pytest
 
-data-pipeline-image-build:
+
+airflow-build:
 	$(DOCKER_COMPOSE_AIRFLOW_DEV) build airflow-image
 
-dev-env-data-pipeline: data-pipeline-image-build
-	$(DOCKER_COMPOSE_AIRFLOW_DEV) up  --scale dask-worker=1 scheduler
+
+airflow-dev-build:
+	$(DOCKER_COMPOSE_AIRFLOW_DEV) build airflow-dev
+
+
+airflow-start: airflow-build
+	$(DOCKER_COMPOSE_AIRFLOW_DEV) up --scale dask-worker=1 scheduler
+
+
+airflow-stop:
+	$(DOCKER_COMPOSE_AIRFLOW_DEV) down
+
+
+ci-test-exclude-e2e:
+	$(DOCKER_COMPOSE) run --rm airflow-dev ./run_test.sh
 
 
 ci-build-and-test:
 	$(MAKE) DOCKER_COMPOSE="$(DOCKER_COMPOSE_CI)" \
-		jupyter-build test
+		airflow-build \
+		airflow-dev-build \
+		jupyter-build \
+		ci-test-exclude-e2e
 
 
 ci-clean:
