@@ -10,8 +10,11 @@ USER_ID = $(shell id -u)
 GROUP_ID = $(shell id -g)
 
 DATA_SCIENCE_DAGS_PROJECTS_HOME = $(shell dirname $(shell pwd))
+DATA_SCIENCE_DAGS_AIRFLOW_PORT = $(shell bash -c 'source .env && echo $$DATA_SCIENCE_DAGS_AIRFLOW_PORT')
 DATA_SCIENCE_DAGS_JUPYTER_PORT = $(shell bash -c 'source .env && echo $$DATA_SCIENCE_DAGS_JUPYTER_PORT')
 
+AIRFLOW_DOCKER_COMPOSE = DATA_SCIENCE_DAGS_AIRFLOW_PORT="$(DATA_SCIENCE_DAGS_AIRFLOW_PORT)" \
+	$(DOCKER_COMPOSE)
 JUPYTER_DOCKER_COMPOSE = USER_ID="$(USER_ID)" GROUP_ID="$(GROUP_ID)" \
 	DATA_SCIENCE_DAGS_JUPYTER_PORT="$(DATA_SCIENCE_DAGS_JUPYTER_PORT)" \
 	DATA_SCIENCE_DAGS_PROJECTS_HOME="$(DATA_SCIENCE_DAGS_PROJECTS_HOME)" \
@@ -159,19 +162,28 @@ test: lint pytest
 
 
 airflow-build:
-	$(DOCKER_COMPOSE) build airflow-image
+	$(AIRFLOW_DOCKER_COMPOSE) build airflow-image
 
 
 airflow-dev-build:
-	$(DOCKER_COMPOSE) build airflow-dev
+	$(AIRFLOW_DOCKER_COMPOSE) build airflow-dev
 
 
-airflow-start: airflow-build
-	$(DOCKER_COMPOSE) up --scale dask-worker=1 scheduler
+airflow-print-url:
+	@echo "airflow url: http://localhost:$(DATA_SCIENCE_DAGS_AIRFLOW_PORT)"
+
+
+airflow-logs:
+	$(AIRFLOW_DOCKER_COMPOSE) logs -f scheduler webserver
+
+
+airflow-start:
+	$(AIRFLOW_DOCKER_COMPOSE) up -d --scale dask-worker=1 scheduler
+	$(MAKE) airflow-print-url
 
 
 airflow-stop:
-	$(DOCKER_COMPOSE) down
+	$(AIRFLOW_DOCKER_COMPOSE) down
 
 
 ci-test-exclude-e2e:
