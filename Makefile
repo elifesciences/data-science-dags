@@ -44,6 +44,7 @@ dev-install:
 	$(PIP) install -r requirements.dev.txt
 	$(PIP) install -r requirements.jupyter.txt
 	$(PIP) install -r requirements.notebook.txt
+	$(PIP) install -r requirements.dag.txt
 	$(PIP) install -e . --no-deps
 
 
@@ -51,11 +52,11 @@ dev-venv: venv-create dev-install
 
 
 dev-flake8:
-	$(PYTHON) -m flake8 data_science_dags tests setup.py
+	$(PYTHON) -m flake8 dags tests setup.py
 
 
 dev-pylint:
-	$(PYTHON) -m pylint data_science_dags tests setup.py
+	$(PYTHON) -m pylint data_science_pipeline dags tests setup.py
 
 
 dev-lint: dev-flake8 dev-pylint
@@ -125,11 +126,11 @@ jupyter-stop:
 
 
 pylint:
-	$(DEV_RUN) pylint data_science_dags tests setup.py
+	$(DEV_RUN) pylint data_science_pipeline dags tests setup.py
 
 
 flake8:
-	$(DEV_RUN) flake8 data_science_dags tests setup.py
+	$(DEV_RUN) flake8 data_science_pipeline dags tests setup.py
 
 
 pytest:
@@ -157,10 +158,10 @@ lint: flake8 pylint
 
 test: lint pytest
 
-build-image-data-pipeline:
+data-pipeline-image-build:
 	$(DOCKER_COMPOSE_AIRFLOW_DEV) build airflow-image
 
-dev-env-data-pipeline: build-image-data-pipeline
+dev-env-data-pipeline:
 	$(DOCKER_COMPOSE_AIRFLOW_DEV) up  --scale dask-worker=1 scheduler
 
 
