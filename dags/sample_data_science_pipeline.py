@@ -24,7 +24,7 @@ APP_DIR_NAME_IN_AIRFLOW_APP_DIR = (
     "notebooks"
 )
 
-DAG_ID = "Data_Science_Data_Pipeline"
+DAG_ID = "Sample_Data_Science_Data_Pipeline"
 DEFAULT_ARGS = {
     "start_date": airflow.utils.dates.days_ago(1),
     "retries": 10,
@@ -46,36 +46,42 @@ DATA_SCIENCE_DAG = DAG(
 )
 
 
-def run_notebook():
+def run_notebook(
+        notebook_file_name: str,
+        notebook_param,
+):
     app_files_location = os.getenv(
         AIRFLOW_APPLICATIONS_DIRECTORY_PATH_ENV_NAME,
         ""
     )
-    app_files_location = os.fspath(
+    notebook_path = os.fspath(
         Path(
             app_files_location,
-            APP_DIR_NAME_IN_AIRFLOW_APP_DIR
+            APP_DIR_NAME_IN_AIRFLOW_APP_DIR,
+            notebook_file_name
+
         )
     )
-    notebook_file_paths = glob.glob(app_files_location + "/*.ipynb")
-    notebook_param = {}
+    notebook_param =  notebook_param or {}
     with TemporaryDirectory() as tmp_dir:
-        for file_path in notebook_file_paths:
-            file_name = os.path.basename(file_path)
-            temp_output_notebook_path = os.fspath(
-                Path(tmp_dir, file_name)
-            )
-            pm.execute_notebook(
-                file_path,
-                temp_output_notebook_path,
-                parameters=notebook_param,
-                progress_bar=False,
-                report_mode=True
-            )
+        temp_output_notebook_path = os.fspath(
+            Path(tmp_dir, notebook_file_name)
+        )
+        pm.execute_notebook(
+            notebook_path,
+            temp_output_notebook_path,
+            parameters=notebook_param,
+            progress_bar=False,
+            report_mode=True
+        )
 
 
 NOTEBOOK_RUN_TASK = PythonOperator(
     task_id="Run_Jupyter_Notebook",
     dag=DATA_SCIENCE_DAG,
     python_callable=run_notebook,
+    op_kwargs={
+        'notebook_file_name': 'example.ipynb',
+        'notebook_param': {}
+    }
 )

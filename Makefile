@@ -161,7 +161,7 @@ test: lint pytest
 data-pipeline-image-build:
 	$(DOCKER_COMPOSE_AIRFLOW_DEV) build airflow-image
 
-dev-env-data-pipeline:
+dev-env-data-pipeline: data-pipeline-image-build
 	$(DOCKER_COMPOSE_AIRFLOW_DEV) up  --scale dask-worker=1 scheduler
 
 
