@@ -1,7 +1,6 @@
 import os
-import glob
-from tempfile import TemporaryDirectory
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from datetime import timedelta
 
 import airflow
@@ -50,19 +49,16 @@ def run_notebook(
         notebook_file_name: str,
         notebook_param,
 ):
-    app_files_location = os.getenv(
-        AIRFLOW_APPLICATIONS_DIRECTORY_PATH_ENV_NAME,
-        ""
-    )
-    notebook_path = os.fspath(
-        Path(
-            app_files_location,
-            APP_DIR_NAME_IN_AIRFLOW_APP_DIR,
-            notebook_file_name
-
+    notebook_path = str(Path(
+        os.getenv(
+            AIRFLOW_APPLICATIONS_DIRECTORY_PATH_ENV_NAME,
+            ""
         )
-    )
-    notebook_param =  notebook_param or {}
+    ).joinpath(
+        APP_DIR_NAME_IN_AIRFLOW_APP_DIR,
+        notebook_file_name
+    ))
+    notebook_param = notebook_param or {}
     with TemporaryDirectory() as tmp_dir:
         temp_output_notebook_path = os.fspath(
             Path(tmp_dir, notebook_file_name)
