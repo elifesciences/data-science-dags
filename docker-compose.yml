@@ -1,6 +1,21 @@
-version: '3'
+version: '3.4'
+
+
+x-airflow-env:
+  &airflow-env
+  - LOAD_EX=n
+  - AIRFLOW_HOST=webserver
+  - AIRFLOW_PORT=8080
+  - AIRFLOW__CORE__EXECUTOR=DaskExecutor
+  - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+  - AIRFLOW__CORE__FERNET_KEY='81HqDtbqAywKSOumSha3BhWNOdQ26slT6K0YaZeZyPs='
+  - AIRFLOW__DASK__CLUSTER_ADDRESS=dask-scheduler:8786
+  - DEPLOYMENT_ENV=ci
+  - GOOGLE_APPLICATION_CREDENTIALS=/usr/local/airflow/.config/gcloud/credentials.json
+
 
 services:
+
   jupyter:
     build:
       context: .
@@ -9,6 +24,71 @@ services:
     command: start-notebook.sh --NotebookApp.token=''
     ports:
       - "${DATA_SCIENCE_DAGS_JUPYTER_PORT}:8888"
+
+  airflow-image:
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+    image: elifesciences/data-science-airflow-dag:${IMAGE_TAG}
+    command: /bin/sh -c exit 0
+    entrypoint: []
+
+  webserver:
+    depends_on:
+      - postgres
+      - dask-worker
+      - dask-scheduler
+    environment: *airflow-env
+    image: elifesciences/data-science-airflow-dag:${IMAGE_TAG}
+    entrypoint: /entrypoint.sh
+    command: webserver
+
+  scheduler:
+    image: elifesciences/data-science-airflow-dag:${IMAGE_TAG}
+    depends_on:
+      - webserver
+    environment: *airflow-env
+    entrypoint: /entrypoint.sh
+    command: scheduler
+
+  test-client:
+    image: elifesciences/data-science-airflow-dag:${IMAGE_TAG}
+    depends_on:
+      - scheduler
+    environment: *airflow-env
+    command: >
+      bash -c "sudo install -D /tmp/credentials.json -m 644 -t  /usr/local/airflow/.config/gcloud
+      && ./run_test.sh with-end-to-end"
+
+  postgres:
+    image: postgres:9.6
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  dask-scheduler:
+    environment: *airflow-env
+    image: elifesciences/data-science-airflow-dag:${IMAGE_TAG}
+    hostname: dask-scheduler
+    entrypoint: [ ]
+    command: ["dask-scheduler"]
+
+  dask-worker:
+    environment: *airflow-env
+    depends_on:
+      - dask-scheduler
+    image: elifesciences/data-science-airflow-dag:${IMAGE_TAG}
+    hostname: dask-worker
+    entrypoint: []
+    command: >
+      bash -c "sudo install -D /tmp/credentials.json -m 644 -t  /usr/local/airflow/.config/gcloud
+      && ./worker.sh tcp://dask-scheduler:8786"
 
 volumes:
   data:

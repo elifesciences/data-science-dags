@@ -1,5 +1,6 @@
 DOCKER_COMPOSE_DEV = docker-compose
 DOCKER_COMPOSE_CI = docker-compose -f docker-compose.yml
+DOCKER_COMPOSE_AIRFLOW_DEV = docker-compose -f docker-compose.yml -f docker-compose.airflow.dev.override.yml
 DOCKER_COMPOSE = $(DOCKER_COMPOSE_DEV)
 
 VENV = venv
@@ -110,7 +111,7 @@ jupyter-print-url:
 	@echo "jupyter url: http://localhost:$(DATA_SCIENCE_DAGS_JUPYTER_PORT)"
 
 
-jupyter-start:
+jupyter-start: build-image
 	$(JUPYTER_DOCKER_COMPOSE) up -d jupyter
 	@$(MAKE) jupyter-print-url
 
@@ -155,6 +156,12 @@ lint: flake8 pylint
 
 
 test: lint pytest
+
+build-image-data-pipeline:
+	$(DOCKER_COMPOSE_AIRFLOW_DEV) build airflow-image
+
+dev-env-data-pipeline: build-image-data-pipeline
+	$(DOCKER_COMPOSE_AIRFLOW_DEV) up  --scale dask-worker=1 scheduler
 
 
 ci-build-and-test:
