@@ -1,3 +1,4 @@
+import logging
 import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -8,6 +9,10 @@ from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 
 import papermill as pm
+
+
+LOGGER = logging.getLogger(__name__)
+
 
 DEPLOYMENT_ENV_ENV_NAME = "DEPLOYMENT_ENV"
 DEFAULT_DEPLOYMENT_ENV_VALUE = "ci"
@@ -45,11 +50,19 @@ DATA_SCIENCE_DAG = DAG(
 )
 
 
-def run_notebook(
-        notebook_file_name: str,
-        notebook_param,
-):
-    notebook_path = str(Path(
+def get_deployment_env() -> str:
+    return os.getenv(
+        DEPLOYMENT_ENV_ENV_NAME,
+        DEFAULT_DEPLOYMENT_ENV_VALUE
+    )
+
+
+def get_default_output_dataset(deployment_env: str) -> str:
+    return 'datascience_%s' % deployment_env
+
+
+def get_notebook_path(notebook_file_name: str) -> str:
+    return str(Path(
         os.getenv(
             AIRFLOW_APPLICATIONS_DIRECTORY_PATH_ENV_NAME,
             ""
@@ -58,7 +71,24 @@ def run_notebook(
         APP_DIR_NAME_IN_AIRFLOW_APP_DIR,
         notebook_file_name
     ))
-    notebook_param = notebook_param or {}
+
+
+def run_notebook(
+        notebook_file_name: str,
+        notebook_param,
+):
+    notebook_path = get_notebook_path(notebook_file_name)
+    deployment_env = get_deployment_env()
+    default_output_dataset = get_default_output_dataset(deployment_env)
+    default_notebook_param = {
+        'deployment_env': deployment_env,
+        'output_dataset': default_output_dataset
+    }
+    notebook_param = {
+        **default_notebook_param,
+        **(notebook_param or {})
+    }
+    LOGGER.info('processing %r with parameters: %s', notebook_path, notebook_param)
     with TemporaryDirectory() as tmp_dir:
         temp_output_notebook_path = os.fspath(
             Path(tmp_dir, notebook_file_name)
