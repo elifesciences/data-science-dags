@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from datetime import timedelta
@@ -99,6 +100,8 @@ def run_notebook(
             parameters=notebook_param,
             progress_bar=False,
             log_output=True,
+            stdout_file=sys.stdout,
+            stderr_file=sys.stderr,
             report_mode=True
         )
 
