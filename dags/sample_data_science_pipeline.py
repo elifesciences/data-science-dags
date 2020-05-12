@@ -25,6 +25,16 @@ AIRFLOW_APPLICATIONS_DIRECTORY_PATH_ENV_NAME = (
     "AIRFLOW_APPLICATIONS_DIRECTORY_PATH"
 )
 
+DATA_SCIENCE_SOURCE_DATASET_ENV_NAME = (
+    "DATA_SCIENCE_SOURCE_DATASET"
+)
+
+DATA_SCIENCE_OUTPUT_DATASET_ENV_NAME = (
+    "DATA_SCIENCE_OUTPUT_DATASET"
+)
+
+DEFAULT_OUTPUT_TABLE_PREFIX = 'data_science_'
+
 APP_DIR_NAME_IN_AIRFLOW_APP_DIR = (
     "notebooks"
 )
@@ -58,8 +68,37 @@ def get_deployment_env() -> str:
     )
 
 
+def get_default_source_dataset(deployment_env: str) -> str:
+    return os.getenv(
+        DATA_SCIENCE_SOURCE_DATASET_ENV_NAME,
+        deployment_env
+    )
+
+
 def get_default_output_dataset(deployment_env: str) -> str:
-    return 'data_science_%s' % deployment_env
+    return os.getenv(
+        DATA_SCIENCE_OUTPUT_DATASET_ENV_NAME,
+        deployment_env
+    )
+
+
+def get_default_notebook_params() -> dict:
+    deployment_env = get_deployment_env()
+    return {
+        'deployment_env': deployment_env,
+        'source_dataset': get_default_source_dataset(deployment_env),
+        'output_dataset': get_default_output_dataset(deployment_env),
+        'output_table_prefix': DEFAULT_OUTPUT_TABLE_PREFIX
+    }
+
+
+def get_combined_notebook_params(
+        default_notebook_params: dict,
+        override_notebook_param: dict = None) -> dict:
+    return {
+        **default_notebook_params,
+        **(override_notebook_param or {})
+    }
 
 
 def get_notebook_path(notebook_file_name: str) -> str:
@@ -76,19 +115,13 @@ def get_notebook_path(notebook_file_name: str) -> str:
 
 def run_notebook(
         notebook_file_name: str,
-        notebook_param,
+        notebook_param: dict = None,
 ):
     notebook_path = get_notebook_path(notebook_file_name)
-    deployment_env = get_deployment_env()
-    default_output_dataset = get_default_output_dataset(deployment_env)
-    default_notebook_param = {
-        'deployment_env': deployment_env,
-        'output_dataset': default_output_dataset
-    }
-    notebook_param = {
-        **default_notebook_param,
-        **(notebook_param or {})
-    }
+    notebook_param = get_combined_notebook_params(
+        get_default_notebook_params(),
+        notebook_param
+    )
     LOGGER.info('processing %r with parameters: %s', notebook_path, notebook_param)
     with TemporaryDirectory() as tmp_dir:
         temp_output_notebook_path = os.fspath(
