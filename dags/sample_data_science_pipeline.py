@@ -98,6 +98,7 @@ def run_notebook(
             temp_output_notebook_path,
             parameters=notebook_param,
             progress_bar=False,
+            log_output=True,
             report_mode=True
         )
 
