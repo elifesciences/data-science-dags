@@ -15,8 +15,8 @@ elifePipeline {
             //   because some source tables or views may not be present in ci
             try {
                 sh "make IMAGE_TAG=${commit} REVISION=${commit} \
-                    DATA_SCIENCE_DAGS_SOURCE_DATASET=staging \
-                    DATA_SCIENCE_DAGS_OUTPUT_DATASET=ci \
+                    DATA_SCIENCE_SOURCE_DATASET=staging \
+                    DATA_SCIENCE_OUTPUT_DATASET=ci \
                     ci-build-and-test"
             } finally {
                 sh "make ci-clean"
