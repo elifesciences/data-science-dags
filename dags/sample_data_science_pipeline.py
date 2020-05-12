@@ -59,7 +59,7 @@ def get_deployment_env() -> str:
 
 
 def get_default_output_dataset(deployment_env: str) -> str:
-    return 'datascience_%s' % deployment_env
+    return 'data_science_%s' % deployment_env
 
 
 def get_notebook_path(notebook_file_name: str) -> str:
