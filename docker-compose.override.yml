@@ -1,28 +1,31 @@
 version: '3.4'
 
+
+x-airflow-volumes:
+  &airflow-volumes
+    - ~/.config/gcloud/application_default_credentials.json:/tmp/credentials.json
+    - ~/.aws/credentials:/usr/local/airflow/.aws/credentials
+    - ./notebooks:/usr/local/airflow/applications_file_directory/notebooks
+    - ./dags:/usr/local/airflow/dags
+    - ./data_science_pipeline:/usr/local/airflow/data_science_pipeline
+
+
 services:
   webserver:
     ports:
       - "${DATA_SCIENCE_DAGS_AIRFLOW_PORT}:8080"
-    volumes:
-      - ~/.config/gcloud/application_default_credentials.json:/tmp/credentials.json
-      - ~/.aws/credentials:/usr/local/airflow/.aws/credentials
+    volumes: *airflow-volumes
 
   scheduler:
-    volumes:
-      - ~/.config/gcloud/application_default_credentials.json:/tmp/credentials.json
-      - ~/.aws/credentials:/usr/local/airflow/.aws/credentials
+    volumes: *airflow-volumes
 
   dask-worker:
-    volumes:
-      - ~/.config/gcloud/application_default_credentials.json:/tmp/credentials.json
-      - ~/.aws/credentials:/usr/local/airflow/.aws/credentials
-      - ./notebooks:/usr/local/airflow/applications_file_directory/notebooks
+    environment:
+      - DEPLOYMENT_ENV=${DATA_SCIENCE_DAGS_DEV_DATASET}
+    volumes: *airflow-volumes
 
   test-client:
-    volumes:
-      - ~/.config/gcloud/application_default_credentials.json:/tmp/credentials.json
-      - ~/.aws/credentials:/usr/local/airflow/.aws/credentials
+    volumes: *airflow-volumes
 
   jupyter:
     environment:
