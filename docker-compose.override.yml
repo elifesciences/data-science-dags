@@ -34,3 +34,4 @@ services:
     volumes:
       - .:/home/jovyan/data-science-dags
       - ~/.config/gcloud:/home/jovyan/.config/gcloud
+      - ~/.aws/credentials:/home/jovyan/.aws/credentials
