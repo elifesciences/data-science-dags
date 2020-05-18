@@ -1,5 +1,7 @@
 import logging
 
+# Note: DagBag.process_file skips files without "airflow" or "DAG" in them
+
 from data_science_pipeline.utils.dags import (
     create_dag,
     create_run_notebook_operator
@@ -18,5 +20,6 @@ DATA_SCIENCE_DAG = create_dag(
 
 NOTEBOOK_RUN_TASK = create_run_notebook_operator(
     notebook_filename='peerscout/peerscout-build-senior-editor-profiles.ipynb',
+    task_id='Run_Jupyter_Notebook2',
     dag=DATA_SCIENCE_DAG
 )
