@@ -107,7 +107,7 @@ def get_combined_notebook_params(
     }
 
 
-def get_notebook_path(notebook_file_name: str) -> str:
+def get_notebook_path(notebook_filename: str) -> str:
     return str(Path(
         os.getenv(
             AIRFLOW_APPLICATIONS_DIRECTORY_PATH_ENV_NAME,
@@ -115,15 +115,15 @@ def get_notebook_path(notebook_file_name: str) -> str:
         )
     ).joinpath(
         APP_DIR_NAME_IN_AIRFLOW_APP_DIR,
-        notebook_file_name
+        notebook_filename
     ))
 
 
 def run_notebook(
-        notebook_file_name: str,
+        notebook_filename: str,
         notebook_params: dict = None,
 ):
-    notebook_path = get_notebook_path(notebook_file_name)
+    notebook_path = get_notebook_path(notebook_filename)
     notebook_params = get_combined_notebook_params(
         get_default_notebook_params(),
         notebook_params
@@ -131,7 +131,7 @@ def run_notebook(
     LOGGER.info('processing %r with parameters: %s', notebook_path, notebook_params)
     with TemporaryDirectory() as tmp_dir:
         temp_output_notebook_path = os.fspath(
-            Path(tmp_dir, os.path.basename(notebook_file_name))
+            Path(tmp_dir, os.path.basename(notebook_filename))
         )
         pm.execute_notebook(
             notebook_path,
@@ -154,7 +154,7 @@ def create_run_notebook_operator(
         task_id=task_id,
         python_callable=run_notebook,
         op_kwargs={
-            'notebook_file_name': notebook_filename,
+            'notebook_filename': notebook_filename,
             'notebook_params': notebook_params or {}
         },
         **kwargs
