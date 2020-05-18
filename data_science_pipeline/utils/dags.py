@@ -1,9 +1,12 @@
 import logging
 import os
 import sys
+from datetime import timedelta
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
+import airflow
+from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 
 import papermill as pm
@@ -33,6 +36,35 @@ DATA_SCIENCE_OUTPUT_DATASET_ENV_NAME = (
 )
 
 DEFAULT_OUTPUT_TABLE_PREFIX = 'data_science_'
+
+
+DATA_SCIENCE_SCHEDULE_INTERVAL_ENV_NAME = (
+    "DATA_SCIENCE_SCHEDULE_INTERVAL"
+)
+
+
+DEFAULT_ARGS = {
+    "start_date": airflow.utils.dates.days_ago(1),
+    "retries": 10,
+    "retry_delay": timedelta(minutes=1),
+    "retry_exponential_backoff": True,
+    "provide_context": False,
+}
+
+
+def create_dag(
+        dag_id: str) -> DAG:
+    return DAG(
+        dag_id=dag_id,
+        schedule_interval=os.getenv(
+            DATA_SCIENCE_SCHEDULE_INTERVAL_ENV_NAME,
+            "@daily"
+        ),
+        default_args=DEFAULT_ARGS,
+        dagrun_timeout=timedelta(minutes=60),
+        max_active_runs=20,
+        concurrency=30
+    )
 
 
 def get_deployment_env() -> str:
