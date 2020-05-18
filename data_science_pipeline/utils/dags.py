@@ -61,7 +61,7 @@ def get_default_dag_args() -> dict:
         default_args=DEFAULT_ARGS,
         dagrun_timeout=timedelta(minutes=60),
         max_active_runs=20,
-        concurrency=30
+        concurrency=1
     )
 
 
