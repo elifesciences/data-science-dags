@@ -121,14 +121,14 @@ def get_notebook_path(notebook_file_name: str) -> str:
 
 def run_notebook(
         notebook_file_name: str,
-        notebook_param: dict = None,
+        notebook_params: dict = None,
 ):
     notebook_path = get_notebook_path(notebook_file_name)
-    notebook_param = get_combined_notebook_params(
+    notebook_params = get_combined_notebook_params(
         get_default_notebook_params(),
-        notebook_param
+        notebook_params
     )
-    LOGGER.info('processing %r with parameters: %s', notebook_path, notebook_param)
+    LOGGER.info('processing %r with parameters: %s', notebook_path, notebook_params)
     with TemporaryDirectory() as tmp_dir:
         temp_output_notebook_path = os.fspath(
             Path(tmp_dir, os.path.basename(notebook_file_name))
@@ -136,7 +136,7 @@ def run_notebook(
         pm.execute_notebook(
             notebook_path,
             temp_output_notebook_path,
-            parameters=notebook_param,
+            parameters=notebook_params,
             progress_bar=False,
             log_output=True,
             stdout_file=sys.stdout,
@@ -155,7 +155,7 @@ def create_run_notebook_operator(
         python_callable=run_notebook,
         op_kwargs={
             'notebook_file_name': notebook_filename,
-            'notebook_param': notebook_params or {}
+            'notebook_params': notebook_params or {}
         },
         **kwargs
     )
