@@ -4,10 +4,9 @@ from datetime import timedelta
 
 import airflow
 from airflow import DAG
-from airflow.operators.python_operator import PythonOperator
 
 from data_science_pipeline.utils.dags import (
-    run_notebook
+    create_run_notebook_operator
 )
 
 
@@ -40,12 +39,7 @@ DATA_SCIENCE_DAG = DAG(
 )
 
 
-NOTEBOOK_RUN_TASK = PythonOperator(
-    task_id="Run_Jupyter_Notebook",
-    dag=DATA_SCIENCE_DAG,
-    python_callable=run_notebook,
-    op_kwargs={
-        'notebook_file_name': 'peerscout/peerscout-build-senior-editor-profiles.ipynb',
-        'notebook_param': {}
-    }
+NOTEBOOK_RUN_TASK = create_run_notebook_operator(
+    notebook_filename='peerscout/peerscout-build-senior-editor-profiles.ipynb',
+    dag=DATA_SCIENCE_DAG
 )

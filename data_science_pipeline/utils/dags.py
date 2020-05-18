@@ -4,6 +4,8 @@ import sys
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
+from airflow.operators.python_operator import PythonOperator
+
 import papermill as pm
 
 
@@ -109,3 +111,19 @@ def run_notebook(
             stderr_file=sys.stderr,
             report_mode=True
         )
+
+
+def create_run_notebook_operator(
+        notebook_filename: str,
+        task_id: str = "Run_Jupyter_Notebook",
+        notebook_params: dict = None,
+        **kwargs):
+    return PythonOperator(
+        task_id=task_id,
+        python_callable=run_notebook,
+        op_kwargs={
+            'notebook_file_name': notebook_filename,
+            'notebook_param': notebook_params or {}
+        },
+        **kwargs
+    )
