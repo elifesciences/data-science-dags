@@ -100,10 +100,10 @@ def get_default_notebook_params() -> dict:
 
 def get_combined_notebook_params(
         default_notebook_params: dict,
-        override_notebook_param: dict = None) -> dict:
+        override_notebook_params: dict = None) -> dict:
     return {
         **default_notebook_params,
-        **(override_notebook_param or {})
+        **(override_notebook_params or {})
     }
 
 
