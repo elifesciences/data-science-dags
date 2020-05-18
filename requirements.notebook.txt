@@ -1,3 +1,4 @@
+bigquery-schema-generator==0.5.1
 boto3==1.12.31
 ipywidgets==7.5.1
 joblib==0.15.0
