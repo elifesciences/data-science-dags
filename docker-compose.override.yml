@@ -31,6 +31,7 @@ services:
     environment:
       - NB_UID=${USER_ID}
       - NB_GID=${GROUP_ID}
+      - GOOGLE_CLOUD_PROJECT=${DATA_SCIENCE_GOOGLE_CLOUD_PROJECT}
     volumes:
       - .:/home/jovyan/data-science-dags
       - ~/.config/gcloud:/home/jovyan/.config/gcloud
