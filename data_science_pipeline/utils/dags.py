@@ -52,10 +52,8 @@ DEFAULT_ARGS = {
 }
 
 
-def create_dag(
-        dag_id: str) -> DAG:
-    return DAG(
-        dag_id=dag_id,
+def get_default_dag_args() -> dict:
+    return dict(
         schedule_interval=os.getenv(
             DATA_SCIENCE_SCHEDULE_INTERVAL_ENV_NAME,
             "@daily"
@@ -64,6 +62,18 @@ def create_dag(
         dagrun_timeout=timedelta(minutes=60),
         max_active_runs=20,
         concurrency=30
+    )
+
+
+def create_dag(
+        dag_id: str,
+        **kwargs) -> DAG:
+    return DAG(
+        dag_id=dag_id,
+        **{
+            **get_default_dag_args(),
+            **kwargs
+        }
     )
 
 
