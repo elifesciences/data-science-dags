@@ -1,4 +1,3 @@
-import logging
 import os
 
 # Note: DagBag.process_file skips files without "airflow" or "DAG" in them
@@ -7,9 +6,6 @@ from data_science_pipeline.utils.dags import (
     create_dag,
     create_run_notebook_operator
 )
-
-
-LOGGER = logging.getLogger(__name__)
 
 
 DEFAULT_PEERSCOUT_RECOMMEND_SCHEDULE = '@hourly'

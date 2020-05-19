@@ -1,14 +1,9 @@
-import logging
-
 # Note: DagBag.process_file skips files without "airflow" or "DAG" in them
 
 from data_science_pipeline.utils.dags import (
     create_dag,
     create_run_notebook_operator
 )
-
-
-LOGGER = logging.getLogger(__name__)
 
 
 DAG_ID = "Sample_Data_Science_Data_Pipeline"
