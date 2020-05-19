@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 import sys
 from datetime import timedelta
 from pathlib import Path
@@ -155,11 +156,23 @@ def run_notebook(
         )
 
 
+def get_default_notebook_task_id(notebook_filename: str) -> str:
+    return (
+        re.sub(
+            r'[^a-z0-9]',
+            '_',
+            os.path.splitext(os.path.basename(notebook_filename))[0].lower()
+        )
+    )
+
+
 def create_run_notebook_operator(
         notebook_filename: str,
-        task_id: str = "Run_Jupyter_Notebook",
+        task_id: str = None,
         notebook_params: dict = None,
         **kwargs):
+    if not task_id:
+        task_id = get_default_notebook_task_id(notebook_filename)
     return PythonOperator(
         task_id=task_id,
         python_callable=run_notebook,
