@@ -15,7 +15,7 @@ DATA_SCIENCE_PEERSCOUT_RECOMMEND_SCHEDULE_INTERVAL_ENV_NAME = (
 )
 
 
-DAG_ID = "PeerScout_Recommend_Senior_Editors"
+DAG_ID = "Data_Science_PeerScout_Recommend_Senior_Editors"
 
 
 def get_schedule_interval() -> str:

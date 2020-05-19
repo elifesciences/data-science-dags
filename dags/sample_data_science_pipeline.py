@@ -6,7 +6,7 @@ from data_science_pipeline.utils.dags import (
 )
 
 
-DAG_ID = "Sample_Data_Science_Data_Pipeline"
+DAG_ID = "Data_Science_Sample_Data_Science_Data_Pipeline"
 
 
 # Note: need to save dag to a variable

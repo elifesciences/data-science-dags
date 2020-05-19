@@ -6,7 +6,7 @@ from data_science_pipeline.utils.dags import (
 )
 
 
-DAG_ID = "PeerScout_Build_Senior_Editor_Profiles"
+DAG_ID = "Data_Science_PeerScout_Build_Senior_Editor_Profiles"
 
 
 # Note: need to save dag to a variable
