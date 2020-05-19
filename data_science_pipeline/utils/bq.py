@@ -116,11 +116,6 @@ def to_gbq(
         )
 
 
-def get_select_all_from_query(view_name: str, project: str,
-                              dataset: str) -> str:
-    return f"SELECT * FROM `{project}.{dataset}.{view_name}`"
-
-
 def run_query_and_save_to_table(  # pylint: disable=too-many-arguments
         client: Client,
         query: str,
