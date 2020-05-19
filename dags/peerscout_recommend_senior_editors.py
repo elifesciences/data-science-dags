@@ -29,6 +29,13 @@ def get_schedule_interval() -> str:
 with create_dag(
         dag_id=DAG_ID,
         schedule_interval=get_schedule_interval()) as dag:
-    create_run_notebook_operator(
-        notebook_filename='peerscout/peerscout-recommend-senior-editors.ipynb'
+    _ = (
+        create_run_notebook_operator(
+            notebook_filename='peerscout/peerscout-recommend-senior-editors.ipynb'
+        )
+        >> create_run_notebook_operator(
+            notebook_filename=(
+                'peerscout/peerscout-update-manuscript-version-matching-editor-profile.ipynb'
+            )
+        )
     )

@@ -1,5 +1,7 @@
 import logging
 import os
+import time
+from itertools import islice
 from tempfile import TemporaryDirectory
 from typing import List
 
@@ -7,14 +9,22 @@ import pandas as pd
 
 from bigquery_schema_generator.generate_schema import SchemaGenerator
 
+from google.cloud import bigquery
 from google.cloud.bigquery.schema import SchemaField
 from google.cloud.bigquery import (
-    LoadJobConfig, Client,
-    SourceFormat, WriteDisposition
+    LoadJobConfig,
+    QueryJobConfig,
+    Client,
+    SourceFormat,
+    WriteDisposition
 )
 
 
 LOGGER = logging.getLogger(__name__)
+
+
+def get_client(project_id: str) -> Client:
+    return Client(project=project_id)
 
 
 def generate_schema_from_file(full_temp_file_location):
@@ -49,7 +59,7 @@ def load_file_into_bq(
     if os.path.isfile(filename) and os.path.getsize(filename) == 0:
         LOGGER.info("File %s is empty.", filename)
         return
-    client = Client(project=project_id)
+    client = get_client(project_id=project_id)
     dataset_ref = client.dataset(dataset_name)
     table_ref = dataset_ref.table(table_name)
     job_config = LoadJobConfig()
@@ -104,3 +114,42 @@ def to_gbq(
             schema=schema,
             project_id=project_id
         )
+
+
+def get_select_all_from_query(view_name: str, project: str,
+                              dataset: str) -> str:
+    return f"SELECT * FROM `{project}.{dataset}.{view_name}`"
+
+
+def run_query_and_save_to_table(  # pylint: disable=too-many-arguments
+        client: Client,
+        query: str,
+        destination_dataset: str,
+        destination_table_name: str):
+    LOGGER.debug(
+        "running query and saving to, destination=%s.%s, query=%r",
+        destination_dataset, destination_table_name, query
+    )
+
+    start = time.perf_counter()
+    dataset_ref = client.dataset(destination_dataset)
+    destination_table_ref = dataset_ref.table(destination_table_name)
+
+    job_config = QueryJobConfig()
+    job_config.destination = destination_table_ref
+    job_config.write_disposition = WriteDisposition.WRITE_TRUNCATE
+
+    query_job = client.query(query, job_config=job_config)
+    # getting the result will make sure that the query ran successfully
+    result: bigquery.table.RowIterator = query_job.result()
+    duration = time.perf_counter() - start
+    LOGGER.info(
+        'ran query and saved to: %s.%s, total rows: %s, took: %.3fs',
+        destination_dataset,
+        destination_table_name,
+        result.total_rows,
+        duration
+    )
+    if LOGGER.isEnabledFor(logging.DEBUG):
+        sample_result = list(islice(result, 3))
+        LOGGER.debug("sample_result: %s", sample_result)
