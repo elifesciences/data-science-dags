@@ -21,7 +21,7 @@ services:
 
   dask-worker:
     environment:
-      - DEPLOYMENT_ENV=${DATA_SCIENCE_DAGS_DEV_DATASET}
+      - DEPLOYMENT_ENV=dev
     volumes: *airflow-volumes
 
   test-client:
