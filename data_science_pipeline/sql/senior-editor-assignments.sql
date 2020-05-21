@@ -1,11 +1,11 @@
 WITH t_related_person_id AS (
-  SELECT Version_ID AS version_id, 'Senior Editor' AS relationship_type, Person.Person_ID
+  SELECT DISTINCT Version_ID AS version_id, 'Senior Editor' AS relationship_type, Person.Person_ID
   FROM `{project}.{dataset}.mv_Editorial_All_Manuscript_Version` AS Version
   JOIN UNNEST(Version.Senior_Editors) AS Person
 
   UNION ALL
 
-  SELECT Version_ID AS version_id, 'Reviewing Editor' AS relationship_type, Person.Person_ID
+  SELECT DISTINCT Version_ID AS version_id, 'Reviewing Editor' AS relationship_type, Person.Person_ID
   FROM `{project}.{dataset}.mv_Editorial_All_Manuscript_Version` AS Version
   JOIN UNNEST(Version.Reviewing_Editors) AS Person
 )
