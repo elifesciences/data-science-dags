@@ -3,6 +3,11 @@ import logging
 import numpy as np
 import pandas as pd
 
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+from data_science_pipeline.utils.misc import identity_fn
+
 from data_science_pipeline.peerscout.models import (
     WeightedKeywordModel
 )
@@ -17,6 +22,7 @@ NAME_3 = 'name 3'
 
 KEYWORD_1 = 'keyword1'
 KEYWORD_2 = 'keyword2'
+KEYWORD_3 = 'keyword3'
 
 
 class TestWeightedKeywordModel:
@@ -215,3 +221,39 @@ class TestWeightedKeywordModel:
             'score': 0.2,
             'matching_keywords': [(0.2, KEYWORD_2)]
         }]]
+
+    def test_should_match_cosine_similarity_when_using_tf_idf(self):
+        vectorizer = TfidfVectorizer(
+            tokenizer=identity_fn,
+            lowercase=False
+        )
+        choices_tf_idf = vectorizer.fit_transform([
+            [KEYWORD_1, KEYWORD_1, KEYWORD_2],
+            [KEYWORD_2, KEYWORD_3, KEYWORD_3]
+        ]).todense()
+        LOGGER.debug('choices_tf_idf: %s', choices_tf_idf)
+        query_keywords_list = [
+            [KEYWORD_1, KEYWORD_2],
+            [KEYWORD_2, KEYWORD_3],
+            [KEYWORD_3]
+        ]
+        query_tf_idf = vectorizer.transform(query_keywords_list).todense()
+        LOGGER.debug('query_tf_idf: %s', query_tf_idf)
+        _prev_norm = vectorizer.norm
+        vectorizer.norm = False
+        vectorizer.norm = _prev_norm
+        model = WeightedKeywordModel.from_tf_matrix(
+            choices_tf_idf,
+            vectorizer=vectorizer
+        )
+        result = model.predict_ranking(query_keywords_list)
+        similarity = cosine_similarity(
+            query_tf_idf,
+            choices_tf_idf
+        )
+        LOGGER.debug('similarity: %s', similarity)
+        LOGGER.debug('proba_matrix: %s', result.proba_matrix)
+        np.testing.assert_allclose(
+            np.asmatrix(result.proba_matrix),
+            np.asmatrix(similarity)
+        )
