@@ -39,6 +39,13 @@ DATA_SCIENCE_OUTPUT_DATASET_ENV_NAME = (
 DEFAULT_OUTPUT_TABLE_PREFIX = 'data_science_'
 
 
+DATA_SCIENCE_STATE_PATH_ENV_NAME = (
+    "DATA_SCIENCE_STATE_PATH"
+)
+DEFAULT_STATE_PATH_FORMAT = (
+    "s3://{env}-elife-data-pipeline/airflow-config/data-science/state"
+)
+
 DATA_SCIENCE_SCHEDULE_INTERVAL_ENV_NAME = (
     "DATA_SCIENCE_SCHEDULE_INTERVAL"
 )
@@ -100,13 +107,21 @@ def get_default_output_dataset(deployment_env: str) -> str:
     )
 
 
+def get_default_state_path(deployment_env: str) -> str:
+    return os.getenv(
+        DATA_SCIENCE_STATE_PATH_ENV_NAME,
+        DEFAULT_STATE_PATH_FORMAT.format(env=deployment_env)
+    )
+
+
 def get_default_notebook_params() -> dict:
     deployment_env = get_deployment_env()
     return {
         'deployment_env': deployment_env,
         'source_dataset': get_default_source_dataset(deployment_env),
         'output_dataset': get_default_output_dataset(deployment_env),
-        'output_table_prefix': DEFAULT_OUTPUT_TABLE_PREFIX
+        'output_table_prefix': DEFAULT_OUTPUT_TABLE_PREFIX,
+        'state_path': get_default_state_path(deployment_env)
     }
 
 
