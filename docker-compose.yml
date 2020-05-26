@@ -101,7 +101,8 @@ services:
     hostname: dask-worker
     entrypoint: []
     command: >
-      bash -c "sudo install -D /tmp/credentials.json -m 644 -t  /usr/local/airflow/.config/gcloud
+      bash -c "sudo install -D /tmp/credentials.json -m 644 -t /usr/local/airflow/.config/gcloud
+      && sudo install -D /tmp/.aws-credentials -m 644 --no-target-directory /usr/local/airflow/.aws/credentials
       && ./worker.sh tcp://dask-scheduler:8786"
 
 volumes:
