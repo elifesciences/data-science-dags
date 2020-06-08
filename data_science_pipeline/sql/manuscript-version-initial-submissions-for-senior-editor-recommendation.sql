@@ -24,5 +24,8 @@ FROM `{project}.{dataset}.mv_manuscript_version` AS version
 JOIN t_last_manuscript_version_abstract_keywords AS manuscript_version_abstract_keywords
   ON manuscript_version_abstract_keywords.version_id = version.version_id
 WHERE version.overall_stage = 'Initial Submission'
-  AND ARRAY_LENGTH(version.senior_editors) = 0
+  AND (
+    ARRAY_LENGTH(version.senior_editors) = 0
+    OR TIMESTAMP_DIFF(CURRENT_TIMESTAMP, version.created_timestamp, DAY) < 30
+  )
   AND TIMESTAMP_DIFF(CURRENT_TIMESTAMP, version.created_timestamp, DAY) < 365
