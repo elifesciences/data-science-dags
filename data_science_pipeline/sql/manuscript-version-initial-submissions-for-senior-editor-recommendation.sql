@@ -1,3 +1,8 @@
+-- Main features:
+--    - Returns Initial Submissions for the purpose of Senior Editor recommendation
+--    - No older than a year
+--    - Not have Senior Editor assigned for more than 30 days
+
 WITH t_manuscript_version_abstract_keywords AS (
   SELECT
     manuscript_abstract_keywords.manuscript_id AS manuscript_id,
@@ -26,7 +31,11 @@ JOIN t_last_manuscript_version_abstract_keywords AS manuscript_version_abstract_
 WHERE version.overall_stage = 'Initial Submission'
   AND (
     ARRAY_LENGTH(version.senior_editors) = 0
-    OR TIMESTAMP_DIFF(CURRENT_TIMESTAMP, version.created_timestamp, DAY) < 30
+    OR TIMESTAMP_DIFF(
+      CURRENT_TIMESTAMP,
+      (SELECT MAX(last_assigned_timestamp) FROM UNNEST(version.senior_editors)),
+      DAY
+    ) < 30
   )
   AND TIMESTAMP_DIFF(CURRENT_TIMESTAMP, version.created_timestamp, DAY) < 365
   AND NOT is_withdrawn
