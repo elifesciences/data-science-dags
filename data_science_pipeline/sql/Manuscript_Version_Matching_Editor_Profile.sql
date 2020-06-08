@@ -37,6 +37,11 @@ t_recommendations AS (
       ', '
     ) AS Matching_Keywords_CSV,
     editor_recommendation.score AS Matching_Score,
+    (
+      MAX(editor_recommendation.score) OVER(
+        PARTITION BY manuscript_version.version_id
+      ) IS NOT NULL
+    ) AS Has_Recommendation,
     manuscript_version.stages[SAFE_OFFSET(0)].stage_name AS Last_Stage_Name,
     (
       SELECT stage_timestamp
@@ -64,7 +69,7 @@ SELECT
       Long_Manuscript_Identifier,
       IF(Senior_Editor_Assigned_Timestamp IS NOT NULL, ' (SE assigned)', ''),
       IF(
-        MAX(Matching_Score) OVER(PARTITION BY Version_ID) IS NULL,
+        NOT Has_Recommendation,
         ' (no recommendation yet)',
         ''
       ),
