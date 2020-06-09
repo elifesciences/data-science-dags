@@ -2,7 +2,7 @@ bigquery-schema-generator==1.0
 boto3==1.13.25
 ipywidgets==7.5.1
 joblib==0.15.1
-numpy==1.18.4
+numpy==1.18.5
 pandas==1.0.4
 pandas-gbq==0.13.2
 tqdm==4.46.0
