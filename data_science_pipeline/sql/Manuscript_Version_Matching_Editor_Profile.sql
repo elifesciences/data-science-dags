@@ -5,13 +5,15 @@ WITH t_initial_submission_version_id_including_null AS (
   UNION ALL
 
   SELECT version_id
-  FROM `{project}.{dataset}.mv_manuscript_version` AS manuscript_version
+  FROM `{project}.{dataset}.v_manuscript_version_last_editor_assigned_timestamp` AS manuscript_version
   WHERE manuscript_version.overall_stage = 'Initial Submission'
   AND TIMESTAMP_DIFF(CURRENT_TIMESTAMP(), manuscript_version.stages[SAFE_OFFSET(0)].stage_timestamp, DAY) <= 90
   AND (
     TIMESTAMP_DIFF(CURRENT_TIMESTAMP(), manuscript_version.stages[SAFE_OFFSET(0)].stage_timestamp, DAY) <= 30
     OR NOT EXISTS (SELECT 1 FROM UNNEST(manuscript_version.stages) WHERE stage_name = 'Senior Editor Assigned')
   )
+  AND NOT is_withdrawn
+  AND NOT is_deleted
 ),
 
 t_recommendations AS (
@@ -35,6 +37,11 @@ t_recommendations AS (
       ', '
     ) AS Matching_Keywords_CSV,
     editor_recommendation.score AS Matching_Score,
+    (
+      MAX(editor_recommendation.score) OVER(
+        PARTITION BY manuscript_version.version_id
+      ) IS NOT NULL
+    ) AS Has_Recommendation,
     manuscript_version.stages[SAFE_OFFSET(0)].stage_name AS Last_Stage_Name,
     (
       SELECT stage_timestamp
@@ -62,7 +69,7 @@ SELECT
       Long_Manuscript_Identifier,
       IF(Senior_Editor_Assigned_Timestamp IS NOT NULL, ' (SE assigned)', ''),
       IF(
-        MAX(Matching_Score) OVER(PARTITION BY Version_ID) IS NULL,
+        NOT Has_Recommendation,
         ' (no recommendation yet)',
         ''
       ),
