@@ -6,7 +6,7 @@ numpy==1.18.5
 pandas==1.0.4
 pandas-gbq==0.13.2
 tqdm==4.46.1
-google-cloud-bigquery==1.24.0
+google-cloud-bigquery==1.25.0
 s3path==0.1.101
 scikit-learn==0.23.1
 six==1.15.0
