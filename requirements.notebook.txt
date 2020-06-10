@@ -1,5 +1,5 @@
 bigquery-schema-generator==1.0
-boto3==1.13.25
+boto3==1.13.26
 ipywidgets==7.5.1
 joblib==0.15.1
 numpy==1.18.5
