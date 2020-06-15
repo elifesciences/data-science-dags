@@ -11,6 +11,7 @@ import pandas as pd
 
 from bigquery_schema_generator.generate_schema import SchemaGenerator
 
+import google.cloud.exceptions
 from google.cloud import bigquery
 from google.cloud.bigquery.schema import SchemaField
 from google.cloud.bigquery import (
@@ -23,6 +24,15 @@ from google.cloud.bigquery import (
 
 
 LOGGER = logging.getLogger(__name__)
+
+
+def is_bq_not_found_exception(exception: BaseException) -> bool:
+    if not exception:
+        return False
+    return (
+        isinstance(exception, google.cloud.exceptions.NotFound)
+        or is_bq_not_found_exception(exception.__context__)
+    )
 
 
 def get_client(project_id: str) -> Client:
@@ -96,6 +106,7 @@ def load_file_into_bq_with_auto_schema(jsonl_file: str, **kwargs):
     load_file_into_bq(
         jsonl_file,
         schema=schema,
+        auto_detect_schema=False,
         **kwargs
     )
 
