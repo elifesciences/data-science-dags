@@ -3,7 +3,6 @@ import urllib3
 import requests
 
 
-
 def requests_retry_session(
         retries=10,
         backoff_factor=0.3,
