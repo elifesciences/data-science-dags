@@ -6,6 +6,7 @@ import pandas as pd
 
 from data_science_pipeline.utils.io import (
     get_path,
+    read_bytes,
     write_bytes
 )
 
@@ -29,10 +30,17 @@ def get_filepath_csv_separator(filepath: str):
 def read_csv(
         filepath: str,
         sep: str = None,
+        compression: str = 'infer',
+        encoding: str = 'utf-8',
         **kwargs) -> pd.DataFrame:
     if sep is None:
         sep = get_filepath_csv_separator(filepath)
-    return pd.read_csv(filepath, sep=sep, **kwargs)
+    if compression == 'infer' and filepath.endswith('.gz'):
+        compression = 'gzip'
+    data = read_bytes(filepath)
+    if compression == 'gzip':
+        data = gzip.decompress(data)
+    return pd.read_csv(StringIO(data.decode(encoding=encoding)), sep=sep, **kwargs)
 
 
 def to_csv(
