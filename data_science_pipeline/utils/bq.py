@@ -1,9 +1,11 @@
 import logging
+import json
 import os
 import time
+from contextlib import contextmanager
 from itertools import islice
 from tempfile import TemporaryDirectory
-from typing import List
+from typing import Iterable, List, ContextManager
 
 import pandas as pd
 
@@ -48,14 +50,18 @@ def get_schemafield_list_from_json_list(
 
 def load_file_into_bq(
         filename: str,
-        dataset_name: str,
-        table_name: str,
+        dataset_name: str = None,
+        table_name: str = None,
         source_format=SourceFormat.NEWLINE_DELIMITED_JSON,
         write_mode=WriteDisposition.WRITE_APPEND,
         auto_detect_schema=True,
         schema: List[SchemaField] = None,
         rows_to_skip=0,
         project_id: str = None):
+    if not table_name:
+        raise ValueError('table_name is required')
+    if dataset_name is None:
+        dataset_name, table_name = table_name.split('.', maxsplit=1)
     if os.path.isfile(filename) and os.path.getsize(filename) == 0:
         LOGGER.info("File %s is empty.", filename)
         return
@@ -84,6 +90,68 @@ def load_file_into_bq(
         )
 
 
+def load_file_into_bq_with_auto_schema(jsonl_file: str, **kwargs):
+    schema = get_schemafield_list_from_json_list(generate_schema_from_file(jsonl_file))
+    LOGGER.info('schema: %s', schema)
+    load_file_into_bq(
+        jsonl_file,
+        schema=schema,
+        **kwargs
+    )
+
+
+def load_file_and_replace_bq_table_with_auto_schema(*args, **kwargs):
+    load_file_into_bq_with_auto_schema(
+        *args,
+        write_mode=WriteDisposition.WRITE_TRUNCATE,
+        **kwargs
+    )
+
+
+def load_file_and_append_to_bq_table_with_auto_schema(*args, **kwargs):
+    load_file_into_bq_with_auto_schema(
+        *args,
+        write_mode=WriteDisposition.WRITE_APPEND,
+        **kwargs
+    )
+
+
+def write_jsonl_to_file(
+        json_list: Iterable[dict],
+        full_temp_file_location: str,
+        write_mode: str = 'w'):
+    with open(full_temp_file_location, write_mode) as write_file:
+        for record in json_list:
+            write_file.write(json.dumps(record))
+            write_file.write("\n")
+        write_file.flush()
+
+
+@contextmanager
+def json_list_as_jsonl_file(json_list: Iterable[dict]) -> ContextManager[str]:
+    with TemporaryDirectory() as temp_dir:
+        jsonl_file = os.path.join(temp_dir, 'data.jsonl')
+        write_jsonl_to_file(json_list, jsonl_file)
+        yield jsonl_file
+
+
+def load_json_list_into_bq_with_auto_schema(json_list: Iterable[dict], **kwargs):
+    with json_list_as_jsonl_file(json_list) as  jsonl_file:
+        load_file_into_bq(jsonl_file, **kwargs)
+
+
+def load_json_list_and_replace_bq_table_with_auto_schema(*args, **kwargs):
+    load_json_list_into_bq_with_auto_schema(
+        *args, write_mode=WriteDisposition.WRITE_TRUNCATE, **kwargs
+    )
+
+
+def load_json_list_and_append_to_bq_table_with_auto_schema(*args, **kwargs):
+    load_json_list_into_bq_with_auto_schema(
+        *args, write_mode=WriteDisposition.WRITE_APPEND, **kwargs
+    )
+
+
 def get_bq_write_disposition(if_exists: str) -> WriteDisposition:
     if if_exists == 'replace':
         return WriteDisposition.WRITE_TRUNCATE
@@ -104,14 +172,11 @@ def to_gbq(
     with TemporaryDirectory() as temp_dir:
         jsonl_file = os.path.join(temp_dir, 'data.jsonl')
         df.to_json(jsonl_file, orient='records', lines=True)
-        schema = get_schemafield_list_from_json_list(generate_schema_from_file(jsonl_file))
-        LOGGER.info('schema: %s', schema)
-        load_file_into_bq(
+        load_file_into_bq_with_auto_schema(
             jsonl_file,
             dataset_name=dataset_name,
             table_name=table_name,
             write_mode=get_bq_write_disposition(if_exists),
-            schema=schema,
             project_id=project_id
         )
 
