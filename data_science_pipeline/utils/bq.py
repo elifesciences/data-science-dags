@@ -102,7 +102,7 @@ def load_file_into_bq(
 
 def load_file_into_bq_with_auto_schema(jsonl_file: str, **kwargs):
     schema = get_schemafield_list_from_json_list(generate_schema_from_file(jsonl_file))
-    LOGGER.info('schema: %s', schema)
+    LOGGER.debug('schema: %s', schema)
     load_file_into_bq(
         jsonl_file,
         schema=schema,
@@ -148,7 +148,7 @@ def json_list_as_jsonl_file(json_list: Iterable[dict]) -> ContextManager[str]:
 
 def load_json_list_into_bq_with_auto_schema(json_list: Iterable[dict], **kwargs):
     with json_list_as_jsonl_file(json_list) as  jsonl_file:
-        load_file_into_bq(jsonl_file, **kwargs)
+        load_file_into_bq_with_auto_schema(jsonl_file, **kwargs)
 
 
 def load_json_list_and_replace_bq_table_with_auto_schema(*args, **kwargs):
