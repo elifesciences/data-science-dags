@@ -1,3 +1,4 @@
+import functools
 import gzip
 from io import StringIO
 
@@ -18,6 +19,24 @@ def isnull(value: any) -> bool:
     if not isinstance(value, (list, set, np.ndarray)) and pd.isnull(value):
         return True
     return False
+
+
+def wrap_fn_or_none(fn: callable) -> callable:
+    @functools.wraps(fn)
+    def wrapper(*args):
+        for arg in args:
+            if isnull(arg):
+                return None
+        return fn(*args)
+    return wrapper
+
+
+def apply_skip_null(
+        ser: pd.Series,
+        func: callable,
+        *args,
+        **kwargs) -> pd.Series:
+    return ser.apply(wrap_fn_or_none(func), *args, **kwargs)
 
 
 def get_filepath_csv_separator(filepath: str):
