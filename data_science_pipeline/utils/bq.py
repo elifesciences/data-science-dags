@@ -22,6 +22,8 @@ from google.cloud.bigquery import (
     WriteDisposition
 )
 
+from data_science_pipeline.utils.io import open_with_auto_compression
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -40,7 +42,7 @@ def get_client(project_id: str) -> Client:
 
 
 def generate_schema_from_file(full_temp_file_location):
-    with open(full_temp_file_location) as file_reader:
+    with open_with_auto_compression(full_temp_file_location, 'r') as file_reader:
         generator = SchemaGenerator(
             input_format="json",
             quoted_values_are_strings=True
@@ -85,7 +87,8 @@ def load_file_into_bq(
     job_config.schema = schema
     if source_format is SourceFormat.CSV:
         job_config.skip_leading_rows = rows_to_skip
-    with open(filename, "rb") as source_file:
+    LOGGER.info('loading from %s', filename)
+    with open_with_auto_compression(filename, "rb") as source_file:
         job = client.load_table_from_file(
             source_file, destination=table_ref, job_config=job_config
         )
@@ -131,7 +134,7 @@ def write_jsonl_to_file(
         json_list: Iterable[dict],
         full_temp_file_location: str,
         write_mode: str = 'w'):
-    with open(full_temp_file_location, write_mode) as write_file:
+    with open_with_auto_compression(full_temp_file_location, write_mode) as write_file:
         for record in json_list:
             write_file.write(json.dumps(record))
             write_file.write("\n")
@@ -139,9 +142,13 @@ def write_jsonl_to_file(
 
 
 @contextmanager
-def json_list_as_jsonl_file(json_list: Iterable[dict]) -> ContextManager[str]:
+def json_list_as_jsonl_file(
+        json_list: Iterable[dict],
+        gzip_enabled: bool = True) -> ContextManager[str]:
     with TemporaryDirectory() as temp_dir:
         jsonl_file = os.path.join(temp_dir, 'data.jsonl')
+        if gzip_enabled:
+            jsonl_file += '.gz'
         write_jsonl_to_file(json_list, jsonl_file)
         yield jsonl_file
 
