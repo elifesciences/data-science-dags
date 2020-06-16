@@ -180,16 +180,25 @@ def get_bq_write_disposition(if_exists: str) -> WriteDisposition:
     raise ValueError('unsupported if_exists: %s' % if_exists)
 
 
+def to_jsonl_without_null(df: pd.DataFrame, jsonl_file: str):
+    (
+        df
+        .apply(lambda x: pd.Series(x.dropna()), axis=1)
+        .to_json(jsonl_file, orient='records', lines=True)
+    )
+
+
 def to_gbq(
         df: pd.DataFrame,
         destination_table: str,
         if_exists: str = 'fail',
-        project_id: str = None):
+        project_id: str = None,
+        temp_dir: str = None):
     """Similar to DataFrame.to_gpq but better handles schema detection of nested fields"""
     dataset_name, table_name = destination_table.split('.', maxsplit=1)
-    with TemporaryDirectory() as temp_dir:
-        jsonl_file = os.path.join(temp_dir, 'data.jsonl')
-        df.to_json(jsonl_file, orient='records', lines=True)
+    with TemporaryDirectory() as _temp_dir:
+        jsonl_file = os.path.join(temp_dir or _temp_dir, 'data.jsonl')
+        to_jsonl_without_null(df, jsonl_file)
         load_file_into_bq_with_auto_schema(
             jsonl_file,
             dataset_name=dataset_name,
