@@ -55,8 +55,9 @@ def get_manuscript_summary_from_json_response(json_response: dict) -> List[str]:
 
 
 class EuropePMCApi:
-    def __init__(self, session: requests.Session):
+    def __init__(self, session: requests.Session, params: dict = None):
         self.session = session
+        self.params = params or {}
 
     def query(
             self,
@@ -67,6 +68,7 @@ class EuropePMCApi:
         response = requests.post(
             'https://www.ebi.ac.uk/europepmc/webservices/rest/searchPOST',
             data={
+                **self.params,
                 'query': query,
                 'format': output_format,
                 'resultType': result_type,
