@@ -1,6 +1,6 @@
 import logging
 from itertools import islice
-from typing import Iterable, List
+from typing import Callable, Iterable, List
 
 import requests
 
@@ -70,16 +70,67 @@ class EuropePMCApiResponsePage:
         self.json_response = json_response
 
     @property
+    def total_count(self) -> int:
+        return int(self.json_response.get('hitCount'))
+
+    @property
+    def current_cursor(self) -> str:
+        return self.json_response.get('request', {}).get('cursorMark')
+
+    @property
     def next_cursor(self) -> str:
         return self.json_response.get('nextCursorMark')
 
-    def get_next_cursor(self, current_cursor: str) -> str:
+    @property
+    def validated_next_cursor(self) -> str:
         next_cursor = self.next_cursor
-        return next_cursor if next_cursor != current_cursor else None
+        if next_cursor == self.current_cursor:
+            return None
+        return next_cursor
 
     @property
     def result_list(self) -> List[dict]:
         return self.json_response.get('resultList', {}).get('result', [])
+
+
+class EuropePMCApiResponsePageIterator:
+    def __init__(self, get_page_fn: Callable[[str], EuropePMCApiResponsePage]):
+        self.get_page_fn = get_page_fn
+        self.first_page = get_page_fn(EUROPEPMC_START_CURSOR)
+        self.total_count = self.first_page.total_count if self.first_page else 0
+        # Note: we are not always receiving exactly the same number of records
+        self.min_received_count = self.total_count * 0.9
+
+    def __iter__(self):
+        if not self.first_page:
+            return
+        yield self.first_page
+        current_cursor = self.first_page.validated_next_cursor
+        current_count = len(self.first_page.result_list)
+        while current_cursor:
+            response_page = self.get_page_fn(current_cursor)
+            if not response_page:
+                return
+            if response_page.current_cursor != current_cursor:
+                raise AssertionError(
+                    'expected current page cursor %s, but was: %s' % (
+                        current_cursor, response_page.current_cursor
+                    )
+                )
+            assert response_page.current_cursor == current_cursor
+            yield response_page
+            current_cursor = response_page.validated_next_cursor
+            current_count += len(response_page.result_list)
+        if current_count < self.min_received_count:
+            raise AssertionError(
+                ' '.join([
+                    'expected %d items, but only received %d items',
+                    '(last page current cursor: %s, last page next cursor: %s)'
+                ]) % (
+                    self.total_count, current_count,
+                    response_page.current_cursor, response_page.next_cursor
+                )
+            )
 
 
 class EuropePMCApi:
@@ -105,7 +156,7 @@ class EuropePMCApi:
             'format': output_format,
             'resultType': result_type,
             'pageSize': page_size,
-            'cursor': cursor
+            'cursorMark': cursor
         }
         try:
             response = requests.post(
@@ -123,16 +174,10 @@ class EuropePMCApi:
     def iter_query_pages(
             self,
             *args,
-            **kwargs) -> EuropePMCApiResponsePage:
-        current_cursor = EUROPEPMC_START_CURSOR
-        while True:
-            response_page = self.query_page(*args, cursor=current_cursor, **kwargs)
-            if not response_page:
-                return
-            yield response_page
-            current_cursor = response_page.get_next_cursor(current_cursor)
-            if not current_cursor:
-                return
+            **kwargs) -> EuropePMCApiResponsePageIterator:
+        return EuropePMCApiResponsePageIterator(
+            lambda cursor: self.query_page(*args, cursor=cursor, **kwargs)
+        )
 
     def iter_query_results(
             self,
