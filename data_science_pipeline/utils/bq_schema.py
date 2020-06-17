@@ -1,4 +1,4 @@
-# copied from:
+# mostly copied from:
 # https://github.com/elifesciences/data-hub-core-airflow-dags/blob/develop/data_pipeline/utils/data_store/bq_data_service.py
 
 import logging
@@ -7,6 +7,8 @@ from google.cloud import bigquery
 from google.cloud.bigquery.schema import SchemaField
 from google.cloud.exceptions import NotFound
 from bigquery_schema_generator.generate_schema import SchemaGenerator
+
+from data_science_pipeline.utils.io import open_with_auto_compression
 
 
 LOGGER = logging.getLogger(__name__)
@@ -162,7 +164,7 @@ def generate_schema_from_file(
         full_file_location: str,
         quoted_values_are_strings: str = True
 ):
-    with open(full_file_location) as file_reader:
+    with open_with_auto_compression(full_file_location, 'r') as file_reader:
         generator = SchemaGenerator(
             input_format="json",
             quoted_values_are_strings=quoted_values_are_strings
