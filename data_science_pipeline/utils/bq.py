@@ -197,7 +197,7 @@ def json_list_as_jsonl_file(
 
 
 def load_json_list_into_bq_with_auto_schema(json_list: Iterable[dict], **kwargs):
-    with json_list_as_jsonl_file(json_list) as  jsonl_file:
+    with json_list_as_jsonl_file(json_list) as jsonl_file:
         load_file_into_bq_with_auto_schema(jsonl_file, **kwargs)
 
 
