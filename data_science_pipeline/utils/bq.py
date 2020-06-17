@@ -5,11 +5,9 @@ import time
 from contextlib import contextmanager
 from itertools import islice
 from tempfile import TemporaryDirectory
-from typing import Iterable, List, ContextManager
+from typing import Iterable, List, ContextManager, Tuple
 
 import pandas as pd
-
-from bigquery_schema_generator.generate_schema import SchemaGenerator
 
 import google.cloud.exceptions
 from google.cloud import bigquery
@@ -23,6 +21,11 @@ from google.cloud.bigquery import (
 )
 
 from data_science_pipeline.utils.io import open_with_auto_compression
+from data_science_pipeline.utils.bq_schema import (
+    generate_schema_from_file,
+    get_schemafield_list_from_json_list,
+    create_or_extend_table_schema
+)
 
 
 LOGGER = logging.getLogger(__name__)
@@ -41,23 +44,14 @@ def get_client(project_id: str) -> Client:
     return Client(project=project_id)
 
 
-def generate_schema_from_file(full_temp_file_location):
-    with open_with_auto_compression(full_temp_file_location, 'r') as file_reader:
-        generator = SchemaGenerator(
-            input_format="json",
-            quoted_values_are_strings=True
-        )
-        schema_map, _ = generator.deduce_schema(
-            file_reader
-        )
-        schema = generator.flatten_schema(schema_map)
-        return schema
-
-
-def get_schemafield_list_from_json_list(
-        json_schema: List[dict]) -> List[SchemaField]:
-    schema = [SchemaField.from_api_repr(x) for x in json_schema]
-    return schema
+def get_validated_dataset_name_table_name(
+        dataset_name: str,
+        table_name: str) -> Tuple[str, str]:
+    if not table_name:
+        raise ValueError('table_name is required')
+    if dataset_name is None:
+        dataset_name, table_name = table_name.split('.', maxsplit=1)
+    return dataset_name, table_name
 
 
 def load_file_into_bq(
@@ -70,10 +64,9 @@ def load_file_into_bq(
         schema: List[SchemaField] = None,
         rows_to_skip=0,
         project_id: str = None):
-    if not table_name:
-        raise ValueError('table_name is required')
-    if dataset_name is None:
-        dataset_name, table_name = table_name.split('.', maxsplit=1)
+    dataset_name, table_name = get_validated_dataset_name_table_name(
+        dataset_name, table_name
+    )
     if os.path.isfile(filename) and os.path.getsize(filename) == 0:
         LOGGER.info("File %s is empty.", filename)
         return
@@ -103,11 +96,43 @@ def load_file_into_bq(
         )
 
 
-def load_file_into_bq_with_auto_schema(jsonl_file: str, **kwargs):
+def load_file_into_bq_with_auto_schema(
+        jsonl_file: str,
+        dataset_name: str = None,
+        table_name: str = None,
+        write_mode: str = WriteDisposition.WRITE_APPEND,
+        project_id: str = None,
+        **kwargs):
+    if write_mode == WriteDisposition.WRITE_APPEND:
+        dataset_name, table_name = get_validated_dataset_name_table_name(
+            dataset_name, table_name
+        )
+        create_or_extend_table_schema(
+            gcp_project=project_id,
+            dataset_name=dataset_name,
+            table_name=table_name,
+            full_file_location=jsonl_file,
+            quoted_values_are_strings=True
+        )
+        load_file_into_bq(
+            jsonl_file,
+            project_id=project_id,
+            dataset_name=dataset_name,
+            table_name=table_name,
+            write_mode=write_mode,
+            schema=None,
+            auto_detect_schema=False,
+            **kwargs
+        )
+        return
     schema = get_schemafield_list_from_json_list(generate_schema_from_file(jsonl_file))
     LOGGER.debug('schema: %s', schema)
     load_file_into_bq(
         jsonl_file,
+        project_id=project_id,
+        dataset_name=dataset_name,
+        table_name=table_name,
+        write_mode=write_mode,
         schema=schema,
         auto_detect_schema=False,
         **kwargs
@@ -130,6 +155,25 @@ def load_file_and_append_to_bq_table_with_auto_schema(*args, **kwargs):
     )
 
 
+# copied from:
+# https://github.com/elifesciences/data-hub-ejp-xml-pipeline/blob/develop/ejp_xml_pipeline/transform_json.py
+def remove_key_with_null_value(record):
+    if isinstance(record, dict):
+        for key in list(record):
+            val = record.get(key)
+            if not val and not isinstance(val, bool):
+                record.pop(key, None)
+            elif isinstance(val, (dict, list)):
+                remove_key_with_null_value(val)
+
+    elif isinstance(record, list):
+        for val in record:
+            if isinstance(val, (dict, list)):
+                remove_key_with_null_value(val)
+
+    return record
+
+
 def write_jsonl_to_file(
         json_list: Iterable[dict],
         full_temp_file_location: str,
@@ -138,7 +182,6 @@ def write_jsonl_to_file(
         for record in json_list:
             write_file.write(json.dumps(record))
             write_file.write("\n")
-        write_file.flush()
 
 
 @contextmanager
@@ -181,10 +224,11 @@ def get_bq_write_disposition(if_exists: str) -> WriteDisposition:
 
 
 def to_jsonl_without_null(df: pd.DataFrame, jsonl_file: str):
-    (
-        df
-        .apply(lambda x: pd.Series(x.dropna()), axis=1)
-        .to_json(jsonl_file, orient='records', lines=True)
+    write_jsonl_to_file(
+        remove_key_with_null_value(
+            df.to_dict(orient='records')
+        ),
+        jsonl_file
     )
 
 
