@@ -1,7 +1,13 @@
+import logging
 import re
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import urlparse, parse_qs, urlencode, urljoin
+from typing import Iterable, List
 
 import requests
+from bs4 import BeautifulSoup
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 NCBI_DOMAIN_NAME = 'ncbi.nlm.nih.gov'
@@ -82,3 +88,97 @@ def parse_term_query(term_query: str) -> dict:
         else:
             result.setdefault('include', {}).setdefault(value_type, []).append(value)
     return result
+
+
+def combined_page_url_href(base_url: str, page_href) -> str:
+    # Note: the actual next page link seem to be loosing the sorting
+    #   we will keep all query parameters from the base url except the page
+    page_list = parse_qs(urlparse(page_href).query).get('page')
+    page = page_list[0] if page_list else '1'
+    return urljoin(
+        base_url,
+        '?' + urlencode({
+            **parse_qs(urlparse(base_url).query),
+            'page': page
+        }, doseq=True)
+    )
+
+
+class PubmedBibliographyNextPageLink:
+    def __init__(self, next_page_soup: BeautifulSoup):
+        self.next_page_soup = next_page_soup
+
+    @property
+    def href(self) -> str:
+        if not self.next_page_soup:
+            return None
+        return self.next_page_soup['href']
+
+    def get_href(self, base_url: str) -> str:
+        if not self.next_page_soup:
+            return None
+        return combined_page_url_href(base_url, self.href)
+
+
+class PubmedBibliographyPage:
+    def __init__(self, html_content: str):
+        self.html_content = html_content
+        self.page_soup = BeautifulSoup(html_content, features='lxml')
+
+    def parse_pmid_text(self, pmid_text: str) -> str:
+        LOGGER.debug('pmid_text: %s', pmid_text)
+        m = re.match(r'.*\b(\d+)\b.*', str(pmid_text), re.DOTALL)
+        if m:
+            LOGGER.debug('m.groups: %s', m.groups())
+            return m.group(1)
+        LOGGER.debug('no match')
+        return None
+
+    @property
+    def pmids(self) -> List[str]:
+        citations_soup = self.page_soup.find('div', class_='citations')
+        pmid_soups = citations_soup.find_all(class_='pmid')
+        return [self.parse_pmid_text(e.text) for e in pmid_soups]
+
+    @property
+    def next_page(self) -> PubmedBibliographyNextPageLink:
+        return PubmedBibliographyNextPageLink(
+            self.page_soup.select_one('#pager .nextPage.enabled')
+        )
+
+    @property
+    def next_page_href(self) -> bool:
+        return self.next_page.href
+
+    def get_next_page_href(self, base_url: str) -> str:
+        return self.next_page.get_href(base_url)
+
+
+class PubmedBibliographyScraper:
+    def __init__(self, session: requests.Session):
+        self.session = session
+
+    def get_html(self, url: str) -> str:
+        response = self.session.get(url)
+        response.raise_for_status()
+        response_text = response.text
+        LOGGER.info('retrieved html from: %s (%d chars)', url, len(response_text))
+        return response_text
+
+    def iter_pages(self, url: str) -> PubmedBibliographyPage:
+        page = PubmedBibliographyPage(self.get_html(url))
+        yield page
+        previous_url = url
+        next_page_url = page.get_next_page_href(url)
+        while next_page_url and next_page_url != previous_url:
+            page = PubmedBibliographyPage(self.get_html(next_page_url))
+            yield page
+            previous_url = next_page_url
+            next_page_url = page.get_next_page_href(url)
+
+    def iter_pmids(self, url: str) -> Iterable[str]:
+        for page in self.iter_pages(url):
+            yield from page.pmids
+
+    def get_pmids(self, url: str) -> List[str]:
+        return list(self.iter_pmids(url))

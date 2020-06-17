@@ -4,8 +4,14 @@ from data_science_pipeline.utils.pubmed import (
     is_ncbi_bibliography_url,
     is_ncbi_search_url,
     get_ncbi_search_term,
-    parse_term_query
+    parse_term_query,
+    combined_page_url_href,
+    PubmedBibliographyPage
 )
+
+
+PMID_1 = '12345671'
+PMID_2 = '12345672'
 
 
 class TestNormalizeUrl:
@@ -117,3 +123,57 @@ class TestParseTermQuery:
         assert result.get('include', {}).get('author') == ['Smith J']
         assert result.get('include', {}).get('pmid') == ['include_id1', 'include_id2']
         assert result.get('exclude', {}).get('pmid') == ['exclude_id1', 'exclude_id2']
+
+
+class TestCombinedPageUrlHref:
+    def test_should_preserve_existing_query_params(self):
+        assert combined_page_url_href(
+            'http://host/path?sortby=pubDate',
+            '?page=2'
+        ) == 'http://host/path?sortby=pubDate&page=2'
+
+    def test_should_update_existing_page(self):
+        assert combined_page_url_href(
+            'http://host/path?sortby=pubDate&page=1',
+            '?page=2'
+        ) == 'http://host/path?sortby=pubDate&page=2'
+
+
+class TestPubmedBibliographyPage:
+    def test_should_find_pubmed_ids(self):
+        html_content = '\n'.join([
+            '<html><body><div class="citations other">',
+            '<div><span class="pmid">PubMed PMID: %s<span></div>' % PMID_1,
+            '<div><span class="pmid">PubMed PMID:\n%s<span></div>' % PMID_2,
+            '</div></body></html>'
+        ])
+        page = PubmedBibliographyPage(html_content)
+        assert page.pmids == [PMID_1, PMID_2]
+
+    def test_should_find_next_enabled_page_url(self):
+        html_content = '\n'.join([
+            '<html><body><div class="citations other">',
+            '<div class="pager"><form id="pager">',
+            '<a class="nextPage enabled" href="?page=2">Next page</a>',
+            '</form></div>',
+            '</div></body></html>'
+        ])
+        page = PubmedBibliographyPage(html_content)
+        assert page.next_page_href == '?page=2'
+        assert page.get_next_page_href(
+            'http://host/path?sortby=pubDate'
+        ) == 'http://host/path?sortby=pubDate&page=2'
+
+    def test_should_return_none_if_next_page_is_disabled(self):
+        html_content = '\n'.join([
+            '<html><body><div class="citations other">',
+            '<div class="pager"><form id="pager">',
+            '<a class="nextPage disabled" href="?page=2">Next page</a>',
+            '</form></div>',
+            '</div></body></html>'
+        ])
+        page = PubmedBibliographyPage(html_content)
+        assert page.next_page_href is None
+        assert page.get_next_page_href(
+            'http://host/path?sortby=pubDate'
+        ) is None

@@ -34,6 +34,8 @@ with create_dag(
         create_run_notebook_operator(
             notebook_filename='peerscout/peerscout-get-editor-parse-pubmed-links.ipynb'
         ) >> create_run_notebook_operator(
+            notebook_filename='peerscout/peerscout-get-editor-pubmed-bibliography-paper-ids.ipynb'
+        ) >> create_run_notebook_operator(
             notebook_filename='peerscout/peerscout-get-editor-pubmed-paper-ids.ipynb',
             # Note: The limit is more for development purpose
             notebook_params={
