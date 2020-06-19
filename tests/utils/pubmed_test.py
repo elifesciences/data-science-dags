@@ -1,6 +1,8 @@
 from data_science_pipeline.utils.pubmed import (
     normalize_url,
     is_ncbi_domain_url,
+    get_ncbi_pubmed_article_id,
+    get_ncbi_pubmed_article_ids,
     is_ncbi_bibliography_url,
     is_ncbi_search_url,
     get_ncbi_search_term,
@@ -40,6 +42,45 @@ class TestIsNcbiDomainUrl:
 
     def test_should_return_false_for_tinyurl(self):
         assert not is_ncbi_domain_url('https://tinyurl.com/path')
+
+
+class TestGetNcbiPubmedArticleId:
+    def test_should_return_none_if_not_pubmed_article_url(self):
+        assert (
+            get_ncbi_pubmed_article_id('https://www.ncbi.nlm.nih.gov/other/123')
+            is None
+        )
+
+    def test_should_extract_pubmed_id(self):
+        assert (
+            get_ncbi_pubmed_article_id('https://www.ncbi.nlm.nih.gov/pubmed/' + PMID_1)
+            == PMID_1
+        )
+
+    def test_should_strip_slash(self):
+        assert (
+            get_ncbi_pubmed_article_id('https://www.ncbi.nlm.nih.gov/pubmed/' + PMID_1 + '/')
+            == PMID_1
+        )
+
+
+class TestGetNcbiPubmedArticleIds:
+    def test_should_extract_multiple_pubmed_article_ids(self):
+        assert (
+            get_ncbi_pubmed_article_ids([
+                'https://www.ncbi.nlm.nih.gov/pubmed/' + PMID_1,
+                'https://www.ncbi.nlm.nih.gov/pubmed/' + PMID_2
+            ]) == [PMID_1, PMID_2]
+        )
+
+    def test_should_skip_non_pubmed_article_urls(self):
+        assert (
+            get_ncbi_pubmed_article_ids([
+                'https://www.ncbi.nlm.nih.gov/pubmed/' + PMID_1,
+                'https://www.ncbi.nlm.nih.gov/other/123',
+                'https://www.ncbi.nlm.nih.gov/pubmed/' + PMID_2
+            ]) == [PMID_1, PMID_2]
+        )
 
 
 class TestIsNcbiBibliographyUrl:

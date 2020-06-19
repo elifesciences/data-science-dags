@@ -211,10 +211,13 @@ class EuropePMCApi:
                 'paging not supported, list of pmids must be less than %d'
                 % EUROPEPMC_MAX_PAGE_SIZE
             )
-        return get_manuscript_summary_from_json_response(self.query_page(
+        result = get_manuscript_summary_from_json_response(self.query_page(
             get_europepmc_pmid_query_string(pmids),
             result_type='core'
         ).json_response)
+        if not result:
+            LOGGER.warning('no results for %s', pmids)
+        return result
 
 
 def europepmc_requests_retry_session(
