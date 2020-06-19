@@ -3,12 +3,11 @@ import os
 import time
 from itertools import islice
 from tempfile import TemporaryDirectory
-from typing import List
+from typing import Iterable, List, Tuple
 
 import pandas as pd
 
-from bigquery_schema_generator.generate_schema import SchemaGenerator
-
+import google.cloud.exceptions
 from google.cloud import bigquery
 from google.cloud.bigquery.schema import SchemaField
 from google.cloud.bigquery import (
@@ -19,43 +18,58 @@ from google.cloud.bigquery import (
     WriteDisposition
 )
 
+from data_science_pipeline.utils.io import open_with_auto_compression
+from data_science_pipeline.utils.json import (
+    remove_key_with_null_value,
+    write_jsonl_to_file,
+    json_list_as_jsonl_file
+)
+from data_science_pipeline.utils.bq_schema import (
+    generate_schema_from_file,
+    get_schemafield_list_from_json_list,
+    create_or_extend_table_schema
+)
+
 
 LOGGER = logging.getLogger(__name__)
+
+
+def is_bq_not_found_exception(exception: BaseException) -> bool:
+    if not exception:
+        return False
+    return (
+        isinstance(exception, google.cloud.exceptions.NotFound)
+        or is_bq_not_found_exception(exception.__context__)
+    )
 
 
 def get_client(project_id: str) -> Client:
     return Client(project=project_id)
 
 
-def generate_schema_from_file(full_temp_file_location):
-    file_reader = open(full_temp_file_location)
-    generator = SchemaGenerator(
-        input_format="json",
-        quoted_values_are_strings=True
-    )
-    schema_map, _ = generator.deduce_schema(
-        file_reader
-    )
-    schema = generator.flatten_schema(schema_map)
-    return schema
-
-
-def get_schemafield_list_from_json_list(
-        json_schema: List[dict]) -> List[SchemaField]:
-    schema = [SchemaField.from_api_repr(x) for x in json_schema]
-    return schema
+def get_validated_dataset_name_table_name(
+        dataset_name: str,
+        table_name: str) -> Tuple[str, str]:
+    if not table_name:
+        raise ValueError('table_name is required')
+    if dataset_name is None:
+        dataset_name, table_name = table_name.split('.', maxsplit=1)
+    return dataset_name, table_name
 
 
 def load_file_into_bq(
         filename: str,
-        dataset_name: str,
-        table_name: str,
+        dataset_name: str = None,
+        table_name: str = None,
         source_format=SourceFormat.NEWLINE_DELIMITED_JSON,
         write_mode=WriteDisposition.WRITE_APPEND,
         auto_detect_schema=True,
         schema: List[SchemaField] = None,
         rows_to_skip=0,
         project_id: str = None):
+    dataset_name, table_name = get_validated_dataset_name_table_name(
+        dataset_name, table_name
+    )
     if os.path.isfile(filename) and os.path.getsize(filename) == 0:
         LOGGER.info("File %s is empty.", filename)
         return
@@ -69,7 +83,8 @@ def load_file_into_bq(
     job_config.schema = schema
     if source_format is SourceFormat.CSV:
         job_config.skip_leading_rows = rows_to_skip
-    with open(filename, "rb") as source_file:
+    LOGGER.info('loading from %s', filename)
+    with open_with_auto_compression(filename, "rb") as source_file:
         job = client.load_table_from_file(
             source_file, destination=table_ref, job_config=job_config
         )
@@ -84,6 +99,82 @@ def load_file_into_bq(
         )
 
 
+def load_file_into_bq_with_auto_schema(
+        jsonl_file: str,
+        dataset_name: str = None,
+        table_name: str = None,
+        write_mode: str = WriteDisposition.WRITE_APPEND,
+        project_id: str = None,
+        **kwargs):
+    if write_mode == WriteDisposition.WRITE_APPEND:
+        dataset_name, table_name = get_validated_dataset_name_table_name(
+            dataset_name, table_name
+        )
+        create_or_extend_table_schema(
+            gcp_project=project_id,
+            dataset_name=dataset_name,
+            table_name=table_name,
+            full_file_location=jsonl_file,
+            quoted_values_are_strings=True
+        )
+        load_file_into_bq(
+            jsonl_file,
+            project_id=project_id,
+            dataset_name=dataset_name,
+            table_name=table_name,
+            write_mode=write_mode,
+            schema=None,
+            auto_detect_schema=False,
+            **kwargs
+        )
+        return
+    schema = get_schemafield_list_from_json_list(generate_schema_from_file(jsonl_file))
+    LOGGER.debug('schema: %s', schema)
+    load_file_into_bq(
+        jsonl_file,
+        project_id=project_id,
+        dataset_name=dataset_name,
+        table_name=table_name,
+        write_mode=write_mode,
+        schema=schema,
+        auto_detect_schema=False,
+        **kwargs
+    )
+
+
+def load_file_and_replace_bq_table_with_auto_schema(*args, **kwargs):
+    load_file_into_bq_with_auto_schema(
+        *args,
+        write_mode=WriteDisposition.WRITE_TRUNCATE,
+        **kwargs
+    )
+
+
+def load_file_and_append_to_bq_table_with_auto_schema(*args, **kwargs):
+    load_file_into_bq_with_auto_schema(
+        *args,
+        write_mode=WriteDisposition.WRITE_APPEND,
+        **kwargs
+    )
+
+
+def load_json_list_into_bq_with_auto_schema(json_list: Iterable[dict], **kwargs):
+    with json_list_as_jsonl_file(json_list) as jsonl_file:
+        load_file_into_bq_with_auto_schema(jsonl_file, **kwargs)
+
+
+def load_json_list_and_replace_bq_table_with_auto_schema(*args, **kwargs):
+    load_json_list_into_bq_with_auto_schema(
+        *args, write_mode=WriteDisposition.WRITE_TRUNCATE, **kwargs
+    )
+
+
+def load_json_list_and_append_to_bq_table_with_auto_schema(*args, **kwargs):
+    load_json_list_into_bq_with_auto_schema(
+        *args, write_mode=WriteDisposition.WRITE_APPEND, **kwargs
+    )
+
+
 def get_bq_write_disposition(if_exists: str) -> WriteDisposition:
     if if_exists == 'replace':
         return WriteDisposition.WRITE_TRUNCATE
@@ -94,24 +185,31 @@ def get_bq_write_disposition(if_exists: str) -> WriteDisposition:
     raise ValueError('unsupported if_exists: %s' % if_exists)
 
 
+def to_jsonl_without_null(df: pd.DataFrame, jsonl_file: str):
+    write_jsonl_to_file(
+        remove_key_with_null_value(
+            df.to_dict(orient='records')
+        ),
+        jsonl_file
+    )
+
+
 def to_gbq(
         df: pd.DataFrame,
         destination_table: str,
         if_exists: str = 'fail',
-        project_id: str = None):
+        project_id: str = None,
+        temp_dir: str = None):
     """Similar to DataFrame.to_gpq but better handles schema detection of nested fields"""
     dataset_name, table_name = destination_table.split('.', maxsplit=1)
-    with TemporaryDirectory() as temp_dir:
-        jsonl_file = os.path.join(temp_dir, 'data.jsonl')
-        df.to_json(jsonl_file, orient='records', lines=True)
-        schema = get_schemafield_list_from_json_list(generate_schema_from_file(jsonl_file))
-        LOGGER.info('schema: %s', schema)
-        load_file_into_bq(
+    with TemporaryDirectory() as _temp_dir:
+        jsonl_file = os.path.join(temp_dir or _temp_dir, 'data.jsonl')
+        to_jsonl_without_null(df, jsonl_file)
+        load_file_into_bq_with_auto_schema(
             jsonl_file,
             dataset_name=dataset_name,
             table_name=table_name,
             write_mode=get_bq_write_disposition(if_exists),
-            schema=schema,
             project_id=project_id
         )
 

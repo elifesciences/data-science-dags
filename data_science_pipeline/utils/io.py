@@ -1,6 +1,7 @@
+import gzip
 from io import BytesIO
 from pathlib import Path
-from typing import Any
+from typing import Any, ContextManager, IO
 
 import joblib
 
@@ -39,3 +40,17 @@ def serialize_object_to(value: Any, path: str):
 
 def load_object_from(path: str) -> Any:
     return joblib.load(BytesIO(read_bytes(path)))
+
+
+def is_gzip_path(path: str) -> bool:
+    return str(path).endswith('.gz')
+
+
+def open_with_auto_compression(path: str, mode: str) -> ContextManager[IO]:
+    if is_gzip_path(path):
+        if mode == 'r':
+            mode = 'rt'
+        if mode == 'w':
+            mode = 'wt'
+        return gzip.open(path, mode)
+    return open(path, mode)
