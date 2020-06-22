@@ -6,7 +6,7 @@ joblib==0.15.1
 lxml==4.5.1
 matplotlib==3.2.2
 numpy==1.19.0
-pandas==1.0.4
+pandas==1.0.5
 pandas-gbq==0.13.2
 tqdm==4.46.1
 google-cloud-bigquery==1.25.0
