@@ -34,6 +34,12 @@ from data_science_pipeline.utils.bq_schema import (
 LOGGER = logging.getLogger(__name__)
 
 
+def with_limit_sql(sql: str, limit: int = None) -> str:
+    if not limit:
+        return sql
+    return sql + '\nLIMIT %d' % limit
+
+
 def is_bq_not_found_exception(exception: BaseException) -> bool:
     if not exception:
         return False
