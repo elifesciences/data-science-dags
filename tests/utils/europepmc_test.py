@@ -3,8 +3,23 @@ import pytest
 from data_science_pipeline.utils.europepmc import (
     get_europepmc_author_query_string,
     get_europepmc_pmid_query_string,
-    get_pmids_from_json_response
+    get_pmids_from_json_response,
+    normalize_author_initials
 )
+
+
+class TestNormalizeAuthorInitials:
+    def test_should_return_author_name_with_full_name(self):
+        assert normalize_author_initials('Smith John') == 'Smith John'
+
+    def test_should_return_author_name_with_simple_initial(self):
+        assert normalize_author_initials('Smith J') == 'Smith J'
+
+    def test_should_return_author_name_with_two_initials(self):
+        assert normalize_author_initials('Smith JX') == 'Smith JX'
+
+    def test_should_return_remove_space_between_initials(self):
+        assert normalize_author_initials('Smith J X') == 'Smith JX'
 
 
 class TestGetEuropepmcAuthorQueryString:
@@ -16,6 +31,11 @@ class TestGetEuropepmcAuthorQueryString:
         assert get_europepmc_author_query_string(
             ['Smith J']
         ) == '(AUTH:"Smith J") AND (SRC:"MED")'
+
+    def test_should_normalize_initials(self):
+        assert get_europepmc_author_query_string(
+            ['Smith J X']
+        ) == '(AUTH:"Smith JX") AND (SRC:"MED")'
 
 
 class TestGetEuropepmcPmidQueryString:
