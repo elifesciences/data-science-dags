@@ -1,3 +1,4 @@
+import re
 import logging
 from itertools import islice
 from typing import Callable, Iterable, List
@@ -21,11 +22,16 @@ EUROPEPMC_MAX_PAGE_SIZE = 1000
 EUROPEPMC_START_CURSOR = '*'
 
 
+def normalize_author_initials(author_name: str) -> str:
+    return re.sub(r'([A-Z])(\s)([A-Z])', r'\1\3', author_name, re.DOTALL)
+
+
 def get_europepmc_author_query_string(author_names: List[str]) -> str:
     if not author_names:
         raise ValueError('author names required')
     return '(%s) AND (SRC:"MED")' % ' OR '.join([
-        'AUTH:"%s"' % author for author in author_names
+        'AUTH:"%s"' % normalize_author_initials(author)
+        for author in author_names
     ])
 
 
