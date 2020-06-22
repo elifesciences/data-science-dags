@@ -1,4 +1,4 @@
 apache-airflow[crypto,celery,postgres,hive,jdbc,ssh]==1.10.10
-dask[complete]==2.18.1
+dask[complete]==2.19.0
 distributed==2.19.0
 papermill==2.1.1
