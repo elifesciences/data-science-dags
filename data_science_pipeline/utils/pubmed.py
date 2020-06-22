@@ -46,7 +46,7 @@ def is_ncbi_pubmed_article_url(url: str) -> str:
 def get_ncbi_pubmed_article_id(url: str) -> str:
     if not is_ncbi_pubmed_article_url(url):
         return None
-    return urlparse(url).path.rstrip('/').split('/')[-1]
+    return urlparse(url).path.rstrip('/').split('/')[-1].strip()
 
 
 def get_ncbi_pubmed_article_ids(urls: List[str]) -> List[str]:

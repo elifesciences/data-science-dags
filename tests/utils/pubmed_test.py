@@ -82,6 +82,13 @@ class TestGetNcbiPubmedArticleIds:
             ]) == [PMID_1, PMID_2]
         )
 
+    def test_should_remove_line_feed(self):
+        assert (
+            get_ncbi_pubmed_article_ids([
+                'https://www.ncbi.nlm.nih.gov/pubmed/' + PMID_1 + '\n',
+            ]) == [PMID_1]
+        )
+
 
 class TestIsNcbiBibliographyUrl:
     def test_should_return_true_for_myncbi_bibliography_url(self):
