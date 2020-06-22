@@ -150,6 +150,7 @@ class EuropePMCApi:
             output_format: str = 'json',
             cursor: str = EUROPEPMC_START_CURSOR,
             page_size: int = EUROPEPMC_MAX_PAGE_SIZE) -> EuropePMCApiResponsePage:
+        LOGGER.debug('query: %s', query)
         data = {
             **self.params,
             'query': query,
