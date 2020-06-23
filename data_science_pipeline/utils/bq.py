@@ -1,9 +1,9 @@
 import logging
 import os
 import time
+from contextlib import contextmanager
 from itertools import islice
-from tempfile import TemporaryDirectory
-from typing import Iterable, List, Tuple
+from typing import Iterable, List, Tuple, ContextManager
 
 import pandas as pd
 
@@ -21,7 +21,6 @@ from google.cloud.bigquery import (
 from data_science_pipeline.utils.io import open_with_auto_compression
 from data_science_pipeline.utils.json import (
     remove_key_with_null_value,
-    write_jsonl_to_file,
     json_list_as_jsonl_file
 )
 from data_science_pipeline.utils.bq_schema import (
@@ -191,26 +190,21 @@ def get_bq_write_disposition(if_exists: str) -> WriteDisposition:
     raise ValueError('unsupported if_exists: %s' % if_exists)
 
 
-def to_jsonl_without_null(df: pd.DataFrame, jsonl_file: str):
-    write_jsonl_to_file(
-        remove_key_with_null_value(
-            df.to_dict(orient='records')
-        ),
-        jsonl_file
-    )
+@contextmanager
+def df_as_jsonl_file_without_null(df: pd.DataFrame, **kwargs) -> ContextManager[str]:
+    json_list = remove_key_with_null_value(df.to_dict(orient='records'))
+    with json_list_as_jsonl_file(json_list, **kwargs) as jsonl_file:
+        yield jsonl_file
 
 
 def to_gbq(
         df: pd.DataFrame,
         destination_table: str,
         if_exists: str = 'fail',
-        project_id: str = None,
-        temp_dir: str = None):
+        project_id: str = None):
     """Similar to DataFrame.to_gpq but better handles schema detection of nested fields"""
     dataset_name, table_name = destination_table.split('.', maxsplit=1)
-    with TemporaryDirectory() as _temp_dir:
-        jsonl_file = os.path.join(temp_dir or _temp_dir, 'data.jsonl')
-        to_jsonl_without_null(df, jsonl_file)
+    with df_as_jsonl_file_without_null(df) as jsonl_file:
         load_file_into_bq_with_auto_schema(
             jsonl_file,
             dataset_name=dataset_name,
