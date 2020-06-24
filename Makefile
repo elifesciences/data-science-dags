@@ -24,6 +24,10 @@ JUPYTER_RUN = $(JUPYTER_DOCKER_COMPOSE) run --rm jupyter
 PROJECT_FOLDER = /home/jovyan/data-science-dags
 DEV_RUN = $(JUPYTER_DOCKER_COMPOSE) run --rm airflow-dev
 
+# Cells starts scrolling horizontally after 116 characters
+NOTEBOOK_MAX_LINE_LENGTH = 116
+NOTEBOOK_PYLINT_EXCLUSIONS = pointless-statement,expression-not-assigned,trailing-newlines,wrong-import-position
+
 OUTPUT_DATASET = data_science
 
 ARGS =
@@ -62,7 +66,17 @@ dev-pylint:
 	$(PYTHON) -m pylint data_science_pipeline dags tests setup.py
 
 
-dev-lint: dev-flake8 dev-pylint
+dev-notebook-lint:
+	$(VENV)/bin/jupyter nbconvert \
+		--to=script \
+		--output-dir=.temp/converted-notebooks/ \
+		./notebooks/**/*.ipynb
+	$(PYTHON) -m pylint .temp/converted-notebooks/*.py \
+		--max-line-length=$(NOTEBOOK_MAX_LINE_LENGTH) \
+		--disable=$(NOTEBOOK_PYLINT_EXCLUSIONS)
+
+
+dev-lint: dev-flake8 dev-pylint dev-notebook-lint
 
 
 dev-pytest:
@@ -136,6 +150,22 @@ flake8:
 	$(DEV_RUN) flake8 data_science_pipeline dags tests setup.py
 
 
+notebook-lint:
+	$(JUPYTER_RUN) bash -c '\
+		cd .. \
+		&& pwd \
+		&& ls -l \
+		&& ls -l ./notebooks \
+		&& jupyter nbconvert \
+		--to=script \
+		--output-dir=/tmp/converted-notebooks/ \
+		./notebooks/**/*.ipynb \
+		&& pylint /tmp/converted-notebooks/*.py \
+		--max-line-length=$(NOTEBOOK_MAX_LINE_LENGTH) \
+		--disable=$(NOTEBOOK_PYLINT_EXCLUSIONS) \
+	'
+
+
 pytest:
 	$(DEV_RUN) pytest -p no:cacheprovider $(ARGS)
 
@@ -156,7 +186,7 @@ watch:
 	@$(MAKE) ARGS="$(ARGS) $(NOT_SLOW_PYTEST_ARGS)" .watch
 
 
-lint: flake8 pylint
+lint: flake8 pylint notebook-lint
 
 
 test: lint pytest
@@ -212,6 +242,7 @@ ci-build-and-test:
 		airflow-build \
 		airflow-dev-build \
 		jupyter-build \
+		notebook-lint \
 		ci-test-exclude-e2e
 
 
