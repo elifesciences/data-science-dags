@@ -28,6 +28,9 @@ RUN if [ "${install_dev}" = "y" ]; then pip install --user -r requirements.dev.t
 
 COPY data_science_pipeline ./data_science_pipeline
 
+# tests
+COPY .pylintrc ./
+
 WORKDIR ${PROJECT_FOLDER}/notebooks
 
 USER root
