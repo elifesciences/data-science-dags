@@ -30,7 +30,7 @@ t_pubmed_id_with_priority_by_person_id AS (
       ELSE 7
     END AS priority
   FROM `elife-data-pipeline.de_dev.data_science_disambiguated_editor_papers_details`
-  WHERE NOT has_mismatching_orcid
+  WHERE NOT COALESCE(has_mismatching_orcid, FALSE)
 ),
 
 t_priority_count_by_person_id AS (
