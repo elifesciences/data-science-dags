@@ -67,8 +67,15 @@ t_max_preferred_priority_by_person_id AS (
   FROM t_priority_count_and_total_priority_count_by_person_id AS counts
   JOIN t_max_available_priority_by_person_id AS max_available
     ON max_available.person_id = counts.person_id
-  WHERE total_priority_count >= 50
+  WHERE (
+    total_priority_count >= {target_paper_count}
     OR priority = max_available.max_available_priority
+  )
+  AND (
+    -- upper limit, unless we are very sure (priority 1 or 2)
+    total_priority_count < {max_paper_count}
+    OR priority <= 2
+  )
   GROUP BY counts.person_id
 ),
 
