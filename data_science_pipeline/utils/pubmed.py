@@ -11,9 +11,11 @@ LOGGER = logging.getLogger(__name__)
 
 
 NCBI_DOMAIN_NAME = 'ncbi.nlm.nih.gov'
-NCBI_PUBMED_PATH_URL_PREFIX = 'https://www.ncbi.nlm.nih.gov/pubmed/'
-NCBI_PUBMED_SUBDOMAIN_URL_PREFIX = 'https://pubmed.ncbi.nlm.nih.gov/'
-
+NCBI_PUBMED_URL_PREFIX_LIST = [
+    'https://www.ncbi.nlm.nih.gov/pubmed/',
+    'https://ncbi.nlm.nih.gov/pubmed/',
+    'https://pubmed.ncbi.nlm.nih.gov/'
+]
 
 AUTHOR_TERM_FIELD = 'author'
 
@@ -41,9 +43,9 @@ def is_ncbi_domain_url(url: str) -> bool:
 
 
 def is_ncbi_pubmed_article_url(url: str) -> str:
-    return (
-        url.startswith(NCBI_PUBMED_PATH_URL_PREFIX)
-        or url.startswith(NCBI_PUBMED_SUBDOMAIN_URL_PREFIX)
+    return any(
+        url.startswith(prefix)
+        for prefix in NCBI_PUBMED_URL_PREFIX_LIST
     )
 
 
