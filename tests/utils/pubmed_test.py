@@ -63,6 +63,12 @@ class TestGetNcbiPubmedArticleId:
             == PMID_1
         )
 
+    def test_should_extract_pubmed_id_from_http_url(self):
+        assert (
+            get_ncbi_pubmed_article_id('http://www.ncbi.nlm.nih.gov/pubmed/' + PMID_1)
+            == PMID_1
+        )
+
     def test_should_strip_slash(self):
         assert (
             get_ncbi_pubmed_article_id('https://www.ncbi.nlm.nih.gov/pubmed/' + PMID_1 + '/')

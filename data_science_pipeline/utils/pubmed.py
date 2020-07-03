@@ -48,6 +48,7 @@ def is_ncbi_pubmed_article_url(url: str) -> str:
 
 
 def get_ncbi_pubmed_article_id(url: str) -> str:
+    url = normalize_url(url)
     if not is_ncbi_pubmed_article_url(url):
         return None
     return urlparse(url).path.rstrip('/').split('/')[-1].strip()
