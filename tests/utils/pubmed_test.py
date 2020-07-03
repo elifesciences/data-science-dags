@@ -51,9 +51,15 @@ class TestGetNcbiPubmedArticleId:
             is None
         )
 
-    def test_should_extract_pubmed_id(self):
+    def test_should_extract_pubmed_id_from_pubmed_path_url(self):
         assert (
             get_ncbi_pubmed_article_id('https://www.ncbi.nlm.nih.gov/pubmed/' + PMID_1)
+            == PMID_1
+        )
+
+    def test_should_extract_pubmed_id_from_pubmed_subdomain_url(self):
+        assert (
+            get_ncbi_pubmed_article_id('https://pubmed.ncbi.nlm.nih.gov/' + PMID_1)
             == PMID_1
         )
 
