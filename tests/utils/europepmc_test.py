@@ -37,6 +37,11 @@ class TestGetEuropepmcAuthorQueryString:
             ['Smith J X']
         ) == '(AUTH:"Smith JX") AND (SRC:"MED")'
 
+    def test_should_not_treat_capitalized_surname_as_initials(self):
+        assert get_europepmc_author_query_string(
+            ['SMITH J']
+        ) == '(AUTH:"SMITH J") AND (SRC:"MED")'
+
 
 class TestGetEuropepmcPmidQueryString:
     def test_should_fail_with_no_pmids(self):

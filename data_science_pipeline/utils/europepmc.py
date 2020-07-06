@@ -23,7 +23,7 @@ EUROPEPMC_START_CURSOR = '*'
 
 
 def normalize_author_initials(author_name: str) -> str:
-    return re.sub(r'([A-Z])(\s)([A-Z])', r'\1\3', author_name, re.DOTALL)
+    return re.sub(r'(\s[A-Z])(\s)([A-Z])', r'\1\3', author_name, re.DOTALL)
 
 
 def get_europepmc_author_query_string(author_names: List[str]) -> str:
