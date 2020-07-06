@@ -26,11 +26,19 @@ def normalize_author_initials(author_name: str) -> str:
     return re.sub(r'(\s[A-Z])(\s)([A-Z])', r'\1\3', author_name, re.DOTALL)
 
 
+def remove_comma(author_name: str) -> str:
+    return author_name.replace(',', '')
+
+
+def normalize_author_name(author_name: str) -> str:
+    return normalize_author_initials(remove_comma(author_name))
+
+
 def get_europepmc_author_query_string(author_names: List[str]) -> str:
     if not author_names:
         raise ValueError('author names required')
     return '(%s) AND (SRC:"MED")' % ' OR '.join([
-        'AUTH:"%s"' % normalize_author_initials(author)
+        'AUTH:"%s"' % normalize_author_name(author)
         for author in author_names
     ])
 
