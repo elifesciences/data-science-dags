@@ -23,15 +23,34 @@ t_pubmed_id_with_priority_by_person_id AS (
     pmid,
     CASE
       WHEN has_matching_orcid THEN 1
-      WHEN has_matching_last_name AND has_matching_first_name AND (has_matching_affiliation OR has_matching_previous_affiliation) THEN 2
-      WHEN has_matching_last_name AND has_matching_first_name AND has_matching_postal_code THEN 3
-      WHEN has_matching_last_name AND has_matching_first_name AND has_matching_city THEN 4
-      WHEN has_matching_last_name AND has_matching_first_name AND has_matching_country THEN 5
-      WHEN has_matching_last_name AND has_matching_first_name_letter AND (has_matching_affiliation OR has_matching_previous_affiliation) THEN 6
+      WHEN NOT COALESCE(has_mismatching_orcid, FALSE)
+        AND has_matching_last_name
+        AND has_matching_first_name
+        AND (has_matching_affiliation OR has_matching_previous_affiliation)
+        THEN 2
+      WHEN NOT COALESCE(has_mismatching_orcid, FALSE)
+        AND has_matching_last_name
+        AND has_matching_first_name
+        AND has_matching_postal_code
+        THEN 3
+      WHEN NOT COALESCE(has_mismatching_orcid, FALSE)
+        AND has_matching_last_name
+        AND has_matching_first_name
+        AND has_matching_city
+        THEN 4
+      WHEN NOT COALESCE(has_mismatching_orcid, FALSE)
+        AND has_matching_last_name
+        AND has_matching_first_name
+        AND has_matching_country
+        THEN 5
+      WHEN NOT COALESCE(has_mismatching_orcid, FALSE)
+        AND has_matching_last_name
+        AND has_matching_first_name_letter
+        AND (has_matching_affiliation OR has_matching_previous_affiliation)
+        THEN 6
       ELSE 7
     END AS priority
   FROM `elife-data-pipeline.de_dev.data_science_disambiguated_editor_papers_details`
-  WHERE NOT COALESCE(has_mismatching_orcid, FALSE)
 ),
 
 t_priority_count_by_person_id AS (
