@@ -6,6 +6,7 @@ WITH t_editor_pubmed_ids AS (
 )
 
 SELECT
+  Profile.Person_ID AS person_id,
   Profile.Name AS name,
   ARRAY_LENGTH(papers.disambiguated_pubmed_ids) AS pubmed_count,
   ARRAY_LENGTH(editor_pubmed_links.relevant_pubmed_urls) AS relevant_pubmed_url_count,
