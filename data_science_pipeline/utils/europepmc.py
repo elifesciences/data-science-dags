@@ -31,7 +31,7 @@ def remove_comma(author_name: str) -> str:
 
 
 def normalize_author_name(author_name: str) -> str:
-    return normalize_author_initials(remove_comma(author_name))
+    return normalize_author_initials(remove_comma(author_name)).strip()
 
 
 def get_europepmc_author_query_string(author_names: List[str]) -> str:
