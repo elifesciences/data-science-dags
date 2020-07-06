@@ -96,7 +96,7 @@ def parse_term_item(term_item: str):
     if not m:
         return term_item, AUTHOR_TERM_FIELD
     term_field = (m.group(2) or AUTHOR_TERM_FIELD).lower()
-    return m.group(1), TERM_FIELD_MAP.get(term_field, term_field)
+    return m.group(1).strip(), TERM_FIELD_MAP.get(term_field, term_field)
 
 
 def parse_term_query(term_query: str) -> dict:
