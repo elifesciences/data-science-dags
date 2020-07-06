@@ -1,62 +1,127 @@
-WITH t_editor_with_orcids AS (
+-- Main features:
+--    - Disambiguates editor linked papers as far as possible
+--      Gives each editor paper match a priority
+--    - Select papers with increasing priority until at least a target number of papers is reached
+
+WITH t_editor AS (
   SELECT
     editor.person_id,
-    editor.relevant_pubmed_ids,
-    (
-      SELECT reference_value
-      FROM UNNEST(person.external_references)
-      WHERE is_enabled
-        AND reference_type = 'ORCID'
-      ORDER BY start_timestamp, modified_timestamp
-      LIMIT 1
-    ) AS verified_orcid,
-    (
-      SELECT reference_value
-      FROM UNNEST(person.external_references)
-      WHERE is_enabled
-        AND reference_type = 'UNVERIFIED_ORCID'
-      ORDER BY start_timestamp, modified_timestamp
-      LIMIT 1
-    ) AS unverified_orcid
+    editor.name,
+    editor.relevant_pubmed_ids
   FROM `{project}.{dataset}.data_science_editor_pubmed_links` AS editor
-  JOIN `{project}.{dataset}.mv_person_v2` AS person
-    ON person.person_id = editor.person_id
 ),
 
-t_editor_with_single_orcid AS (
-  SELECT
-    *,
-    COALESCE(verified_orcid, unverified_orcid) AS orcid
-  FROM t_editor_with_orcids
-),
-
-t_pubmed_id_by_orcid AS (
-  SELECT
-    author.authorId.value AS orcid,
-    manuscript_summary.pmid
-  FROM `{project}.{dataset}.data_science_external_manuscript_summary` AS manuscript_summary
-  JOIN UNNEST(manuscript_summary.authorList.author) AS author
-  WHERE author.authorId.type = 'ORCID'
-    AND pmid IS NOT NULL
-),
-
-t_pubmed_id_by_person_id AS (
-  SELECT DISTINCT editor.person_id, pmid
-  FROM t_editor_with_single_orcid AS editor
-  JOIN t_pubmed_id_by_orcid AS paper
-    ON paper.orcid = editor.orcid
+t_pubmed_id_with_priority_by_person_id AS (
+  SELECT DISTINCT editor.person_id, pmid, 1 AS priority
+  FROM t_editor AS editor
+  JOIN UNNEST(relevant_pubmed_ids) AS pmid
 
   UNION DISTINCT
 
-  SELECT DISTINCT editor.person_id, pmid
-  FROM t_editor_with_single_orcid AS editor
-  JOIN UNNEST(relevant_pubmed_ids) AS pmid
+  SELECT DISTINCT
+    person_id,
+    pmid,
+    CASE
+      WHEN has_matching_orcid THEN 1
+      WHEN NOT COALESCE(has_mismatching_orcid, FALSE)
+        AND has_matching_last_name
+        AND has_matching_first_name
+        AND (has_matching_affiliation OR has_matching_previous_affiliation)
+        THEN 2
+      WHEN NOT COALESCE(has_mismatching_orcid, FALSE)
+        AND has_matching_last_name
+        AND has_matching_first_name
+        AND has_matching_postal_code
+        THEN 3
+      WHEN NOT COALESCE(has_mismatching_orcid, FALSE)
+        AND has_matching_last_name
+        AND has_matching_first_name
+        AND has_matching_city
+        THEN 4
+      WHEN NOT COALESCE(has_mismatching_orcid, FALSE)
+        AND has_matching_last_name
+        AND has_matching_first_name
+        AND has_matching_country
+        THEN 5
+      WHEN NOT COALESCE(has_mismatching_orcid, FALSE)
+        AND has_matching_last_name
+        AND has_matching_first_name_letter
+        AND (has_matching_affiliation OR has_matching_previous_affiliation)
+        THEN 6
+      ELSE 1000 - author_match_score
+    END AS priority
+  FROM `elife-data-pipeline.de_dev.data_science_disambiguated_editor_papers_details`
+),
+
+t_priority_count_by_person_id AS (
+  SELECT person_id, priority, COUNT(*) AS priority_count
+  FROM t_pubmed_id_with_priority_by_person_id 
+  GROUP BY person_id, priority
+),
+
+t_priority_count_and_total_priority_count_by_person_id AS (
+  SELECT
+    current_counts.*,
+    (
+      priority_count
+      + (
+        SELECT COALESCE(SUM(priority_count), 0)
+        FROM t_priority_count_by_person_id AS higher_priority_counts
+        WHERE higher_priority_counts.person_id = current_counts.person_id
+        AND higher_priority_counts.priority < current_counts.priority
+      )
+    ) AS total_priority_count
+  FROM t_priority_count_by_person_id AS current_counts
+),
+
+t_priority_below_and_above_target_count_by_person_id AS (
+  SELECT
+    person_id,
+    MAX(IF(
+      total_priority_count < {target_paper_count},
+      priority,
+      NULL
+    )) AS priority_below_target_count,
+    MIN(IF(
+      (
+        total_priority_count >= {target_paper_count}
+        AND (
+          -- upper limit, unless we are very sure (priority 1 or 2)
+          total_priority_count < {max_paper_count}
+          OR priority <= 2
+        )
+      ),
+      priority,
+      NULL
+    )) AS priority_above_target_count
+  FROM t_priority_count_and_total_priority_count_by_person_id
+  GROUP BY person_id
+),
+
+t_max_preferred_priority_by_person_id AS (
+  SELECT
+    person_id,
+    COALESCE(priority_above_target_count, priority_below_target_count) AS max_preferred_priority
+  FROM t_priority_below_and_above_target_count_by_person_id
+),
+
+t_preferred_pubmed_id_by_person_id AS (
+  SELECT DISTINCT
+    max_preferred.person_id,
+    paper.pmid
+  FROM t_max_preferred_priority_by_person_id AS max_preferred
+  JOIN t_pubmed_id_with_priority_by_person_id AS paper
+    ON paper.person_id = max_preferred.person_id
+    AND paper.priority <= max_preferred.max_preferred_priority
+    AND paper.pmid IS NOT NULL
 )
 
 SELECT
   editor.person_id,
-  ARRAY_AGG(pmid IGNORE NULLS) AS disambiguated_pubmed_ids
-FROM t_editor_with_single_orcid AS editor
-LEFT JOIN t_pubmed_id_by_person_id AS paper
-  ON paper.person_id = editor.person_id
-GROUP BY editor.person_id
+  editor.name,
+  ARRAY(
+    SELECT pmid
+    FROM t_preferred_pubmed_id_by_person_id AS preferred_paper
+    WHERE preferred_paper.person_id = editor.person_id
+  ) AS disambiguated_pubmed_ids
+FROM t_editor AS editor
