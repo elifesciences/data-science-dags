@@ -39,12 +39,6 @@ t_priority_count_by_person_id AS (
   GROUP BY person_id, priority
 ),
 
-t_max_available_priority_by_person_id AS (
-  SELECT person_id, MAX(priority) AS max_available_priority
-  FROM t_priority_count_by_person_id 
-  GROUP BY person_id
-),
-
 t_priority_count_and_total_priority_count_by_person_id AS (
   SELECT
     current_counts.*,
@@ -60,23 +54,35 @@ t_priority_count_and_total_priority_count_by_person_id AS (
   FROM t_priority_count_by_person_id AS current_counts
 ),
 
+t_priority_below_and_above_target_count_by_person_id AS (
+  SELECT
+    person_id,
+    MAX(IF(
+      total_priority_count < {target_paper_count},
+      priority,
+      NULL
+    )) AS priority_below_target_count,
+    MIN(IF(
+      (
+        total_priority_count >= {target_paper_count}
+        AND (
+          -- upper limit, unless we are very sure (priority 1 or 2)
+          total_priority_count < {max_paper_count}
+          OR priority <= 2
+        )
+      ),
+      priority,
+      NULL
+    )) AS priority_above_target_count
+  FROM t_priority_count_and_total_priority_count_by_person_id
+  GROUP BY person_id
+),
+
 t_max_preferred_priority_by_person_id AS (
   SELECT
-    counts.person_id,
-    MIN(priority) AS max_preferred_priority
-  FROM t_priority_count_and_total_priority_count_by_person_id AS counts
-  JOIN t_max_available_priority_by_person_id AS max_available
-    ON max_available.person_id = counts.person_id
-  WHERE (
-    total_priority_count >= {target_paper_count}
-    OR priority = max_available.max_available_priority
-  )
-  AND (
-    -- upper limit, unless we are very sure (priority 1 or 2)
-    total_priority_count < {max_paper_count}
-    OR priority <= 2
-  )
-  GROUP BY counts.person_id
+    person_id,
+    COALESCE(priority_above_target_count, priority_below_target_count) AS max_preferred_priority
+  FROM t_priority_below_and_above_target_count_by_person_id
 ),
 
 t_preferred_pubmed_id_by_person_id AS (
