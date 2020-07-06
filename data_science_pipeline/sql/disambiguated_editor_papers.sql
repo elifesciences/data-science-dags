@@ -48,7 +48,7 @@ t_pubmed_id_with_priority_by_person_id AS (
         AND has_matching_first_name_letter
         AND (has_matching_affiliation OR has_matching_previous_affiliation)
         THEN 6
-      ELSE 7
+      ELSE 1000 - author_match_score
     END AS priority
   FROM `elife-data-pipeline.de_dev.data_science_disambiguated_editor_papers_details`
 ),
