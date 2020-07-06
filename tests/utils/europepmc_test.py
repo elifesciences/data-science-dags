@@ -52,6 +52,11 @@ class TestGetEuropepmcAuthorQueryString:
             [' Smith J ']
         ) == '(AUTH:"Smith J") AND (SRC:"MED")'
 
+    def test_should_remove_double_quotes(self):
+        assert get_europepmc_author_query_string(
+            [' "Smith J" ']
+        ) == '(AUTH:"Smith J") AND (SRC:"MED")'
+
 
 class TestGetEuropepmcPmidQueryString:
     def test_should_fail_with_no_pmids(self):
