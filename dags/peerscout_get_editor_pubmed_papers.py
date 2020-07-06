@@ -51,6 +51,8 @@ with create_dag(
                 'max_manuscripts': 1000000
             }
         ) >> create_run_notebook_operator(
+            notebook_filename='peerscout/peerscout-disambiguate-editor-papers-details.ipynb'
+        ) >> create_run_notebook_operator(
             notebook_filename='peerscout/peerscout-disambiguate-editor-papers.ipynb'
         )
     )
