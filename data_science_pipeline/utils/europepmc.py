@@ -4,6 +4,7 @@ from itertools import islice
 from typing import Callable, Iterable, List
 
 import requests
+from icu import Transliterator  # pylint: disable=no-name-in-module
 
 from data_science_pipeline.utils.requests import (
     requests_retry_session as _requests_retry_session
@@ -34,10 +35,17 @@ def remove_double_quotes(author_name: str) -> str:
     return author_name.strip('"')
 
 
+def transliterate_to_ascii(author_name: str) -> str:
+    transliterator = Transliterator.createInstance('Any-Latin; Latin-ASCII')
+    return transliterator.transliterate(author_name)
+
+
 def normalize_author_name(author_name: str) -> str:
     return normalize_author_initials(
-        remove_double_quotes(
-            remove_comma(author_name.strip())
+        transliterate_to_ascii(
+            remove_double_quotes(
+                remove_comma(author_name.strip())
+            )
         )
     )
 

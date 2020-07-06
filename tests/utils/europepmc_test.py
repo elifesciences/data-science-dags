@@ -57,6 +57,11 @@ class TestGetEuropepmcAuthorQueryString:
             [' "Smith J" ']
         ) == '(AUTH:"Smith J") AND (SRC:"MED")'
 
+    def test_should_transliterate_author_name_to_ascii(self):
+        assert get_europepmc_author_query_string(
+            [' "Śḿïth Ĵ" ']
+        ) == '(AUTH:"Smith J") AND (SRC:"MED")'
+
 
 class TestGetEuropepmcPmidQueryString:
     def test_should_fail_with_no_pmids(self):
