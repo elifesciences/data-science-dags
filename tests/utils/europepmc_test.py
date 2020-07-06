@@ -47,6 +47,11 @@ class TestGetEuropepmcAuthorQueryString:
             ['Smith, J']
         ) == '(AUTH:"Smith J") AND (SRC:"MED")'
 
+    def test_should_remove_dot(self):
+        assert get_europepmc_author_query_string(
+            ['Smith J.']
+        ) == '(AUTH:"Smith J") AND (SRC:"MED")'
+
     def test_should_strip_space(self):
         assert get_europepmc_author_query_string(
             [' Smith J ']

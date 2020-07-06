@@ -31,6 +31,10 @@ def remove_comma(author_name: str) -> str:
     return author_name.replace(',', '')
 
 
+def remove_dot(author_name: str) -> str:
+    return author_name.replace('.', '')
+
+
 def remove_double_quotes(author_name: str) -> str:
     return author_name.strip('"')
 
@@ -44,7 +48,7 @@ def normalize_author_name(author_name: str) -> str:
     return normalize_author_initials(
         transliterate_to_ascii(
             remove_double_quotes(
-                remove_comma(author_name.strip())
+                remove_dot(remove_comma(author_name.strip()))
             )
         )
     )
