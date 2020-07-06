@@ -6,6 +6,7 @@
 WITH t_editor AS (
   SELECT
     editor.person_id,
+    editor.name,
     editor.relevant_pubmed_ids
   FROM `{project}.{dataset}.data_science_editor_pubmed_links` AS editor
 ),
@@ -98,6 +99,7 @@ t_preferred_pubmed_id_by_person_id AS (
 
 SELECT
   editor.person_id,
+  editor.name,
   ARRAY(
     SELECT pmid
     FROM t_preferred_pubmed_id_by_person_id AS preferred_paper
