@@ -182,6 +182,14 @@ class TestParseTermQuery:
         result = parse_term_query(' Smith J [Author]')
         assert result.get('include', {}).get('author') == ['Smith J']
 
+    def test_should_remove_double_quotes_from_author_name_without_suffix(self):
+        result = parse_term_query('"Smith J"')
+        assert result.get('include', {}).get('author') == ['Smith J']
+
+    def test_should_remove_double_quotes_from_author_name_with_suffix(self):
+        result = parse_term_query('"Smith J"[Author]')
+        assert result.get('include', {}).get('author') == ['Smith J']
+
     def test_should_parse_author_with_included_and_excluded_ids(self):
         result = parse_term_query(' '.join([
             'Smith J[Author]',
