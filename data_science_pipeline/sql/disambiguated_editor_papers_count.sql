@@ -11,7 +11,7 @@ SELECT
   ARRAY_LENGTH(papers.disambiguated_pubmed_ids) AS pubmed_count,
   ARRAY_LENGTH(editor_pubmed_links.relevant_pubmed_urls) AS relevant_pubmed_url_count,
   ARRAY_LENGTH(editor_pubmed_links.relevant_pubmed_ids) AS relevant_pubmed_id_count,
-  ARRAY_LENGTH(editor_pubmed_ids.pubmed_ids) AS total_pubmed_id_count,
+  ARRAY_LENGTH(editor_pubmed_ids.pubmed_ids) AS retrieved_pubmed_id_count,
   editor_pubmed_links.pubmed_url,
   editor_pubmed_links.search_term
 FROM `{project}.{dataset}.mv_Editorial_Editor_Profile` AS Profile
