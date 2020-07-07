@@ -37,6 +37,36 @@ class TestGetEuropepmcAuthorQueryString:
             ['Smith J X']
         ) == '(AUTH:"Smith JX") AND (SRC:"MED")'
 
+    def test_should_not_treat_capitalized_surname_as_initials(self):
+        assert get_europepmc_author_query_string(
+            ['SMITH J']
+        ) == '(AUTH:"SMITH J") AND (SRC:"MED")'
+
+    def test_should_remove_comma(self):
+        assert get_europepmc_author_query_string(
+            ['Smith, J']
+        ) == '(AUTH:"Smith J") AND (SRC:"MED")'
+
+    def test_should_remove_dot(self):
+        assert get_europepmc_author_query_string(
+            ['Smith J.']
+        ) == '(AUTH:"Smith J") AND (SRC:"MED")'
+
+    def test_should_strip_space(self):
+        assert get_europepmc_author_query_string(
+            [' Smith J ']
+        ) == '(AUTH:"Smith J") AND (SRC:"MED")'
+
+    def test_should_remove_double_quotes(self):
+        assert get_europepmc_author_query_string(
+            [' "Smith J" ']
+        ) == '(AUTH:"Smith J") AND (SRC:"MED")'
+
+    def test_should_transliterate_author_name_to_ascii(self):
+        assert get_europepmc_author_query_string(
+            [' "Śḿïth Ĵ" ']
+        ) == '(AUTH:"Smith J") AND (SRC:"MED")'
+
 
 class TestGetEuropepmcPmidQueryString:
     def test_should_fail_with_no_pmids(self):

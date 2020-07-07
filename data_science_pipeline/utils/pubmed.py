@@ -90,13 +90,20 @@ def resolve_url_if_not_ncbi_domain(url: str) -> str:
     return resolve_url(url)
 
 
+def remove_double_quotes(value: str) -> str:
+    return value.strip('"')
+
+
 def parse_term_item(term_item: str):
     term_item = term_item.strip()
     m = re.match(r'([^\[]+)(?:\[(.*)\])?', term_item)
     if not m:
         return term_item, AUTHOR_TERM_FIELD
     term_field = (m.group(2) or AUTHOR_TERM_FIELD).lower()
-    return m.group(1), TERM_FIELD_MAP.get(term_field, term_field)
+    return (
+        remove_double_quotes(m.group(1).strip()),
+        TERM_FIELD_MAP.get(term_field, term_field)
+    )
 
 
 def parse_term_query(term_query: str) -> dict:
