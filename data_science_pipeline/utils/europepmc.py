@@ -4,6 +4,7 @@ from itertools import islice
 from typing import Callable, Iterable, List
 
 import requests
+from icu import Transliterator  # pylint: disable=no-name-in-module
 
 from data_science_pipeline.utils.requests import (
     requests_retry_session as _requests_retry_session
@@ -23,14 +24,41 @@ EUROPEPMC_START_CURSOR = '*'
 
 
 def normalize_author_initials(author_name: str) -> str:
-    return re.sub(r'([A-Z])(\s)([A-Z])', r'\1\3', author_name, re.DOTALL)
+    return re.sub(r'(\s[A-Z])(\s)([A-Z])', r'\1\3', author_name, re.DOTALL)
+
+
+def remove_comma(author_name: str) -> str:
+    return author_name.replace(',', '')
+
+
+def remove_dot(author_name: str) -> str:
+    return author_name.replace('.', '')
+
+
+def remove_double_quotes(author_name: str) -> str:
+    return author_name.strip('"')
+
+
+def transliterate_to_ascii(author_name: str) -> str:
+    transliterator = Transliterator.createInstance('Any-Latin; Latin-ASCII')
+    return transliterator.transliterate(author_name)
+
+
+def normalize_author_name(author_name: str) -> str:
+    return normalize_author_initials(
+        transliterate_to_ascii(
+            remove_double_quotes(
+                remove_dot(remove_comma(author_name.strip()))
+            )
+        )
+    )
 
 
 def get_europepmc_author_query_string(author_names: List[str]) -> str:
     if not author_names:
         raise ValueError('author names required')
     return '(%s) AND (SRC:"MED")' % ' OR '.join([
-        'AUTH:"%s"' % normalize_author_initials(author)
+        'AUTH:"%s"' % normalize_author_name(author)
         for author in author_names
     ])
 
