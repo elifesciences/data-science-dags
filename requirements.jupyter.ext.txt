@@ -1,0 +1,1 @@
+nbresuse[resources]==0.3.6
