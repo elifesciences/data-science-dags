@@ -19,6 +19,12 @@ COPY requirements.notebook.txt ./
 RUN pip install -r requirements.notebook.txt \
   && jupyter nbextension enable --py widgetsnbextension
 
+COPY requirements.jupyter.ext.txt ./
+RUN pip install -r requirements.jupyter.ext.txt \
+  && jupyter serverextension enable --py nbresuse --sys-prefix \
+  && jupyter nbextension install --py nbresuse --sys-prefix \
+  && jupyter nbextension enable --py nbresuse --sys-prefix
+
 COPY setup.py ./
 RUN pip install -e . --no-deps --user
 
