@@ -1,6 +1,6 @@
 beautifulsoup4==4.9.1
 bigquery-schema-generator==1.0
-boto3==1.14.17
+boto3==1.14.42
 cloudpickle==1.4.1
 ipywidgets==7.5.1
 joblib==0.16.0
