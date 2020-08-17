@@ -25,7 +25,7 @@ t_last_manuscript_version_abstract_keywords AS (
 )
 
 SELECT version.version_id, manuscript_version_abstract_keywords.extracted_keywords
-FROM `{project}.{dataset}.v_manuscript_version_last_editor_assigned_timestamp` AS version
+FROM `{project}.{dataset}.mv_manuscript_version` AS version
 JOIN t_last_manuscript_version_abstract_keywords AS manuscript_version_abstract_keywords
   ON manuscript_version_abstract_keywords.version_id = version.version_id
 WHERE version.overall_stage = 'Initial Submission'
