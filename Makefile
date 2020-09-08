@@ -47,12 +47,12 @@ venv-create:
 
 
 dev-install:
-	$(PIP) install -r requirements.build.txt
-	$(PIP) install -r requirements.dev.txt
-	$(PIP) install -r requirements.jupyter.txt
-	$(PIP) install -r requirements.notebook.txt
-	$(PIP) install -r requirements.dag.txt
-	$(PIP) install -e . --no-deps
+	$(PIP) install --disable-pip-version-check -r requirements.build.txt
+	$(PIP) install --disable-pip-version-check -r requirements.dev.txt
+	$(PIP) install --disable-pip-version-check -r requirements.jupyter.txt
+	$(PIP) install --disable-pip-version-check -r requirements.notebook.txt
+	$(PIP) install --disable-pip-version-check -r requirements.dag.txt
+	$(PIP) install --disable-pip-version-check -e . --no-deps
 
 
 dev-venv: venv-create dev-install
