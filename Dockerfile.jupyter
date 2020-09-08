@@ -13,24 +13,26 @@ USER jovyan
 ENV PATH=/home/jovyan/.local/bin:${PATH}
 
 COPY requirements.build.txt ./
-RUN pip install -r requirements.build.txt
+RUN pip install --disable-pip-version-check -r requirements.build.txt
 
 COPY requirements.notebook.txt ./
-RUN pip install -r requirements.notebook.txt \
+RUN pip install --disable-pip-version-check -r requirements.notebook.txt \
   && jupyter nbextension enable --py widgetsnbextension
 
 COPY requirements.jupyter.ext.txt ./
-RUN pip install -r requirements.jupyter.ext.txt \
+RUN pip install --disable-pip-version-check -r requirements.jupyter.ext.txt \
   && jupyter serverextension enable --py nbresuse --sys-prefix \
   && jupyter nbextension install --py nbresuse --sys-prefix \
   && jupyter nbextension enable --py nbresuse --sys-prefix
 
 COPY setup.py ./
-RUN pip install -e . --no-deps --user
+RUN pip install --disable-pip-version-check -e . --no-deps --user
 
 ARG install_dev=y
 COPY requirements.dev.txt ./
-RUN if [ "${install_dev}" = "y" ]; then pip install --user -r requirements.dev.txt; fi
+RUN if [ "${install_dev}" = "y" ]; then \
+    pip install --disable-pip-version-check --user -r requirements.dev.txt; \
+  fi
 
 COPY data_science_pipeline ./data_science_pipeline
 
