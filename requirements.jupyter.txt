@@ -1,2 +1,2 @@
-jupyterlab==2.2.6
+jupyterlab==2.2.7
 papermill==2.1.3
