@@ -166,8 +166,6 @@ def run_notebook(
             parameters=notebook_params,
             progress_bar=False,
             log_output=True,
-            stdout_file=sys.stdout,
-            stderr_file=sys.stderr,
             report_mode=True
         )
 
