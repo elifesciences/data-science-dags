@@ -6,11 +6,11 @@ WITH t_full_submission_version_id_including_null AS (
 
   SELECT version_id
   FROM `{project}.{dataset}.mv_manuscript_version` AS manuscript_version
-  WHERE manuscript_version.overall_stage = 'Full Submission'
+  WHERE manuscript_version.overall_stage = 'Initial Submission'
   AND TIMESTAMP_DIFF(CURRENT_TIMESTAMP(), manuscript_version.stages[SAFE_OFFSET(0)].stage_timestamp, DAY) <= 90
   AND (
     TIMESTAMP_DIFF(CURRENT_TIMESTAMP(), manuscript_version.stages[SAFE_OFFSET(0)].stage_timestamp, DAY) <= 30
-    OR NOT EXISTS (SELECT 1 FROM UNNEST(manuscript_version.stages) WHERE stage_name = 'Reviewing Editor Assigned')
+    OR NOT EXISTS (SELECT 1 FROM UNNEST(manuscript_version.stages) WHERE stage_name = 'Senior Editor Assigned')
   )
   AND NOT is_withdrawn
   AND NOT is_deleted
