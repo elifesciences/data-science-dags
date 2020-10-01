@@ -8,7 +8,7 @@ lxml==4.5.2
 matplotlib==3.3.2
 numpy==1.19.2
 pandas==1.1.2
-pandas-gbq==0.13.2
+pandas-gbq==0.13.3
 PyICU==2.5
 tqdm==4.50.0
 google-cloud-bigquery==1.28.0
