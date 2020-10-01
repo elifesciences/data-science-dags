@@ -201,12 +201,13 @@ def to_gbq(
         df: pd.DataFrame,
         destination_table: str,
         if_exists: str = 'fail',
-        project_id: str = None):
+        project_id: str = None,
+        jsonl_file: str = None):
     """Similar to DataFrame.to_gpq but better handles schema detection of nested fields"""
     dataset_name, table_name = destination_table.split('.', maxsplit=1)
-    with df_as_jsonl_file_without_null(df) as jsonl_file:
+    with df_as_jsonl_file_without_null(df, jsonl_file=jsonl_file) as _jsonl_file:
         load_file_into_bq_with_auto_schema(
-            jsonl_file,
+            _jsonl_file,
             dataset_name=dataset_name,
             table_name=table_name,
             write_mode=get_bq_write_disposition(if_exists),

@@ -59,11 +59,15 @@ DEFAULT_ARGS = {
 }
 
 
+# daily at 2am to allow other data being updated
+DEFAULT_DATA_SCIENCE_SCHEDULE_INTERVAL = "0 2 * * *"
+
+
 def get_default_dag_args() -> dict:
     return dict(
         schedule_interval=os.getenv(
             DATA_SCIENCE_SCHEDULE_INTERVAL_ENV_NAME,
-            "@daily"
+            DEFAULT_DATA_SCIENCE_SCHEDULE_INTERVAL
         ),
         catchup=False,
         default_args=DEFAULT_ARGS,
