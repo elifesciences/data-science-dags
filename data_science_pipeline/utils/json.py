@@ -4,6 +4,8 @@ from contextlib import contextmanager
 from tempfile import TemporaryDirectory
 from typing import ContextManager, Iterable
 
+import pandas as pd
+
 from data_science_pipeline.utils.io import open_with_auto_compression
 
 
@@ -13,7 +15,7 @@ def remove_key_with_null_value(record):
     if isinstance(record, dict):
         for key in list(record):
             val = record.get(key)
-            if not val and not isinstance(val, bool):
+            if pd.isna(val) or not val and not isinstance(val, bool):
                 record.pop(key, None)
             elif isinstance(val, (dict, list)):
                 remove_key_with_null_value(val)

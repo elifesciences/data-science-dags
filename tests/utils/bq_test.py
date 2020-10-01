@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 
 import pandas as pd
+import numpy as np
 
 from data_science_pipeline.utils.bq import (
     df_as_jsonl_file_without_null
@@ -13,6 +14,16 @@ class TestDfAsJsonlFileWithoutNull:
     def test_should_remove_null_value(self, temp_dir: Path):
         jsonl_file = temp_dir / 'data.jsonl'
         df = pd.DataFrame([{'key1': 'value1', 'key2': None}])
+        with df_as_jsonl_file_without_null(df, gzip_enabled=False) as jsonl_file:
+            result = [
+                json.loads(line)
+                for line in Path(jsonl_file).read_text().splitlines()
+            ]
+        assert result == [{'key1': 'value1'}]
+
+    def test_should_remove_np_nan_value(self, temp_dir: Path):
+        jsonl_file = temp_dir / 'data.jsonl'
+        df = pd.DataFrame([{'key1': 'value1', 'key2': np.nan}])
         with df_as_jsonl_file_without_null(df, gzip_enabled=False) as jsonl_file:
             result = [
                 json.loads(line)
