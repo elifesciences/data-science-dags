@@ -39,7 +39,12 @@ def write_jsonl_to_file(
 @contextmanager
 def json_list_as_jsonl_file(
         json_list: Iterable[dict],
-        gzip_enabled: bool = True) -> ContextManager[str]:
+        gzip_enabled: bool = True,
+        jsonl_file: str = None) -> ContextManager[str]:
+    if jsonl_file:
+        write_jsonl_to_file(json_list, jsonl_file)
+        yield jsonl_file
+        return
     with TemporaryDirectory() as temp_dir:
         jsonl_file = os.path.join(temp_dir, 'data.jsonl')
         if gzip_enabled:
