@@ -4,6 +4,8 @@ from contextlib import contextmanager
 from tempfile import TemporaryDirectory
 from typing import ContextManager, Iterable
 
+import pandas as pd
+
 from data_science_pipeline.utils.io import open_with_auto_compression
 
 
@@ -13,7 +15,7 @@ def remove_key_with_null_value(record):
     if isinstance(record, dict):
         for key in list(record):
             val = record.get(key)
-            if not val and not isinstance(val, bool):
+            if pd.isna(val) or not val and not isinstance(val, bool):
                 record.pop(key, None)
             elif isinstance(val, (dict, list)):
                 remove_key_with_null_value(val)
@@ -39,7 +41,12 @@ def write_jsonl_to_file(
 @contextmanager
 def json_list_as_jsonl_file(
         json_list: Iterable[dict],
-        gzip_enabled: bool = True) -> ContextManager[str]:
+        gzip_enabled: bool = True,
+        jsonl_file: str = None) -> ContextManager[str]:
+    if jsonl_file:
+        write_jsonl_to_file(json_list, jsonl_file)
+        yield jsonl_file
+        return
     with TemporaryDirectory() as temp_dir:
         jsonl_file = os.path.join(temp_dir, 'data.jsonl')
         if gzip_enabled:
