@@ -1,5 +1,10 @@
+import logging
 from datetime import datetime
+
 import pandas as pd
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 def to_date_isoformat(d: datetime) -> datetime:
@@ -58,3 +63,27 @@ def filter_by_year(df: pd.DataFrame, year_date, **kwargs) -> pd.DataFrame:
     year_start_date = get_year_start_date(year_date)
     next_year_start_date = year_start_date + pd.offsets.YearBegin(1)
     return filter_date_between(df, year_start_date, next_year_start_date, **kwargs)
+
+
+def get_rolling_average(
+        series: pd.Series,
+        window: int,
+        min_periods: int = 1) -> pd.Series:
+    rolling = series.rolling(
+        window=window,
+        min_periods=min_periods,
+        center=True
+    )
+    rolling_mean = rolling.mean()
+    rolling_mean[pd.isnull(series)] = None
+    LOGGER.debug('rolling_mean:\n%s', rolling_mean)
+    return rolling_mean
+
+
+def get_ewma(
+        series: pd.Series,
+        **kwargs) -> pd.Series:
+    result = series.ewm(**kwargs).mean()
+    result[pd.isnull(series)] = None
+    LOGGER.debug('result:\n%s', result)
+    return result
