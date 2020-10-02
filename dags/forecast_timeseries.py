@@ -43,3 +43,11 @@ with create_dag(dag_id=DAG_ID, schedule_interval=get_schedule_interval()) as dag
             'output_table_name': 'Forecast_Full_Submission_Received_To_First_Decision'
         }
     )
+    create_run_notebook_operator(
+        task_id='Forecast_Accept_Decision_To_VOR',
+        notebook_filename='forecasting/forecast-timeseries.ipynb',
+        notebook_params={
+            'sql_filename': 'accept_decision_to_vor_by_date.sql',
+            'output_table_name': 'Forecast_Accept_Decision_To_VOR'
+        }
+    )
