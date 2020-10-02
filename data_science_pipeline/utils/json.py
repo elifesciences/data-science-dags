@@ -5,8 +5,13 @@ from tempfile import TemporaryDirectory
 from typing import ContextManager, Iterable
 
 import pandas as pd
+import numpy as np
 
 from data_science_pipeline.utils.io import open_with_auto_compression
+
+
+def is_scalar_nan(value) -> bool:
+    return np.isscalar(value) and pd.isnull(value)
 
 
 # copied from:
@@ -15,7 +20,7 @@ def remove_key_with_null_value(record):
     if isinstance(record, dict):
         for key in list(record):
             val = record.get(key)
-            if pd.isna(val) or not val and not isinstance(val, bool):
+            if is_scalar_nan(val) or not val and not isinstance(val, bool):
                 record.pop(key, None)
             elif isinstance(val, (dict, list)):
                 remove_key_with_null_value(val)
