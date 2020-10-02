@@ -8,7 +8,7 @@ from data_science_pipeline.utils.dags import (
 )
 
 
-DAG_ID = "Data_Science_Forecast_Initial_Submission"
+DAG_ID = "Data_Science_Forecast_Timeseries"
 
 
 DEFAULT_FORECAST_SCHEDULE = '@hourly'
@@ -28,5 +28,10 @@ def get_schedule_interval() -> str:
 # Note: need to save dag to a variable
 with create_dag(dag_id=DAG_ID, schedule_interval=get_schedule_interval()) as dag:
     create_run_notebook_operator(
-        notebook_filename='forecasting/forecast-initial-submission.ipynb'
+        task_id='Forecast_Initial_Submission',
+        notebook_filename='forecasting/forecast-timeseries.ipynb',
+        notebook_params={
+            'sql_filename': 'initial_submission_count_by_date.sql',
+            'output_table_name': 'Forecast_Initial_Submission'
+        }
     )
