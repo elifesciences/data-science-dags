@@ -41,6 +41,16 @@ class TestDfAsJsonlFileWithoutNull:
             ]
         assert result == [{'parent': {'key1': 'value1'}}]
 
+    def test_should_not_fail_with_list_values_field(self, temp_dir: Path):
+        jsonl_file = temp_dir / 'data.jsonl'
+        df = pd.DataFrame([{'key1': ['value1', 'value2'], 'key2': None}])
+        with df_as_jsonl_file_without_null(df, gzip_enabled=False) as jsonl_file:
+            result = [
+                json.loads(line)
+                for line in Path(jsonl_file).read_text().splitlines()
+            ]
+        assert result == [{'key1': ['value1', 'value2']}]
+
     def test_should_use_gzip_compression_by_default(self, temp_dir: Path):
         jsonl_file = temp_dir / 'data.jsonl'
         df = pd.DataFrame([{'key1': 'value1', 'key2': None}])
