@@ -1,4 +1,7 @@
+import logging
+
 import pandas as pd
+import numpy as np
 
 from data_science_pipeline.utils.timeseries import (
     to_date_isoformat,
@@ -9,8 +12,20 @@ from data_science_pipeline.utils.timeseries import (
     get_quarter_week_date,
     filter_by_month,
     filter_by_quarter,
-    filter_by_year
+    filter_by_year,
+    get_rolling_average,
+    get_ewma
 )
+
+
+LOGGER = logging.getLogger(__name__)
+
+
+def _nan_to_none(ser: pd.Series) -> list:
+    return [
+        None if np.isscalar(item) and np.isnan(item) else item
+        for item in list(ser)
+    ]
 
 
 class TestGetMonthStartDate:
@@ -141,3 +156,40 @@ class TestFilterByYear:
         )['ds'].apply(to_date_isoformat)) == [
             '2020-01-01', '2020-12-31'
         ]
+
+
+class TestGetRollingAverage:
+    def test_should_return_passed_single_value_and_keep_null(self):
+        assert _nan_to_none(get_rolling_average(pd.Series([
+            np.nan, 123, np.nan
+        ]), window=3)) == [None, 123, None]
+
+    def test_should_return_values_with_moving_average(self):
+        assert _nan_to_none(get_rolling_average(pd.Series([
+            np.nan, 100, 200, 100, 200, 100, np.nan
+        ]), window=3)) == [
+            None,
+            (100 + 200) / 2,  # =150
+            (100 + 200 + 100) / 3,  # =133.
+            (200 + 100 + 200) / 3,  # =166.
+            (100 + 200 + 100) / 3,  # =133.
+            (200 + 100) / 2,  # 150
+            None
+        ]
+
+
+class TestGetEwma:
+    def test_should_return_passed_single_value_and_keep_null(self):
+        assert _nan_to_none(get_ewma(pd.Series([
+            np.nan, 123, np.nan
+        ]), span=3)) == [None, 123, None]
+
+    def test_should_return_values_with_moving_average(self):
+        result = _nan_to_none(get_ewma(pd.Series([
+            np.nan, 100, 200, 100, 200, 100, np.nan
+        ]), span=3))
+        LOGGER.debug('result: %s', result)
+        assert list(pd.isnull(result)) == [True, False, False, False, False, False, True]
+        not_null_values = pd.Series(result).dropna()
+        assert (not_null_values >= 100).all()
+        assert (not_null_values <= 200).all()
