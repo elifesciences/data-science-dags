@@ -19,3 +19,7 @@ ignored-classes=
     lxml.builder.E
 extension-pkg-whitelist=
     lxml
+
+[IMPORTS]
+known-third-party=
+    airflow
