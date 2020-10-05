@@ -1,4 +1,4 @@
-beautifulsoup4==4.9.2
+beautifulsoup4==4.9.3
 bigquery-schema-generator==1.1
 boto3==1.15.11
 cloudpickle==1.4.1
