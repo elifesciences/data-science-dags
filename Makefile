@@ -76,6 +76,19 @@ dev-notebook-lint:
 		--disable=$(NOTEBOOK_PYLINT_EXCLUSIONS)
 
 
+dev-notebook-nbstripout:
+	$(VENV)/bin/nbstripout \
+		$(shell find ./notebooks -name *.ipynb)
+
+
+dev-nbstripout-status:
+	$(VENV)/bin/nbstripout --status
+
+
+dev-nbstripout-install:
+	$(VENV)/bin/nbstripout --install
+
+
 dev-lint: dev-flake8 dev-pylint dev-notebook-lint
 
 
@@ -166,6 +179,20 @@ notebook-lint:
 	'
 
 
+notebook-nbstripout-check:
+	$(JUPYTER_RUN) bash -c '\
+		cd .. \
+		&& pwd \
+		&& ls -l --recursive ./notebooks \
+		&& rm -rf /tmp/notebooks-nbstripout \
+		&& cp -r ./notebooks /tmp/notebooks-nbstripout \
+		&& nbstripout $$(find ./notebooks -name *.ipynb) \
+		&& ls -l --recursive /tmp/notebooks-nbstripout \
+		&& diff --recursive --brief /tmp/notebooks-nbstripout ./notebooks \
+		&& echo no unstripped notebook outputs found \
+	'
+
+
 pytest:
 	$(DEV_RUN) pytest -p no:cacheprovider $(ARGS)
 
@@ -243,6 +270,7 @@ ci-build-and-test:
 		airflow-dev-build \
 		jupyter-build \
 		notebook-lint \
+		notebook-nbstripout-check \
 		ci-test-exclude-e2e
 
 
