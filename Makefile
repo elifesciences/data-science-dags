@@ -76,6 +76,11 @@ dev-notebook-lint:
 		--disable=$(NOTEBOOK_PYLINT_EXCLUSIONS)
 
 
+dev-notebook-nbstripout:
+	$(VENV)/bin/nbstripout \
+		./notebooks/**/*.ipynb
+
+
 dev-lint: dev-flake8 dev-pylint dev-notebook-lint
 
 
