@@ -81,6 +81,14 @@ dev-notebook-nbstripout:
 		$(shell find ./notebooks -name *.ipynb)
 
 
+dev-nbstripout-status:
+	$(VENV)/bin/nbstripout --status
+
+
+dev-nbstripout-install:
+	$(VENV)/bin/nbstripout --install
+
+
 dev-lint: dev-flake8 dev-pylint dev-notebook-lint
 
 
