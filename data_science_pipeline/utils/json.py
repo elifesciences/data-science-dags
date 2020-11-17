@@ -52,7 +52,7 @@ def is_empty_value(value) -> bool:
 def remove_key_with_null_value(record):
     if isinstance(record, dict):
         return {
-            key: value
+            key: remove_key_with_null_value(value)
             for key, value in record.items()
             if not is_empty_value(value)
         }

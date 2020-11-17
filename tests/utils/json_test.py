@@ -82,6 +82,16 @@ class TestRemoveKeyWithNullValue:
             'other': 'value'
         }]) == [{'other': 'value'}]
 
+    def test_should_remove_none_from_dict_within_dict(self):
+        assert remove_key_with_null_value({
+            'parent': {
+                'key1': None,
+                'other': 'value'
+            }
+        }) == {
+            'parent': {'other': 'value'}
+        }
+
     def test_should_not_modify_passed_in_value(self):
         record = {
             'key1': None,
