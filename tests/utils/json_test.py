@@ -15,6 +15,7 @@ class TestGetJsonCompatibleValue:
     def test_should_convert_numpy_array_to_list(self):
         assert get_json_compatible_value(np.asarray([1, 2, 3])) == [1, 2, 3]
 
+
 class TestGetRecursiveJsonCompatibleValue:
     def test_should_return_passed_in_none_value(self):
         assert get_recursive_json_compatible_value(None) is None
