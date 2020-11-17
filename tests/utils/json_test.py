@@ -75,6 +75,21 @@ class TestRemoveKeyWithNullValue:
         }
         assert remove_key_with_null_value(record.copy()) == record
 
+    def test_should_remove_none_from_dict_within_list(self):
+        assert remove_key_with_null_value([{
+            'key1': None,
+            'other': 'value'
+        }]) == [{'other': 'value'}]
+
+    def test_should_not_modify_passed_in_value(self):
+        record = {
+            'key1': None,
+            'other': 'value'
+        }
+        record_copy = record.copy()
+        remove_key_with_null_value(record)
+        assert record == record_copy
+
 
 class TestWriteJsonlToFile:
     def test_should_be_able_to_write_numpy_array(self, temp_dir: Path):

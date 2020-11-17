@@ -35,29 +35,32 @@ def get_recursive_json_compatible_value(value):
     return get_json_compatible_value(value)
 
 
-# copied from:
+def is_empty_value(value) -> bool:
+    return (
+        (value is None or np.isscalar(value))
+        and (
+            pd.isnull(value)
+            or (not value and not isinstance(value, bool))
+        )
+    )
+
+
+# initially copied from:
 # https://github.com/elifesciences/data-hub-ejp-xml-pipeline/blob/develop/ejp_xml_pipeline/transform_json.py
 # modified to handle numpy and pandas types
+# refactored to be more functional
 def remove_key_with_null_value(record):
     if isinstance(record, dict):
-        for key in list(record):
-            value = record.get(key)
-            if (
-                (value is None or np.isscalar(value))
-                and (
-                    pd.isnull(value)
-                    or (not value and not isinstance(value, bool))
-                )
-            ):
-                record.pop(key, None)
-            elif isinstance(value, (dict, list)):
-                remove_key_with_null_value(value)
-
-    elif isinstance(record, list):
-        for value in record:
-            if isinstance(value, (dict, list)):
-                remove_key_with_null_value(value)
-
+        return {
+            key: value
+            for key, value in record.items()
+            if not is_empty_value(value)
+        }
+    if isinstance(record, list):
+        return [
+            remove_key_with_null_value(value)
+            for value in record
+        ]
     return record
 
 
