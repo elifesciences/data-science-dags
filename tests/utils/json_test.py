@@ -1,6 +1,46 @@
+import json
+from pathlib import Path
+
 import numpy as np
 
-from data_science_pipeline.utils.json import remove_key_with_null_value
+from data_science_pipeline.utils.json import (
+    get_json_compatible_value,
+    get_recursive_json_compatible_value,
+    remove_key_with_null_value,
+    write_jsonl_to_file
+)
+
+
+class TestGetJsonCompatibleValue:
+    def test_should_convert_numpy_array_to_list(self):
+        assert get_json_compatible_value(np.asarray([1, 2, 3])) == [1, 2, 3]
+
+class TestGetRecursiveJsonCompatibleValue:
+    def test_should_return_passed_in_none_value(self):
+        assert get_recursive_json_compatible_value(None) is None
+
+    def test_should_return_passed_in_string_value(self):
+        assert get_recursive_json_compatible_value('123') == '123'
+
+    def test_should_return_passed_in_int_value(self):
+        assert get_recursive_json_compatible_value(123) == 123
+
+    def test_should_convert_numpy_array_to_list(self):
+        assert get_recursive_json_compatible_value(np.asarray([1, 2, 3])) == [1, 2, 3]
+
+    def test_should_convert_numpy_array_within_dict(self):
+        assert get_recursive_json_compatible_value({
+            'key1': np.asarray([1, 2, 3])
+        }) == {
+            'key1': [1, 2, 3]
+        }
+
+    def test_should_convert_numpy_array_within_list(self):
+        assert get_recursive_json_compatible_value([
+            np.asarray([1, 2, 3])
+        ]) == [
+            [1, 2, 3]
+        ]
 
 
 class TestRemoveKeyWithNullValue:
@@ -34,3 +74,14 @@ class TestRemoveKeyWithNullValue:
             'other': 'value'
         }
         assert remove_key_with_null_value(record.copy()) == record
+
+
+class TestWriteJsonlToFile:
+    def test_should_be_able_to_write_numpy_array(self, temp_dir: Path):
+        temp_file = temp_dir / 'file.json'
+        write_jsonl_to_file([{
+            'key1': np.asarray([1, 2, 3])
+        }], temp_file)
+        assert json.loads(temp_file.read_text()) == {
+            'key1': [1, 2, 3]
+        }
