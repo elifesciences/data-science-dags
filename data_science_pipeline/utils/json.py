@@ -42,7 +42,10 @@ def write_jsonl_to_file(
         write_mode: str = 'w'):
     with open_with_auto_compression(full_temp_file_location, write_mode) as write_file:
         for record in json_list:
-            write_file.write(json.dumps(record))
+            try:
+                write_file.write(json.dumps(record))
+            except TypeError as exc:
+                raise TypeError('failed to convert %r due to %r' % (record, exc)) from exc
             write_file.write("\n")
 
 
