@@ -10,25 +10,28 @@ import numpy as np
 from data_science_pipeline.utils.io import open_with_auto_compression
 
 
-def is_scalar_nan(value) -> bool:
-    return np.isscalar(value) and pd.isnull(value)
-
-
 # copied from:
 # https://github.com/elifesciences/data-hub-ejp-xml-pipeline/blob/develop/ejp_xml_pipeline/transform_json.py
+# modified to handle numpy and pandas types
 def remove_key_with_null_value(record):
     if isinstance(record, dict):
         for key in list(record):
-            val = record.get(key)
-            if is_scalar_nan(val) or not val and not isinstance(val, bool):
+            value = record.get(key)
+            if (
+                (value is None or np.isscalar(value))
+                and (
+                    pd.isnull(value)
+                    or (not value and not isinstance(value, bool))
+                )
+            ):
                 record.pop(key, None)
-            elif isinstance(val, (dict, list)):
-                remove_key_with_null_value(val)
+            elif isinstance(value, (dict, list)):
+                remove_key_with_null_value(value)
 
     elif isinstance(record, list):
-        for val in record:
-            if isinstance(val, (dict, list)):
-                remove_key_with_null_value(val)
+        for value in record:
+            if isinstance(value, (dict, list)):
+                remove_key_with_null_value(value)
 
     return record
 
