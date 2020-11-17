@@ -1,7 +1,7 @@
 beautifulsoup4==4.9.3
 bigquery-schema-generator==1.2
 boto3==1.16.19
-cattrs==1.0.0
+cattrs==1.1.1
 cloudpickle==1.4.1
 fbprophet==0.7.1
 ipywidgets==7.5.1
