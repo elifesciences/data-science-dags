@@ -260,6 +260,13 @@ airflow-stop:
 	$(AIRFLOW_DOCKER_COMPOSE) down
 
 
+clean:
+	$(DOCKER_COMPOSE) down -v
+
+airflow-initdb:
+	$(DOCKER_COMPOSE) run --rm  webserver initdb
+
+
 ci-test-exclude-e2e:
 	$(DOCKER_COMPOSE) run --rm airflow-dev ./run_test.sh
 
