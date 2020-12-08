@@ -15,6 +15,6 @@ pyarrow==2.0.0
 PyICU==2.6
 tqdm==4.54.1
 google-cloud-bigquery==2.3.1
-s3path==0.2.202
+s3path==0.2.203
 scikit-learn==0.23.2
 six==1.15.0
