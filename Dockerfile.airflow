@@ -1,16 +1,16 @@
-FROM puckel/docker-airflow:1.10.4
-ARG install_dev
+FROM apache/airflow:1.10.13-python3.6
+ARG install_dev=n
 
 USER root
 
 RUN apt-get update \
-  && apt-get install sudo pkg-config libicu-dev -yqq \
+  && apt-get install sudo pkg-config libicu-dev gcc g++ -yqq \
   && rm -rf /var/lib/apt/lists/*
+
 RUN usermod -aG sudo airflow
 RUN echo "airflow ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
-RUN sed -i 's/LocalExecutor/SequentialExecutor/' /entrypoint.sh
-
+USER airflow
 COPY requirements.build.txt ./
 RUN pip install --disable-pip-version-check -r requirements.build.txt
 
@@ -24,16 +24,15 @@ COPY requirements.notebook.txt ./
 RUN pip install --disable-pip-version-check -r requirements.notebook.txt \
   && jupyter nbextension enable --py widgetsnbextension
 
-USER airflow
 COPY --chown=airflow:airflow requirements.dev.txt ./
 RUN if [ "${install_dev}" = "y" ]; then \
     pip install --disable-pip-version-check --user -r requirements.dev.txt; \
   fi
 
-ENV PATH /usr/local/airflow/.local/bin:$PATH
+ENV PATH /home/airflow/.local/bin:$PATH
 
-RUN mkdir /usr/local/airflow/applications_file_directory
-ENV AIRFLOW_APPLICATIONS_DIRECTORY_PATH /usr/local/airflow/applications_file_directory
+RUN mkdir /home/airflow/applications_file_directory
+ENV AIRFLOW_APPLICATIONS_DIRECTORY_PATH /home/airflow/applications_file_directory
 
 COPY --chown=airflow:airflow data_science_pipeline ./data_science_pipeline
 COPY --chown=airflow:airflow dags ./dags
