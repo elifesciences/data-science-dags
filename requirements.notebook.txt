@@ -16,5 +16,5 @@ PyICU==2.6
 tqdm==4.54.1
 google-cloud-bigquery==2.3.1
 s3path==0.2.205
-scikit-learn==0.23.2
+scikit-learn==0.24.0
 six==1.15.0
