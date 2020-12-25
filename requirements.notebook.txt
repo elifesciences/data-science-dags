@@ -4,7 +4,7 @@ boto3==1.16.43
 cattrs==1.0.0
 cloudpickle==1.4.1
 fbprophet==0.7.1
-ipywidgets==7.5.1
+ipywidgets==7.6.0
 joblib==0.17.0
 lxml==4.6.2
 matplotlib==3.3.3
