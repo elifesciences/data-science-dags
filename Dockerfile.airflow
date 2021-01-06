@@ -31,8 +31,8 @@ RUN if [ "${install_dev}" = "y" ]; then \
 
 ENV PATH /home/airflow/.local/bin:$PATH
 
-RUN mkdir /home/airflow/applications_file_directory
-ENV AIRFLOW_APPLICATIONS_DIRECTORY_PATH /home/airflow/applications_file_directory
+RUN mkdir $AIRFLOW_HOME/applications_file_directory
+ENV AIRFLOW_APPLICATIONS_DIRECTORY_PATH $AIRFLOW_HOME/applications_file_directory
 
 COPY --chown=airflow:airflow data_science_pipeline ./data_science_pipeline
 COPY --chown=airflow:airflow dags ./dags
