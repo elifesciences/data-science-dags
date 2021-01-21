@@ -1,2 +1,2 @@
 jupyterlab==3.0.0
-papermill==2.2.2
+papermill==2.3.0
