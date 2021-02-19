@@ -14,7 +14,7 @@ pandas-gbq==0.14.1
 pyarrow==2.0.0
 PyICU==2.6
 tqdm==4.56.0
-google-cloud-bigquery==2.6.1
+google-cloud-bigquery==2.9.0
 s3path==0.2.205
 scikit-learn==0.24.1
 six==1.15.0
