@@ -19,6 +19,9 @@ COPY requirements.notebook.txt ./
 RUN pip install --disable-pip-version-check -r requirements.notebook.txt \
   && jupyter nbextension enable --py widgetsnbextension
 
+COPY requirements.fbprophet.txt ./
+RUN pip install --disable-pip-version-check -r requirements.fbprophet.txt
+
 COPY requirements.jupyter.ext.txt ./
 RUN pip install --disable-pip-version-check -r requirements.jupyter.ext.txt \
   && jupyter serverextension enable --py nbresuse --sys-prefix \
