@@ -7,7 +7,7 @@ ipywidgets==7.5.1
 joblib==0.17.0
 lxml==4.6.3
 pandas-gbq==0.14.1
-pyarrow==2.0.0
+pyarrow==4.0.0
 PyICU==2.6
 google-cloud-bigquery==2.6.1
 s3path==0.2.205
