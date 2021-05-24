@@ -12,7 +12,7 @@ PyICU==2.6
 google-cloud-bigquery==2.6.1
 s3path==0.2.205
 scikit-learn==0.24.1
-six==1.15.0
+six==1.16.0
 pystan==2.19.1.1
 convertdate==2.3.2
 matplotlib==3.3.4
