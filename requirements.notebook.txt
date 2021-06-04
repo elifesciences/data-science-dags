@@ -11,7 +11,7 @@ pyarrow==4.0.1
 PyICU==2.7.3
 google-cloud-bigquery==2.18.0
 s3path==0.3.1
-scikit-learn==0.24.1
+scikit-learn==0.24.2
 six==1.16.0
 pystan==2.19.1.1
 convertdate==2.3.2
