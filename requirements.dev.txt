@@ -1,4 +1,4 @@
-flake8==3.8.4
+flake8==3.9.2
 nbstripout==0.3.9
 pylint==2.6.0
 pytest==6.2.4
