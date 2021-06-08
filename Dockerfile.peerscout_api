@@ -1,0 +1,17 @@
+FROM python:3.7
+
+USER root
+
+ENV PROJECT_FOLDER=/app/peerscout_api
+
+WORKDIR ${PROJECT_FOLDER}
+
+COPY requirements.build.txt ./
+RUN pip install --disable-pip-version-check -r requirements.build.txt
+
+COPY requirements.api.txt ./
+RUN pip install --disable-pip-version-check -r requirements.api.txt
+
+COPY data_science_pipeline ./data_science_pipeline
+
+CMD ["python3", "-m", "data_science_pipeline.peerscout.api.main"]
