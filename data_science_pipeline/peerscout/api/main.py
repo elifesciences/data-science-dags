@@ -1,6 +1,5 @@
 from flask import Flask, jsonify, request
 import functools
-import json
 import logging
 import os
 from abc import ABC, abstractmethod
@@ -36,11 +35,14 @@ output2 = {
 class EnvironmentVariableNames:
     PEERSCOUT_API_ACCESS_TOKEN = 'PEERSCOUT_API_ACCESS_TOKEN'
 
+
 class HttpHeaderVariables:
     ACCESS_TOKEN = 'X-Access-Token'
 
+
 def get_peerscout_api_access_token():
     return os.getenv(EnvironmentVariableNames.PEERSCOUT_API_ACCESS_TOKEN)
+
 
 class RouteWrapper(ABC):
     @abstractmethod
@@ -90,12 +92,12 @@ def create_app():
         data = request.get_json(force=True)
         try:
             abstract = data['abstract']
-            body_html = data['body_html']
+            # body_html = data['body_html']
         except KeyError as e:
             raise BadRequest() from e
-        if abstract=='output1':
+        if abstract == 'output1':
             return jsonify(output1)
-        elif abstract=='output2':
+        elif abstract == 'output2':
             return jsonify(output2)
         else:
             return BadRequestKeyError
@@ -105,8 +107,7 @@ def create_app():
 def main():
     app = create_app()
     app.run(port='8080', host='0.0.0.0', threaded=False)
-        
+
 
 if __name__ == "__main__":
     main()
-
