@@ -110,5 +110,13 @@ services:
       && sudo install -D /tmp/.aws-credentials -m 644 --no-target-directory /home/airflow/.aws/credentials
       && ./worker.sh tcp://dask-scheduler:8786"
 
+  peerscout-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.peerscout_api
+    environment: 
+      - PEERSCOUT_API_ACCESS_TOKEN=${PEERSCOUT_API_ACCESS_TOKEN}
+    image: elifesciences/data-science-dags_peerscout-api:${IMAGE_TAG}
+
 volumes:
   data:

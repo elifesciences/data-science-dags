@@ -36,3 +36,7 @@ services:
       - .:/home/jovyan/data-science-dags
       - ~/.config/gcloud:/home/jovyan/.config/gcloud
       - ~/.aws/credentials:/home/jovyan/.aws/credentials
+  
+  peerscout-api:
+    volumes: 
+      - ./data_science_pipeline:/app/peerscout_api/data_science_pipeline
