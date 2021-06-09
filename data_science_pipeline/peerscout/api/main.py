@@ -4,7 +4,7 @@ import logging
 import os
 from abc import ABC, abstractmethod
 from typing import Optional
-from werkzeug.exceptions import BadRequest, BadRequestKeyError, Unauthorized
+from werkzeug.exceptions import BadRequest, Unauthorized
 
 
 LOGGER = logging.getLogger(__name__)
