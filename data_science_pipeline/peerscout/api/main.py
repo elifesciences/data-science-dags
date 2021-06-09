@@ -99,7 +99,7 @@ def create_app():
         elif abstract == 'output2':
             return jsonify(output2)
         else:
-            return BadRequestKeyError()
+            raise BadRequest('no valid abstract provided')
     return app
 
 
