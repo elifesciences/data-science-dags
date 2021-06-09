@@ -92,7 +92,6 @@ def create_app():
         data = request.get_json(force=True)
         try:
             abstract = data['abstract']
-            # body_html = data['body_html']
         except KeyError as e:
             raise BadRequest() from e
         if abstract == 'output1':
@@ -100,7 +99,7 @@ def create_app():
         elif abstract == 'output2':
             return jsonify(output2)
         else:
-            return BadRequestKeyError
+            return BadRequestKeyError()
     return app
 
 
