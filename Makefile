@@ -288,10 +288,10 @@ ci-build-and-test:
 		airflow-build \
 		airflow-dev-build \
 		jupyter-build \
+		peerscout-api-buid \
 		notebook-lint \
 		notebook-nbstripout-check \
 		ci-test-exclude-e2e
-
 
 ci-clean:
 	$(DOCKER_COMPOSE_CI) down -v
