@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: elifesciences/data-science-dags_peerscout-api
+  repository: elifesciences/data-science-dags_peerscout-api_unstable
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
