@@ -88,7 +88,7 @@ def create_app():
 
     @app.route('/api/status', methods=['GET'])
     def _status():
-        return jsonify({'message':'Welcome to PeerScout'})
+        return jsonify({'message': 'Welcome to PeerScout'})
 
     @app.route('/api/peerscout', methods=['POST'])
     @route_wrapper
