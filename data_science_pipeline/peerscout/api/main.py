@@ -86,9 +86,13 @@ def create_app():
 
     app = Flask(__name__)
 
+    @app.route('/api/status', methods=['GET'])
+    def _status():
+        return jsonify({'message': 'Welcome to PeerScout'})
+
     @app.route('/api/peerscout', methods=['POST'])
     @route_wrapper
-    def _home():
+    def _peerscout_api():
         data = request.get_json(force=True)
         try:
             abstract = data['abstract']
