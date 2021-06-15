@@ -10,16 +10,35 @@ import json
 
 LOGGER = logging.getLogger(__name__)
 
-output = {
-    "reviewing_editor_recommendation": {
-        "person_ids": [],
-        "recommendation_html": "The recommended editors are ..."
-    },
-    "senior_editor_recommendation": {
-        "person_ids": [],
-        "recommendation_html": "The recommended editors are ..."
-    }
-}
+REQUEST_JSON_SCHEMA_PATH = os.path.join(os.path.dirname(__file__), 'input-json-schema.json')
+
+
+def response_json(
+    abstract: str,
+    reviewing_editors: list,
+    senior_editors: list) -> dict:
+
+    data = {}
+
+    if abstract == "":
+        data['reviewing_editor_recommendation']={}
+        data['senior_editor_recommendation']={}
+        data['reviewing_editor_recommendation']['person_ids'] = []
+        data['senior_editor_recommendation']['person_ids'] = []
+        data['reviewing_editor_recommendation']['recommendation_html'] = "The recommended editors are ..."
+        data['senior_editor_recommendation']['recommendation_html'] = "The recommended editors are ..."
+    elif reviewing_editors == "" and senior_editors == "":
+        data['recommendation'] = "We don't have a recommendation"
+    else :
+        data['reviewing_editor_recommendation']={}
+        data['senior_editor_recommendation']={}
+        data['reviewing_editor_recommendation']['person_ids'] = reviewing_editors
+        data['senior_editor_recommendation']['person_ids'] = senior_editors
+        data['reviewing_editor_recommendation']['recommendation_html'] = "The recommended editors are ..."
+        data['senior_editor_recommendation']['recommendation_html'] = "The recommended editors are ..."
+
+    json_data = json.dumps(data)
+    return json_data
 
 
 class EnvironmentVariableNames:
@@ -76,6 +95,9 @@ def create_app():
 
     app = Flask(__name__)
 
+    with open(REQUEST_JSON_SCHEMA_PATH) as f:
+        json_schema = json.load(f)
+
     @app.route('/', methods=['GET'])
     def _home():
         html = """<h1>PeerScout Recommendation API</h1>
@@ -91,27 +113,24 @@ def create_app():
     @route_wrapper
     def _peerscout_api():
         data = request.get_json(force=True)
-        with open('./data_science_pipeline/peerscout/api/input-json-schema.json') as f:
-            json_schema = json.load(f)
-
+        LOGGER.info('Processing the request: %s', data)
+ 
         try:
             jsonschema.validate(data, json_schema)
         except jsonschema.exceptions.ValidationError as e:
-            print("invalid JSON:", e)
-
-        try:
-            abstract = data['abstract']
-            reviewing_editors = data['include_reviewing_editors_id']
-            senior_editors = data['include_senior_editors_id']
-        except KeyError as e:
+            LOGGER.info('invalid JSON %s, %s', data, e)
             raise BadRequest() from e
 
-        if abstract != "":
-            output['reviewing_editor_recommendation']['person_ids'] = reviewing_editors
-            output['senior_editor_recommendation']['person_ids'] = senior_editors
-            return jsonify(output)
-        else:
-            raise BadRequest('no valid abstract provided')
+        abstract = data['abstract']
+        reviewing_editors = data['include_reviewing_editors_id']
+        senior_editors = data['include_senior_editors_id']
+
+        return response_json(
+            abstract=abstract,
+            reviewing_editors=reviewing_editors,
+            senior_editors=senior_editors
+            )
+
     return app
 
 
