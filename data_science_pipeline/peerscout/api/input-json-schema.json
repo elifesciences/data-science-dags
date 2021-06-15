@@ -1,0 +1,63 @@
+{
+    "type": "object",
+    "properties": {
+      "manuscript_id": {
+        "type": "string"
+      },
+      "tracking_number": {
+        "type": "string"
+      },
+      "revision_number": {
+        "type": "integer"
+      },
+      "abstract": {
+        "type": "string"
+      },
+      "title": {
+        "type": "string"
+      },
+      "include_reviewing_editors_id": {
+        "type": "array",
+        "items": [
+          {
+            "type": "string"
+          }
+        ]
+      },
+      "exclude_reviewing_editors_id": {
+        "type": "array",
+        "items": [
+          {
+            "type": "string"
+          }
+        ]
+      },
+      "include_senior_editors_id": {
+        "type": "array",
+        "items": [
+          {
+            "type": "string"
+          }
+        ]
+      },
+      "exclude_senior_editors_id": {
+        "type": "array",
+        "items": [
+          {
+            "type": "string"
+          }
+        ]
+      }
+    },
+    "required": [
+      "manuscript_id",
+      "tracking_number",
+      "revision_number",
+      "abstract",
+      "title",
+      "include_reviewing_editors_id",
+      "exclude_reviewing_editors_id",
+      "include_senior_editors_id",
+      "exclude_senior_editors_id"
+    ]
+  }
