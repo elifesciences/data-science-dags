@@ -1,7 +1,7 @@
 {
     "manuscript_id":"67890",
     "tracking_number":"67890_xyZ",
-    "revision_number":"1",
+    "revision_number":1,
     "abstract":"Second Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     "title":"Second Lorem Ipsum",
     "include_reviewing_editors_id":[
