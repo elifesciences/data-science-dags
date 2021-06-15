@@ -28,7 +28,7 @@ def response_json(
         data['senior_editor_recommendation']['person_ids'] = []
         data['reviewing_editor_recommendation']['recommendation_html'] = "..."
         data['senior_editor_recommendation']['recommendation_html'] = "..."
-    elif reviewing_editors == "" and senior_editors == "":
+    elif reviewing_editors == [] and senior_editors == []:
         data['recommendation'] = "We don't have a recommendation"
     else:
         data['reviewing_editor_recommendation'] = {}
