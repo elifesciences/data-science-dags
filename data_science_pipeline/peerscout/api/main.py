@@ -14,28 +14,29 @@ REQUEST_JSON_SCHEMA_PATH = os.path.join(os.path.dirname(__file__), 'input-json-s
 
 
 def response_json(
-    abstract: str,
-    reviewing_editors: list,
-    senior_editors: list) -> dict:
+        abstract: str,
+        reviewing_editors: list,
+        senior_editors: list
+) -> dict:
 
     data = {}
 
     if abstract == "":
-        data['reviewing_editor_recommendation']={}
-        data['senior_editor_recommendation']={}
+        data['reviewing_editor_recommendation'] = {}
+        data['senior_editor_recommendation'] = {}
         data['reviewing_editor_recommendation']['person_ids'] = []
         data['senior_editor_recommendation']['person_ids'] = []
-        data['reviewing_editor_recommendation']['recommendation_html'] = "The recommended editors are ..."
-        data['senior_editor_recommendation']['recommendation_html'] = "The recommended editors are ..."
+        data['reviewing_editor_recommendation']['recommendation_html'] = "..."
+        data['senior_editor_recommendation']['recommendation_html'] = "..."
     elif reviewing_editors == "" and senior_editors == "":
         data['recommendation'] = "We don't have a recommendation"
-    else :
-        data['reviewing_editor_recommendation']={}
-        data['senior_editor_recommendation']={}
+    else:
+        data['reviewing_editor_recommendation'] = {}
+        data['senior_editor_recommendation'] = {}
         data['reviewing_editor_recommendation']['person_ids'] = reviewing_editors
         data['senior_editor_recommendation']['person_ids'] = senior_editors
-        data['reviewing_editor_recommendation']['recommendation_html'] = "The recommended editors are ..."
-        data['senior_editor_recommendation']['recommendation_html'] = "The recommended editors are ..."
+        data['reviewing_editor_recommendation']['recommendation_html'] = "..."
+        data['senior_editor_recommendation']['recommendation_html'] = "..."
 
     json_data = json.dumps(data)
     return json_data
@@ -114,7 +115,7 @@ def create_app():
     def _peerscout_api():
         data = request.get_json(force=True)
         LOGGER.info('Processing the request: %s', data)
- 
+
         try:
             jsonschema.validate(data, json_schema)
         except jsonschema.exceptions.ValidationError as e:
