@@ -120,10 +120,10 @@ def create_app():
         suggested_reviewing_editor_person_ids = author_suggestion['include_reviewing_editors_id']
         suggested_senior_editor_person_ids = author_suggestion['include_senior_editors_id']
 
-        return get_response_json(
+        return jsonify(get_response_json(
             senior_editor_person_ids=suggested_senior_editor_person_ids if abstract else [],
             reviewing_editor_person_ids=suggested_reviewing_editor_person_ids if abstract else []
-        )
+        ))
 
     return app
 
