@@ -4,20 +4,22 @@
     "revision_number":0,
     "abstract":"<p>Lorem ipsum dolor sit amet, <i>consectetur adipiscing elit</i>, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
     "title":"<b>Lorem Ipsum</b>",
-    "author_suggested_to_include_reviewing_editors_id":[
-      "43038",
-      "178962",
-      "7970"
-    ],
-    "author_suggested_to_exclude_reviewing_editors_id":[
-      "1000"
-    ],
-    "author_suggested_to_include_senior_editors_id":[
-      "15332",
-      "42473",
-      "42011"
-    ],
-    "author_suggested_to_exclude_senior_editors_id":[
-      "73636"
-    ]
+    "author_suggestion":{
+      "include_reviewing_editors_id":[
+        "43038",
+        "178962",
+        "7970"
+      ],
+      "exclude_reviewing_editors_id":[
+        "1000"
+      ],
+      "include_senior_editors_id":[
+        "15332",
+        "42473",
+        "42011"
+      ],
+      "exclude_senior_editors_id":[
+        "73636"
+      ]
+    } 
   }

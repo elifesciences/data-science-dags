@@ -4,22 +4,24 @@
     "revision_number":1,
     "abstract":"Second Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     "title":"Second Lorem Ipsum",
-    "author_suggested_to_include_reviewing_editors_id":[
-      "103435",
-      "70207",
-      "41622"
-    ],
-    "author_suggested_to_exclude_reviewing_editors_id":[
-      ""
-    ],
-    "author_suggested_to_include_senior_editors_id":[
-      "73636",
-      "28627",
-      "97155"
-    ],
-    "author_suggested_to_exclude_senior_editors_id":[
-      "1",
-      "2"
-    ]
+    "author_suggestion":{
+      "include_reviewing_editors_id":[
+        "103435",
+        "70207",
+        "41622"
+      ],
+      "exclude_reviewing_editors_id":[
+        ""
+      ],
+      "include_senior_editors_id":[
+        "73636",
+        "28627",
+        "97155"
+      ],
+      "exclude_senior_editors_id":[
+        "1",
+        "2"
+      ]
+    }
   }
   

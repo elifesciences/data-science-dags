@@ -1,63 +1,71 @@
 {
-    "type": "object",
-    "properties": {
-      "manuscript_id": {
-        "type": "string"
-      },
-      "tracking_number": {
-        "type": "string"
-      },
-      "revision_number": {
-        "type": "integer"
-      },
-      "abstract": {
-        "type": "string"
-      },
-      "title": {
-        "type": "string"
-      },
-      "author_suggested_to_include_reviewing_editors_id": {
-        "type": "array",
-        "items": [
-          {
-            "type": "string"
-          }
-        ]
-      },
-      "author_suggested_to_exclude_reviewing_editors_id": {
-        "type": "array",
-        "items": [
-          {
-            "type": "string"
-          }
-        ]
-      },
-      "author_suggested_to_include_senior_editors_id": {
-        "type": "array",
-        "items": [
-          {
-            "type": "string"
-          }
-        ]
-      },
-      "author_suggested_to_exclude_senior_editors_id": {
-        "type": "array",
-        "items": [
-          {
-            "type": "string"
-          }
-        ]
-      }
+  "type": "object",
+  "properties": {
+    "manuscript_id": {
+      "type": "string"
     },
-    "required": [
-      "manuscript_id",
-      "tracking_number",
-      "revision_number",
-      "abstract",
-      "title",
-      "author_suggested_to_include_reviewing_editors_id",
-      "author_suggested_to_exclude_reviewing_editors_id",
-      "author_suggested_to_include_senior_editors_id",
-      "author_suggested_to_exclude_senior_editors_id"
-    ]
-  }
+    "tracking_number": {
+      "type": "string"
+    },
+    "revision_number": {
+      "type": "integer"
+    },
+    "abstract": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "author_suggestion": {
+      "type": "object",
+      "properties": {
+        "include_reviewing_editors_id": {
+          "type": "array",
+          "items": [
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "exclude_reviewing_editors_id": {
+          "type": "array",
+          "items": [
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "include_senior_editors_id": {
+          "type": "array",
+          "items": [
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "exclude_senior_editors_id": {
+          "type": "array",
+          "items": [
+            {
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "required": [
+        "include_reviewing_editors_id",
+        "exclude_reviewing_editors_id",
+        "include_senior_editors_id",
+        "exclude_senior_editors_id"
+      ]
+    }
+  },
+  "required": [
+    "manuscript_id",
+    "tracking_number",
+    "revision_number",
+    "abstract",
+    "title",
+    "author_suggestion"
+  ]
+}

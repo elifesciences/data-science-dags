@@ -116,10 +116,9 @@ def create_app():
             raise BadRequest() from e
 
         abstract = data['abstract']
-        suggested_reviewing_editor_person_ids = data[
-            'author_suggested_to_include_reviewing_editors_id']
-        suggested_senior_editor_person_ids = data[
-            'author_suggested_to_include_senior_editors_id']
+        author_suggestion = data['author_suggestion']
+        suggested_reviewing_editor_person_ids = author_suggestion['include_reviewing_editors_id']
+        suggested_senior_editor_person_ids = author_suggestion['include_senior_editors_id']
 
         return get_response_json(
             senior_editor_person_ids=suggested_senior_editor_person_ids if abstract else [],
