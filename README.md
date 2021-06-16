@@ -9,11 +9,17 @@ PEERSCOUT_API_ACCESS_TOKEN='123' make peerscout-api-start
 ```
 
 
+To test the api
+
+```bash
+make peerscout-api-start
+```
+
 ```bash
 curl \
     --header 'X-Access-Token: 123' \
     --request POST \
-    --data '{"abstract":"output1"}' \
+    --data '@example-data/peerscout-api-request1.json' \
     http://localhost:8080/api/peerscout
 ```
 
@@ -23,6 +29,6 @@ or
 curl \
     --header 'X-Access-Token: 123' \
     --request POST \
-    --data '{"abstract":"output2"}' \
+    --data '@example-data/peerscout-api-request2.json' \
     http://localhost:8080/api/peerscout
 ```
