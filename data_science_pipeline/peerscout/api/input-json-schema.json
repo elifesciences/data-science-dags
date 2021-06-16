@@ -16,7 +16,7 @@
       "title": {
         "type": "string"
       },
-      "include_reviewing_editors_id": {
+      "author_suggested_to_include_reviewing_editors_id": {
         "type": "array",
         "items": [
           {
@@ -24,7 +24,7 @@
           }
         ]
       },
-      "exclude_reviewing_editors_id": {
+      "author_suggested_to_exclude_reviewing_editors_id": {
         "type": "array",
         "items": [
           {
@@ -32,7 +32,7 @@
           }
         ]
       },
-      "include_senior_editors_id": {
+      "author_suggested_to_include_senior_editors_id": {
         "type": "array",
         "items": [
           {
@@ -40,7 +40,7 @@
           }
         ]
       },
-      "exclude_senior_editors_id": {
+      "author_suggested_to_exclude_senior_editors_id": {
         "type": "array",
         "items": [
           {
@@ -55,9 +55,9 @@
       "revision_number",
       "abstract",
       "title",
-      "include_reviewing_editors_id",
-      "exclude_reviewing_editors_id",
-      "include_senior_editors_id",
-      "exclude_senior_editors_id"
+      "author_suggested_to_include_reviewing_editors_id",
+      "author_suggested_to_exclude_reviewing_editors_id",
+      "author_suggested_to_include_senior_editors_id",
+      "author_suggested_to_exclude_senior_editors_id"
     ]
   }
