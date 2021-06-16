@@ -13,35 +13,6 @@ LOGGER = logging.getLogger(__name__)
 REQUEST_JSON_SCHEMA_PATH = os.path.join(os.path.dirname(__file__), 'input-json-schema.json')
 
 
-def response_json(
-        abstract: str,
-        reviewing_editors: list,
-        senior_editors: list
-) -> dict:
-
-    data = {}
-
-    if abstract == "":
-        data['reviewing_editor_recommendation'] = {}
-        data['senior_editor_recommendation'] = {}
-        data['reviewing_editor_recommendation']['person_ids'] = []
-        data['senior_editor_recommendation']['person_ids'] = []
-        data['reviewing_editor_recommendation']['recommendation_html'] = "..."
-        data['senior_editor_recommendation']['recommendation_html'] = "..."
-    elif reviewing_editors == [] and senior_editors == []:
-        data['recommendation'] = "We don't have a recommendation"
-    else:
-        data['reviewing_editor_recommendation'] = {}
-        data['senior_editor_recommendation'] = {}
-        data['reviewing_editor_recommendation']['person_ids'] = reviewing_editors
-        data['senior_editor_recommendation']['person_ids'] = senior_editors
-        data['reviewing_editor_recommendation']['recommendation_html'] = "..."
-        data['senior_editor_recommendation']['recommendation_html'] = "..."
-
-    json_data = json.dumps(data)
-    return json_data
-
-
 class EnvironmentVariableNames:
     PEERSCOUT_API_ACCESS_TOKEN = 'PEERSCOUT_API_ACCESS_TOKEN'
 
@@ -89,6 +60,28 @@ def get_route_wrapper(access_token: Optional[str]) -> RouteWrapper:
     return AccessControlRouteWrapper(access_token)
 
 
+def get_recommendation_html(person_ids: list) -> str:
+    if not person_ids:
+        return '<b>No</b> recommendation available'
+    return '<b>The recommended editors are:</b> %s' % person_ids
+
+
+def get_recommendation_json(person_ids: list) -> dict:
+    return {
+       'person_ids': person_ids,
+       'recommendation_html': get_recommendation_html(person_ids)
+    }
+
+
+def get_response_json(
+        senior_editor_person_ids: list,
+        reviewing_editor_person_ids: list) -> dict:
+    return {
+        'senior_editor_recommendation': get_recommendation_json(senior_editor_person_ids),
+        'reviewing_editor_recommendation': get_recommendation_json(reviewing_editor_person_ids)
+    }
+
+
 def create_app():
     route_wrapper = get_route_wrapper(
         get_peerscout_api_access_token()
@@ -123,14 +116,15 @@ def create_app():
             raise BadRequest() from e
 
         abstract = data['abstract']
-        reviewing_editors = data['include_reviewing_editors_id']
-        senior_editors = data['include_senior_editors_id']
+        suggested_reviewing_editor_person_ids = data[
+            'author_suggested_to_include_reviewing_editors_id']
+        suggested_senior_editor_person_ids = data[
+            'author_suggested_to_include_senior_editors_id']
 
-        return response_json(
-            abstract=abstract,
-            reviewing_editors=reviewing_editors,
-            senior_editors=senior_editors
-            )
+        return get_response_json(
+            senior_editor_person_ids=suggested_senior_editor_person_ids if abstract else [],
+            reviewing_editor_person_ids=suggested_reviewing_editor_person_ids if abstract else []
+        )
 
     return app
 
