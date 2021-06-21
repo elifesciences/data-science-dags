@@ -1,63 +1,15 @@
-from flask import Flask, jsonify, request
-import functools
-import logging
 import os
-from abc import ABC, abstractmethod
-from typing import Optional
-from werkzeug.exceptions import BadRequest, Unauthorized
-import jsonschema
 import json
+import logging
+import jsonschema
+
+from flask import Flask, jsonify, request
+from werkzeug.exceptions import BadRequest
+
 
 LOGGER = logging.getLogger(__name__)
 
 REQUEST_JSON_SCHEMA_PATH = os.path.join(os.path.dirname(__file__), 'input-json-schema.json')
-
-
-class EnvironmentVariableNames:
-    PEERSCOUT_API_ACCESS_TOKEN = 'PEERSCOUT_API_ACCESS_TOKEN'
-
-
-class HttpHeaderVariables:
-    ACCESS_TOKEN = 'X-Access-Token'
-
-
-def get_peerscout_api_access_token():
-    return os.getenv(EnvironmentVariableNames.PEERSCOUT_API_ACCESS_TOKEN)
-
-
-class RouteWrapper(ABC):
-    @abstractmethod
-    def wrap(self, fn):
-        pass
-
-    def __call__(self, fn):
-        return self.wrap(fn)
-
-
-class DummyRouteWrapper(RouteWrapper):
-    def wrap(self, fn):
-        return fn
-
-
-class AccessControlRouteWrapper(RouteWrapper):
-    def __init__(self, access_token: str):
-        self.access_token = access_token
-
-    def wrap(self, fn):
-        @functools.wraps(fn)
-        def wrapper(*args, **kwargs):
-            LOGGER.debug('checking access (fn:%s)', fn)
-            request_access_token = request.headers.get(HttpHeaderVariables.ACCESS_TOKEN)
-            if request_access_token != self.access_token:
-                raise Unauthorized()
-            return fn(*args, **kwargs)
-        return wrapper
-
-
-def get_route_wrapper(access_token: Optional[str]) -> RouteWrapper:
-    if not access_token:
-        return DummyRouteWrapper()
-    return AccessControlRouteWrapper(access_token)
 
 
 def get_recommendation_html(person_ids: list) -> str:
@@ -83,10 +35,6 @@ def get_response_json(
 
 
 def create_app():
-    route_wrapper = get_route_wrapper(
-        get_peerscout_api_access_token()
-    )
-
     app = Flask(__name__)
 
     with open(REQUEST_JSON_SCHEMA_PATH) as f:
@@ -104,7 +52,6 @@ def create_app():
         return jsonify({"status": "OK"})
 
     @app.route('/api/peerscout', methods=['POST'])
-    @route_wrapper
     def _peerscout_api():
         data = request.get_json(force=True)
         LOGGER.info('Processing the request: %s', data)
