@@ -63,11 +63,11 @@ dev-venv: venv-create dev-install
 
 
 dev-flake8:
-	$(PYTHON) -m flake8 data_science_pipeline dags tests setup.py
+	$(PYTHON) -m flake8 data_science_pipeline dags tests tests_peerscout_api setup.py
 
 
 dev-pylint:
-	$(PYTHON) -m pylint data_science_pipeline dags tests setup.py
+	$(PYTHON) -m pylint data_science_pipeline dags tests tests_peerscout_api setup.py
 
 
 dev-notebook-lint:
