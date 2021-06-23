@@ -2,8 +2,8 @@
     "manuscript_id":"67890",
     "tracking_number":"67890_xyZ",
     "revision_number":1,
-    "abstract":"Second Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    "title":"Second Lorem Ipsum",
+    "abstract":"<p>spaCy is a free, open-source library for advanced <i>Natural Language Processing (NLP)</i> in Python.</p>",
+    "title":"What is spaCy?",
     "author_suggestion":{
       "include_reviewing_editors_id":[
         "103435",
