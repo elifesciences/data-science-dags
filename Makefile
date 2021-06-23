@@ -63,11 +63,11 @@ dev-venv: venv-create dev-install
 
 
 dev-flake8:
-	$(PYTHON) -m flake8 data_science_pipeline dags tests setup.py
+	$(PYTHON) -m flake8 data_science_pipeline dags tests tests_peerscout_api setup.py
 
 
 dev-pylint:
-	$(PYTHON) -m pylint data_science_pipeline dags tests setup.py
+	$(PYTHON) -m pylint data_science_pipeline dags tests tests_peerscout_api setup.py
 
 
 dev-notebook-lint:
@@ -267,7 +267,7 @@ peerscout-api-buid:
 	$(PEERSCOUT_API_DOCKER_COMPOSE) build peerscout-api
 
 peerscout-api-start: 
-	$(PEERSCOUT_API_DOCKER_COMPOSE) run --rm -p '8080:8080' -e FLASK_ENV=development peerscout-api
+	$(PEERSCOUT_API_DOCKER_COMPOSE) run --rm -p '8090:8080' -e FLASK_ENV=development peerscout-api
 
 peerscout-api-stop:
 	$(PEERSCOUT_API_DOCKER_COMPOSE) down
