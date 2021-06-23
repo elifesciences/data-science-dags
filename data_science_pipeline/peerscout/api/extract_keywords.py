@@ -6,8 +6,7 @@ from typing import Iterable, List
 import spacy
 from spacy.language import Language
 
-
-from elife_data_hub_utils.keyword_extract.spacy_keyword import(
+from elife_data_hub_utils.keyword_extract.spacy_keyword import (
     SpacyKeywordDocumentParser,
     DEFAULT_SPACY_LANGUAGE_MODEL_NAME
 )
@@ -36,7 +35,7 @@ class SimpleKeywordExtractor(KeywordExtractor):
         return (
             simple_regex_keyword_extraction(text)
             for text in text_list
-        ) 
+        )
 
 
 class SpacyKeywordExtractor(KeywordExtractor):

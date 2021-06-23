@@ -6,11 +6,11 @@ import jsonschema
 from flask import Flask, jsonify, request
 from werkzeug.exceptions import BadRequest
 
-from data_science_pipeline.peerscout.api.extract_keywords import(
+from data_science_pipeline.peerscout.api.extract_keywords import (
     get_keyword_extractor
 )
 
-from elife_data_hub_utils.keyword_extract.spacy_keyword import(
+from elife_data_hub_utils.keyword_extract.spacy_keyword import (
     DEFAULT_SPACY_LANGUAGE_MODEL_NAME
 )
 
@@ -40,7 +40,7 @@ def get_response_json(
         'senior_editor_recommendation': get_recommendation_json(senior_editor_person_ids),
         'reviewing_editor_recommendation': get_recommendation_json(reviewing_editor_person_ids),
         # added temproraly to see the keywords
-        'extracted_keywords' : keywords
+        'extracted_keywords': keywords
     }
 
 
