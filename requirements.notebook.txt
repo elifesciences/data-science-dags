@@ -16,6 +16,6 @@ six==1.16.0
 pystan==2.19.1.1
 convertdate==2.3.2
 matplotlib==3.4.2
-numpy==1.20.3
+numpy==1.21.0
 pandas==1.2.4
 tqdm==4.61.1
