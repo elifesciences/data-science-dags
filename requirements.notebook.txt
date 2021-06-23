@@ -17,5 +17,5 @@ pystan==2.19.1.1
 convertdate==2.3.2
 matplotlib==3.4.2
 numpy==1.21.0
-pandas==1.2.4
+pandas==1.2.5
 tqdm==4.61.1
