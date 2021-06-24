@@ -113,16 +113,15 @@ def get_editor_recomendations_for_api(
     editor_names = get_editor_names(model_dict)
     editor_person_id_by_name_map = get_editor_person_id_by_name_map(model_dict)
 
-    prediction_results_with_similarity = pd.Series(
-        get_recommended_editors_with_probability(
+    prediction_results_with_similarity = get_recommended_editors_with_probability(
             keyword_similarity,
             manuscript_matching_keywords_list,
             editor_names,
             threshold=0.001
         )
-    )
-
-    prediction_results_df = prediction_results_with_similarity.to_frame('prediction')
+    
+    LOGGER.info('Length of prediction result: %s', len(prediction_results_with_similarity))
+    LOGGER.info('Count of keywords extracted: %s', len(extracted_keywords))
 
     prediction_results_flat_df = pd.DataFrame([
         {
@@ -130,9 +129,9 @@ def get_editor_recomendations_for_api(
             'name': predicted_editor[1],
             'person_id': editor_person_id_by_name_map[predicted_editor[1]],
         }
-        for row in prediction_results_df.itertuples()
-        for predicted_editor in row.prediction
+        for row in prediction_results_with_similarity
+        for predicted_editor in row
     ])
 
-    return prediction_results_flat_df.drop_duplicates().sort_values(
+    return prediction_results_flat_df.sort_values(
         'score', ascending=False).head(top_n_editor)
