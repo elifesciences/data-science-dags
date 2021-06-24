@@ -139,10 +139,10 @@ def create_app():
         # suggested_senior_editor_person_ids = author_suggestion['include_senior_editors_id']
 
         return jsonify(get_response_json(
-            senior_editor_person_ids=suggested_senior_editor_person_ids if abstract else [],
-            reviewing_editor_person_ids=suggested_reviewing_editor_person_ids if abstract else [],
-            senior_editor_names=suggested_senior_editor_names if abstract else [],
-            reviewing_editor_names=suggested_reviewing_editor_names if abstract else [],
+            senior_editor_person_ids=suggested_senior_editor_person_ids,
+            reviewing_editor_person_ids=suggested_reviewing_editor_person_ids,
+            senior_editor_names=suggested_senior_editor_names,
+            reviewing_editor_names=suggested_reviewing_editor_names,
             # added temproraly to see the keywords
             keywords=extracted_keywords
         ))
