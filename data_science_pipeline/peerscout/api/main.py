@@ -49,29 +49,32 @@ def get_model_path(deployment_env: str) -> str:
     )
 
 
-
-
-
-def get_recommendation_html(person_ids: list) -> str:
+def get_recommendation_html(person_ids: list, names: list) -> str:
     if not person_ids:
         return '<b>No</b> recommendation available'
-    return '<b>The recommended editors are:</b> %s' % person_ids
+    return '<b>The recommended editors are:</b> %s' % names
 
 
-def get_recommendation_json(person_ids: list) -> dict:
+def get_recommendation_json(person_ids: list, names: list) -> dict:
     return {
        'person_ids': person_ids,
-       'recommendation_html': get_recommendation_html(person_ids)
+       'recommendation_html': get_recommendation_html(person_ids, names)
     }
 
 
 def get_response_json(
         senior_editor_person_ids: list,
+        senior_editor_names: list,
         reviewing_editor_person_ids: list,
+        reviewing_editor_names: list,
         keywords: list) -> dict:
     return {
-        'senior_editor_recommendation': get_recommendation_json(senior_editor_person_ids),
-        'reviewing_editor_recommendation': get_recommendation_json(reviewing_editor_person_ids),
+        'senior_editor_recommendation': get_recommendation_json(
+            senior_editor_person_ids,
+            senior_editor_names),
+        'reviewing_editor_recommendation': get_recommendation_json(
+            reviewing_editor_person_ids,
+            reviewing_editor_names),
         # added temproraly to see the keywords
         'extracted_keywords': keywords
     }
@@ -128,6 +131,9 @@ def create_app():
         suggested_senior_editor_person_ids = recomended_senior_editors['person_id']
         suggested_reviewing_editor_person_ids = recomended_reviewing_editors['person_id']
 
+        suggested_senior_editor_names = recomended_senior_editors['name']
+        suggested_reviewing_editor_names = recomended_reviewing_editors['name']
+
         # author_suggestion = data['author_suggestion']
         # suggested_reviewing_editor_person_ids = author_suggestion['include_reviewing_editors_id']
         # suggested_senior_editor_person_ids = author_suggestion['include_senior_editors_id']
@@ -135,6 +141,8 @@ def create_app():
         return jsonify(get_response_json(
             senior_editor_person_ids=suggested_senior_editor_person_ids if abstract else [],
             reviewing_editor_person_ids=suggested_reviewing_editor_person_ids if abstract else [],
+            senior_editor_names=suggested_senior_editor_names if abstract else [],
+            reviewing_editor_names=suggested_reviewing_editor_names if abstract else [],
             # added temproraly to see the keywords
             keywords=extracted_keywords
         ))
