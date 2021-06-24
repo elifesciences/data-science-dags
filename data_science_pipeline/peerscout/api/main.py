@@ -134,10 +134,6 @@ def create_app():
         suggested_senior_editor_names = recomended_senior_editors['name']
         suggested_reviewing_editor_names = recomended_reviewing_editors['name']
 
-        # author_suggestion = data['author_suggestion']
-        # suggested_reviewing_editor_person_ids = author_suggestion['include_reviewing_editors_id']
-        # suggested_senior_editor_person_ids = author_suggestion['include_senior_editors_id']
-
         return jsonify(get_response_json(
             senior_editor_person_ids=suggested_senior_editor_person_ids,
             reviewing_editor_person_ids=suggested_reviewing_editor_person_ids,
