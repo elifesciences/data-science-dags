@@ -40,3 +40,4 @@ services:
   peerscout-api:
     volumes: 
       - ./data_science_pipeline:/app/peerscout_api/data_science_pipeline
+      - ~/.aws/credentials:/root/.aws/credentials
