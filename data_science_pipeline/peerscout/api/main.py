@@ -14,9 +14,42 @@ from elife_data_hub_utils.keyword_extract.spacy_keyword import (
     DEFAULT_SPACY_LANGUAGE_MODEL_NAME
 )
 
+from data_science_pipeline.peerscout.api.recomend_editor import (
+    load_model,
+    get_editor_recomendations_for_api
+)
+
+DEPLOYMENT_ENV_ENV_NAME = "DEPLOYMENT_ENV"
+DEFAULT_DEPLOYMENT_ENV_VALUE = "ci"
+DATA_SCIENCE_STATE_PATH_ENV_NAME = "DATA_SCIENCE_STATE_PATH"
+DEFAULT_STATE_PATH_FORMAT = (
+    "s3://{env}-elife-data-pipeline/airflow-config/data-science/state"
+)
+
+SENIOR_EDITOR_MODEL_NAME = 'senior_editor_model.joblib'
+REVIEWING_EDITOR_MODEL_NAME = 'reviewing_editor_model.joblib'
+DEFAULT_N_FOR_TOP_N_EDITORS = 3
+
 LOGGER = logging.getLogger(__name__)
 
 REQUEST_JSON_SCHEMA_PATH = os.path.join(os.path.dirname(__file__), 'input-json-schema.json')
+
+
+def get_deployment_env() -> str:
+    return os.getenv(
+        DEPLOYMENT_ENV_ENV_NAME,
+        DEFAULT_DEPLOYMENT_ENV_VALUE
+    )
+
+
+def get_model_path(deployment_env: str) -> str:
+    return os.getenv(
+        DATA_SCIENCE_STATE_PATH_ENV_NAME,
+        DEFAULT_STATE_PATH_FORMAT.format(env=deployment_env)
+    )
+
+
+
 
 
 def get_recommendation_html(person_ids: list) -> str:
@@ -48,6 +81,10 @@ def create_app():
     app = Flask(__name__)
     keyword_extractor = get_keyword_extractor(DEFAULT_SPACY_LANGUAGE_MODEL_NAME)
 
+    MODEL_PATH = get_model_path(get_deployment_env())
+    senior_editor_model_dict = load_model(MODEL_PATH, SENIOR_EDITOR_MODEL_NAME)
+    reviewing_editor_model_dict = load_model(MODEL_PATH, REVIEWING_EDITOR_MODEL_NAME)
+
     with open(REQUEST_JSON_SCHEMA_PATH) as f:
         json_schema = json.load(f)
 
@@ -75,9 +112,25 @@ def create_app():
 
         abstract = data['abstract']
         extracted_keywords = list(keyword_extractor.iter_extract_keywords(text_list=[abstract]))
-        author_suggestion = data['author_suggestion']
-        suggested_reviewing_editor_person_ids = author_suggestion['include_reviewing_editors_id']
-        suggested_senior_editor_person_ids = author_suggestion['include_senior_editors_id']
+
+        recomended_senior_editors = get_editor_recomendations_for_api(
+            senior_editor_model_dict,
+            extracted_keywords,
+            DEFAULT_N_FOR_TOP_N_EDITORS
+        )
+
+        recomended_reviewing_editors = get_editor_recomendations_for_api(
+            reviewing_editor_model_dict,
+            extracted_keywords,
+            DEFAULT_N_FOR_TOP_N_EDITORS
+        )
+
+        suggested_senior_editor_person_ids = recomended_senior_editors['person_id']
+        suggested_reviewing_editor_person_ids = recomended_reviewing_editors['person_id']
+
+        # author_suggestion = data['author_suggestion']
+        # suggested_reviewing_editor_person_ids = author_suggestion['include_reviewing_editors_id']
+        # suggested_senior_editor_person_ids = author_suggestion['include_senior_editors_id']
 
         return jsonify(get_response_json(
             senior_editor_person_ids=suggested_senior_editor_person_ids if abstract else [],
