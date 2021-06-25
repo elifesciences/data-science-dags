@@ -128,11 +128,11 @@ def create_app():
             DEFAULT_N_FOR_TOP_N_EDITORS
         )
 
-        suggested_senior_editor_person_ids = recomended_senior_editors['person_id']
-        suggested_reviewing_editor_person_ids = recomended_reviewing_editors['person_id']
+        suggested_senior_editor_person_ids = recomended_senior_editors['person_id'].to_list()
+        suggested_reviewing_editor_person_ids = recomended_reviewing_editors['person_id'].to_list()
 
-        suggested_senior_editor_names = recomended_senior_editors['name']
-        suggested_reviewing_editor_names = recomended_reviewing_editors['name']
+        suggested_senior_editor_names = recomended_senior_editors['name'].to_list()
+        suggested_reviewing_editor_names = recomended_reviewing_editors['name'].to_list()
 
         return jsonify(get_response_json(
             senior_editor_person_ids=suggested_senior_editor_person_ids,
