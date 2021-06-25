@@ -114,8 +114,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.peerscout_api
-    environment: 
-      - PEERSCOUT_API_ACCESS_TOKEN=${PEERSCOUT_API_ACCESS_TOKEN}
     image: elifesciences/data-science-dags_peerscout-api:${IMAGE_TAG}
 
 volumes:
