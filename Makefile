@@ -263,7 +263,7 @@ airflow-start:
 airflow-stop:
 	$(AIRFLOW_DOCKER_COMPOSE) down
 
-peerscout-api-buid:
+peerscout-api-build:
 	$(PEERSCOUT_API_DOCKER_COMPOSE) build peerscout-api
 
 peerscout-api-start: 
