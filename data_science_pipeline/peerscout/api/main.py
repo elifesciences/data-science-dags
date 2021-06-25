@@ -66,17 +66,14 @@ def get_response_json(
         senior_editor_person_ids: list,
         senior_editor_names: list,
         reviewing_editor_person_ids: list,
-        reviewing_editor_names: list,
-        keywords: list) -> dict:
+        reviewing_editor_names: list) -> dict:
     return {
         'senior_editor_recommendation': get_recommendation_json(
             senior_editor_person_ids,
             senior_editor_names),
         'reviewing_editor_recommendation': get_recommendation_json(
             reviewing_editor_person_ids,
-            reviewing_editor_names),
-        # added temproraly to see the keywords
-        'extracted_keywords': keywords
+            reviewing_editor_names)
     }
 
 
@@ -138,9 +135,7 @@ def create_app():
             senior_editor_person_ids=suggested_senior_editor_person_ids,
             reviewing_editor_person_ids=suggested_reviewing_editor_person_ids,
             senior_editor_names=suggested_senior_editor_names,
-            reviewing_editor_names=suggested_reviewing_editor_names,
-            # added temproraly to see the keywords
-            keywords=extracted_keywords
+            reviewing_editor_names=suggested_reviewing_editor_names
         ))
 
     return app
