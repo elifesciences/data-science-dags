@@ -119,7 +119,7 @@ def get_editor_recomendations_for_api(
             editor_names,
             threshold=0.001
         )
-    
+
     LOGGER.info('Length of prediction result: %s', len(prediction_results_with_similarity))
     LOGGER.info('Count of keywords extracted: %s', len(extracted_keywords))
 
