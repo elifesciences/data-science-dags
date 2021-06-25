@@ -39,7 +39,7 @@ services:
   
   peerscout-api:
     volumes: 
-      - ./data_science_pipeline:/app/peerscout_api/data_science_pipeline
+      - ./peerscout_api:/app/api/peerscout_api
       - ~/.aws/credentials:/root/.aws/credentials
     environment:
       - DEPLOYMENT_ENV=staging
