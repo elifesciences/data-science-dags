@@ -6,18 +6,19 @@ import jsonschema
 from flask import Flask, jsonify, request
 from werkzeug.exceptions import BadRequest
 
-from data_science_pipeline.peerscout.api.extract_keywords import (
-    get_keyword_extractor
+from peerscout_api.extract_keywords import (
+    get_keyword_extractor,
+)
+
+from peerscout_api.recomend_editor import (
+    load_model,
+    get_editor_recomendations_for_api
 )
 
 from elife_data_hub_utils.keyword_extract.spacy_keyword import (
     DEFAULT_SPACY_LANGUAGE_MODEL_NAME
 )
 
-from data_science_pipeline.peerscout.api.recomend_editor import (
-    load_model,
-    get_editor_recomendations_for_api
-)
 
 DEPLOYMENT_ENV_ENV_NAME = "DEPLOYMENT_ENV"
 DEFAULT_DEPLOYMENT_ENV_VALUE = "ci"
