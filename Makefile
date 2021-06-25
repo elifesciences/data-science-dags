@@ -63,11 +63,11 @@ dev-venv: venv-create dev-install
 
 
 dev-flake8:
-	$(PYTHON) -m flake8 data_science_pipeline dags tests tests_peerscout_api setup.py
+	$(PYTHON) -m flake8 data_science_pipeline peerscout_api dags tests tests_peerscout_api setup.py
 
 
 dev-pylint:
-	$(PYTHON) -m pylint data_science_pipeline dags tests tests_peerscout_api setup.py
+	$(PYTHON) -m pylint data_science_pipeline peerscout_api dags tests tests_peerscout_api setup.py
 
 
 dev-notebook-lint:
@@ -160,11 +160,11 @@ jupyter-stop:
 
 
 pylint:
-	$(DEV_RUN) pylint data_science_pipeline dags tests setup.py
+	$(DEV_RUN) pylint data_science_pipeline peerscout_api dags tests setup.py
 
 
 flake8:
-	$(DEV_RUN) flake8 data_science_pipeline dags tests setup.py
+	$(DEV_RUN) flake8 data_science_pipeline peerscout_api dags tests setup.py
 
 
 notebook-lint:
@@ -288,7 +288,7 @@ ci-build-and-test:
 		airflow-build \
 		airflow-dev-build \
 		jupyter-build \
-		peerscout-api-buid \
+		peerscout-api-build \
 		notebook-lint \
 		notebook-nbstripout-check \
 		ci-test-exclude-e2e
