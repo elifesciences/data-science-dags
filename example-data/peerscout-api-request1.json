@@ -2,7 +2,7 @@
     "manuscript_id":"12345",
     "tracking_number":"12345_ABC",
     "revision_number":0,
-    "abstract":"<p>Lorem ipsum dolor sit amet, <i>consectetur adipiscing elit</i>, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+    "abstract":"<p>Fibroblast-like synoviocytes (FLSs)</p> are a major cell population of the pannus that invades cartilage and bone in <i>rheumatoid arthritis (RA)</i>. The aims of this study were to investigate the effects of interleukin-17 (IL-17) and IL-17-producing T helper (Th17) cells on resistance to apoptosis in FLSs from RA patients and the roles of mitochondria dysfunction and autophagy formation. FLSs isolated from RA and OA patients displayed different morphological and physiological features of mitochondria. RA FLSs exhibited autophagosome formation and dysfunction of mitochondrial respiration compared with OA FLSs. IL-17 induced mitochondrial dysfunction and autophagosome formation in RA FLSs, suggesting their resistance to apoptosis. Autophagy-related anti-apoptosis induced by IL-17 was restored by autophagy inhibitor, suggesting a relationship between mitochondrial dysfunction and anti-apoptosis in RA FLSs. Our findings suggest that, in RA, interactions between RA FLSs and Th17 cells may be involved in the tumorous growth",
     "title":"<b>Lorem Ipsum</b>",
     "author_suggestion":{
       "include_reviewing_editors_id":[
