@@ -56,8 +56,8 @@ def get_recommendation_html(person_ids: list, names: list) -> str:
     formated_name = ''
     for name in names:
         formated_name += "<br />" + name
-    return """<p><strong>Recommended Editors (based on keyword matching):\
-        </strong> %s </p>""" % formated_name
+    return """<p><strong>Recommended Editors (based on keyword matching):</strong>\
+        %s</p>""" % formated_name
 
 
 def get_recommendation_json(person_ids: list, names: list) -> dict:
