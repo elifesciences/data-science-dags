@@ -1,7 +1,7 @@
 import os
 import logging
 from typing import List, NamedTuple, Tuple, T
-from numpy import array
+import numpy as np
 import pandas as pd
 
 from sklearn.metrics.pairwise import cosine_similarity
@@ -19,7 +19,7 @@ class PeerScoutModelProps(NamedTuple):
     editor_names: List[str]
     editor_person_ids: List[str]
     editor_tf_idf_vectorizer: Vectorizer
-    editor_tf_idf: array
+    editor_tf_idf: np.ndarray
 
     def get_editor_person_id_by_name_map(self):
         editor_names = self.editor_names
