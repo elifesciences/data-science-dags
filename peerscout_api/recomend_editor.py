@@ -1,73 +1,66 @@
 import os
 import logging
-from typing import List, Tuple, T
+from typing import List, NamedTuple, Tuple, T
+from numpy import array
 import pandas as pd
 
 from sklearn.metrics.pairwise import cosine_similarity
 
 from data_science_pipeline.utils.io import load_object_from
 from data_science_pipeline.peerscout.models import (
+    Vectorizer,
     WeightedKeywordModel
 )
 
 LOGGER = logging.getLogger(__name__)
 
 
-def load_model(model_path: str, model_name: str) -> dict:
+class PeerScoutModelProps(NamedTuple):
+    editor_names: List[str]
+    editor_person_ids: List[str]
+    editor_tf_idf_vectorizer: Vectorizer
+    editor_tf_idf: array
+
+    def get_editor_person_id_by_name_map(self):
+        editor_names = self.editor_names
+        editor_person_ids = self.editor_person_ids
+        editor_person_id_by_name_map = dict(zip(editor_names, editor_person_ids))
+        return editor_person_id_by_name_map
+
+
+def load_model(model_path: str, model_name: str) -> PeerScoutModelProps:
     model_full_path = os.path.join(model_path, model_name)
     LOGGER.info('Loading model : %s', model_full_path)
     model_dict = load_object_from(model_full_path)
 
-    return model_dict
+    return PeerScoutModelProps(
+        editor_names=model_dict['editor_names'],
+        editor_person_ids=model_dict['editor_person_ids'],
+        editor_tf_idf_vectorizer=model_dict['editor_tf_idf_vectorizer'],
+        editor_tf_idf=model_dict['editor_tf_idf'],
+        )
 
 
-def get_editor_tf_idf_vectorizer(model_dict: dict):
-    return model_dict['editor_tf_idf_vectorizer']
-
-
-def get_editor_tf_idf(model_dict: dict):
-    return model_dict['editor_tf_idf']
-
-
-def get_editor_names(model_dict: dict):
-    return model_dict['editor_names']
-
-
-def get_editor_person_id_by_name_map(model_dict: dict):
-    editor_names = model_dict['editor_names']
-    editor_person_ids = model_dict['editor_person_ids']
-    editor_person_id_by_name_map = dict(zip(editor_names, editor_person_ids))
-    return editor_person_id_by_name_map
-
-
-def get_weighted_keyword_valid_model(model_dict: dict):
-    editor_tf_idf = get_editor_tf_idf(model_dict)
-    editor_tf_idf_vectorizer = get_editor_tf_idf_vectorizer(model_dict)
-    editor_names = get_editor_names(model_dict)
-
+def get_weighted_keyword_valid_model(model: PeerScoutModelProps):
     weighted_keyword_valid_model = WeightedKeywordModel.from_tf_matrix(
-        editor_tf_idf.todense(),
-        vectorizer=editor_tf_idf_vectorizer,
-        choices=editor_names
+        model.editor_tf_idf.todense(),
+        vectorizer=model.editor_tf_idf_vectorizer,
+        choices=model.editor_names
     )
     return weighted_keyword_valid_model
 
 
-def get_keyword_similarity(model_dict: dict, extracted_keywords: list):
-    editor_tf_idf = get_editor_tf_idf(model_dict)
-    editor_tf_idf_vectorizer = get_editor_tf_idf_vectorizer(model_dict)
-
+def get_keyword_similarity(model: PeerScoutModelProps, extracted_keywords: List[List[str]]):
     keyword_similarity = cosine_similarity(
-        editor_tf_idf_vectorizer.transform(extracted_keywords),
-        editor_tf_idf
+        model.editor_tf_idf_vectorizer.transform(extracted_keywords),
+        model.editor_tf_idf
     )
-
     return keyword_similarity
 
 
-def get_manuscript_matching_keywords_list(model_dict: dict, extracted_keywords: list):
+def get_manuscript_matching_keywords_list(model: PeerScoutModelProps, extracted_keywords: list):
     weighted_keyword_valid_model = \
-        get_weighted_keyword_valid_model(model_dict).predict_ranking(extracted_keywords)
+        get_weighted_keyword_valid_model(model).predict_ranking(extracted_keywords)
     matching_keywords_list = weighted_keyword_valid_model.matching_keywords_list
     return matching_keywords_list
 
@@ -98,25 +91,24 @@ def get_recommended_editors_with_probability(
 
 
 def get_editor_recomendations_for_api(
-        model_dict: dict,
+        model: PeerScoutModelProps,
         extracted_keywords: list,
         top_n_editor: int):
 
     keyword_similarity = get_keyword_similarity(
-        model_dict,
+        model,
         extracted_keywords
     )
     manuscript_matching_keywords_list = get_manuscript_matching_keywords_list(
-        model_dict,
+        model,
         extracted_keywords
     )
-    editor_names = get_editor_names(model_dict)
-    editor_person_id_by_name_map = get_editor_person_id_by_name_map(model_dict)
+    editor_person_id_by_name_map = model.get_editor_person_id_by_name_map()
 
     prediction_results_with_similarity = get_recommended_editors_with_probability(
             keyword_similarity,
             manuscript_matching_keywords_list,
-            editor_names,
+            model.editor_names,
             threshold=0.001
         )
 
