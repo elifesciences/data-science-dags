@@ -2,7 +2,7 @@
     "manuscript_id":"12345",
     "tracking_number":"12345_ABC",
     "revision_number":0,
-    "abstract":"<p>Glutamatergic synapse dysfunction </p>  is believed to underlie the development of <i>Autism Spectrum Disorder (ASD)</i> and Intellectual Disability (ID) in many individuals. However, identification of genetic markers that contribute to synaptic dysfunction in these individuals is notoriously difficult. Based on genomic analysis, structural modeling, and functional data, we recently established the involvement of the TRIO-RAC1 pathway in ASD and ID. Furthermore, we identified pathological de novo mutations in TRIO that compromise glutamatergic synapse function and likely contribute to the development of ASD/ID. Here we show that a combination of structure-based computational predictions and experimental validation can be employed to reliably predict whether missense mutations in the human TRIO gene impede TRIO protein function and compromise TRIO’s role in glutamatergic synapse regulation. With the growing accessibility of genome sequencing, the use of such tools in the accurate identification of pathological mutations will be instrumental in early diagnostics of ASD/ID.",
+    "abstract":"<p>Lorem ipsum dolor sit amet, <i>consectetur adipiscing elit</i>, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
     "title":"<b>Lorem Ipsum</b>",
     "author_suggestion":{
       "include_reviewing_editors_id":[
