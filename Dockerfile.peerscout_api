@@ -2,7 +2,7 @@ FROM python:3.7
 
 USER root
 
-ENV PROJECT_FOLDER=/app/peerscout_api
+ENV PROJECT_FOLDER=/app/api
 
 WORKDIR ${PROJECT_FOLDER}
 
@@ -16,6 +16,7 @@ RUN pip install --disable-pip-version-check -r requirements.api.txt
 RUN python -m spacy download en_core_web_lg
 RUN python -m spacy download en_core_web_sm
 
+COPY peerscout_api ./peerscout_api
 COPY data_science_pipeline ./data_science_pipeline
 
-CMD ["python3", "-m", "data_science_pipeline.peerscout.api.main"]
+CMD ["python3", "-m", "peerscout_api.main"]
