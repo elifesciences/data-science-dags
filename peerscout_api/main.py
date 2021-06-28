@@ -96,7 +96,7 @@ def create_app():
     @app.route('/', methods=['GET'])
     def _home():
         html = """<h1>PeerScout Recommendation API</h1>
-        <p>This site is a prototype PeerScout Recommendation API for
+        <p>PeerScout Recommendation API for
         senior and reviewing editor recommendations.</p>"""
         return html
 
