@@ -272,6 +272,13 @@ peerscout-api-start:
 peerscout-api-stop:
 	$(PEERSCOUT_API_DOCKER_COMPOSE) down
 
+peerscout-api-dev-build:
+	$(PEERSCOUT_API_DOCKER_COMPOSE) build peerscout-api-dev
+
+peerscout-api-dev-pytest:
+	$(PEERSCOUT_API_DOCKER_COMPOSE) run --rm peerscout-api-dev python -m pytest
+
+
 clean:
 	$(DOCKER_COMPOSE) down -v
 
@@ -291,7 +298,9 @@ ci-build-and-test:
 		peerscout-api-build \
 		notebook-lint \
 		notebook-nbstripout-check \
-		ci-test-exclude-e2e
+		ci-test-exclude-e2e \
+		peerscout-api-dev-build \
+		peerscout-api-dev-pytest
 
 
 ci-clean:
