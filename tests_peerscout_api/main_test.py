@@ -1,8 +1,7 @@
 import logging
-import json
+from unittest.mock import patch, MagicMock
 
 from flask.testing import FlaskClient
-from pandas.core.frame import DataFrame
 
 import pytest
 import pandas as pd
@@ -14,7 +13,6 @@ from peerscout_api.main import (
 
 import peerscout_api.main as target_module
 
-from unittest.mock import patch, MagicMock
 
 LOGGER = logging.getLogger(__name__)
 
@@ -76,9 +74,9 @@ VALID_RECOMENDATION_RESPONSE = {
 @pytest.fixture(name='get_editor_recomendations_for_api_mock', autouse=True)
 def _get_editor_recomendations_for_api() -> MagicMock:
     with patch.object(target_module, 'get_editor_recomendations_for_api') as mock:
-        mock.return_value=pd.DataFrame(columns=['person_id','name'])
+        mock.return_value = pd.DataFrame(columns=['person_id', 'name'])
         yield mock
-        
+
 
 @pytest.fixture(name='get_keyword_extractor_mock', autouse=True)
 def _get_keyword_extractor_mock() -> MagicMock:
@@ -121,12 +119,14 @@ class TestPeerscoutAPI:
     ):
         response = test_client.post('/api/peerscout', json=INPUT_DATA_WTIHOUT_ABSTRACT)
         assert _get_ok_json(response) == NO_RECOMENDATION_RESPONSE
-    
+
     def test_should_respond_with_recomendation(
         self,
         test_client: FlaskClient,
         get_editor_recomendations_for_api_mock: MagicMock
     ):
-        get_editor_recomendations_for_api_mock.return_value = pd.DataFrame({'person_id':PERSON_IDS,'name':NAMES})
+        get_editor_recomendations_for_api_mock.return_value = pd.DataFrame(
+            {'person_id': PERSON_IDS, 'name': NAMES}
+        )
         response = test_client.post('/api/peerscout', json=INPUT_DATA_VALID)
         assert _get_ok_json(response) == VALID_RECOMENDATION_RESPONSE
