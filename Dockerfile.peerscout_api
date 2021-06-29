@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM python:3.7 AS base
 
 USER root
 
@@ -16,7 +16,22 @@ RUN pip install --disable-pip-version-check -r requirements.api.txt
 RUN python -m spacy download en_core_web_lg
 RUN python -m spacy download en_core_web_sm
 
+
+FROM base AS runtime
+
 COPY peerscout_api ./peerscout_api
 COPY data_science_pipeline ./data_science_pipeline
 
 CMD ["python3", "-m", "peerscout_api.main"]
+
+
+FROM runtime AS dev
+
+COPY requirements.dev.txt ./
+RUN pip install --disable-pip-version-check -r requirements.dev.txt
+
+COPY peerscout_api ./peerscout_api
+COPY data_science_pipeline ./data_science_pipeline
+
+COPY .pylintrc .flake8 ./
+COPY tests_peerscout_api ./tests_peerscout_api

@@ -43,3 +43,8 @@ services:
       - ~/.aws/credentials:/root/.aws/credentials
     environment:
       - DEPLOYMENT_ENV=staging
+
+  peerscout-api-dev:
+    volumes: 
+      - ./peerscout_api:/app/api/peerscout_api
+      - ./tests_peerscout_api:/app/api/tests_peerscout_api

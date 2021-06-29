@@ -114,7 +114,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.peerscout_api
+      target: runtime
     image: elifesciences/data-science-dags_peerscout-api:${IMAGE_TAG}
+
+  peerscout-api-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.peerscout_api
+      target: dev
+    image: elifesciences/data-science-dags_peerscout-api_dev:${IMAGE_TAG}
 
 volumes:
   data:

@@ -25,6 +25,8 @@ JUPYTER_RUN = $(JUPYTER_DOCKER_COMPOSE) run --rm jupyter
 PEERSCOUT_API_DOCKER_COMPOSE = DATA_SCIENCE_DAGS_PEERSCOUT_API_PORT="$(DATA_SCIENCE_DAGS_PEERSCOUT_API_PORT)" \
 	$(DOCKER_COMPOSE)
 
+PEERSCOUT_API_DEV_DOCKER_PYTHON = $(PEERSCOUT_API_DOCKER_COMPOSE) run --rm peerscout-api-dev python
+
 PROJECT_FOLDER = /home/jovyan/data-science-dags
 DEV_RUN = $(JUPYTER_DOCKER_COMPOSE) run --rm airflow-dev
 
@@ -272,6 +274,28 @@ peerscout-api-start:
 peerscout-api-stop:
 	$(PEERSCOUT_API_DOCKER_COMPOSE) down
 
+peerscout-api-dev-build:
+	$(PEERSCOUT_API_DOCKER_COMPOSE) build peerscout-api-dev
+
+peerscout-api-dev-flake8:
+	$(PEERSCOUT_API_DEV_DOCKER_PYTHON) -m flake8 tests_peerscout_api peerscout_api
+
+peerscout-api-dev-pylint:
+	$(PEERSCOUT_API_DEV_DOCKER_PYTHON) -m pylint tests_peerscout_api peerscout_api
+
+peerscout-api-dev-lint: \
+	peerscout-api-dev-flake8 peerscout-api-dev-pylint
+
+peerscout-api-dev-pytest:
+	$(PEERSCOUT_API_DEV_DOCKER_PYTHON) -m pytest -v
+
+peerscout-api-dev-pytest-watch:
+	$(PEERSCOUT_API_DEV_DOCKER_PYTHON) -m pytest_watch -- -v
+
+peerscout-api-dev-test: \
+	peerscout-api-dev-lint peerscout-api-dev-pytest
+
+
 clean:
 	$(DOCKER_COMPOSE) down -v
 
@@ -291,7 +315,9 @@ ci-build-and-test:
 		peerscout-api-build \
 		notebook-lint \
 		notebook-nbstripout-check \
-		ci-test-exclude-e2e
+		ci-test-exclude-e2e \
+		peerscout-api-dev-build \
+		peerscout-api-dev-test
 
 
 ci-clean:
