@@ -5,7 +5,7 @@ from flask.testing import FlaskClient
 
 import pytest
 
-from data_science_pipeline.peerscout.api.main import (
+from peerscout_api.main import (
     create_app,
 )
 
