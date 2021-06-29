@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM python:3.7 AS runtime
 
 USER root
 
@@ -20,3 +20,11 @@ COPY peerscout_api ./peerscout_api
 COPY data_science_pipeline ./data_science_pipeline
 
 CMD ["python3", "-m", "peerscout_api.main"]
+
+
+FROM runtime AS dev
+
+COPY requirements.dev.txt ./
+RUN pip install --disable-pip-version-check -r requirements.dev.txt
+
+COPY tests_peerscout_api ./tests_peerscout_api
