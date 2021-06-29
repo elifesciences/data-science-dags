@@ -3,5 +3,5 @@ jsonschema==3.2.0
 pandas==1.2.5
 s3path==0.3.2
 scikit-learn==0.24.2
-boto3==1.17.98
+boto3==1.17.102
 https://github.com/elifesciences/elife-data-hub-utils/archive/refs/tags/v0.0.3.zip#egg=elife_data_hub_utils
