@@ -8,7 +8,9 @@ import pandas as pd
 
 from peerscout_api.main import (
     create_app,
-    get_recommendation_html
+    get_recommendation_html,
+    RECOMMENDATION_HEADING,
+    NO_RECOMENDATION_TEXT
 )
 
 import peerscout_api.main as target_module
@@ -47,11 +49,11 @@ INPUT_DATA_WTIHOUT_ABSTRACT = {**INPUT_DATA_VALID, "abstract": ""}
 NO_RECOMENDATION_RESPONSE = {
     "reviewing_editor_recommendation": {
         "person_ids": [],
-        "recommendation_html": "<b>No</b> recommendation available"
+        "recommendation_html": RECOMMENDATION_HEADING+NO_RECOMENDATION_TEXT
     },
     "senior_editor_recommendation": {
         "person_ids": [],
-        "recommendation_html": "<b>No</b> recommendation available"
+        "recommendation_html": RECOMMENDATION_HEADING+NO_RECOMENDATION_TEXT
     }
 }
 
@@ -130,3 +132,18 @@ class TestPeerscoutAPI:
         )
         response = test_client.post('/api/peerscout', json=INPUT_DATA_VALID)
         assert _get_ok_json(response) == VALID_RECOMENDATION_RESPONSE
+
+
+class TestGetRecommendationHtml:
+    # def test_should_have_editor_exclusion_when_the_recomendation_not_avaliable():
+    def test_should_have_recomendation_heading_when_the_recomendation_not_avaliable(
+        self
+    ):
+        assert RECOMMENDATION_HEADING in get_recommendation_html(person_ids=[], names=[]) 
+
+    def test_should_have_recomendation_heading_when_the_recomendation_avaliable(
+        self
+    ):
+        assert RECOMMENDATION_HEADING in get_recommendation_html(person_ids=PERSON_IDS, names=NAMES) 
+
+
