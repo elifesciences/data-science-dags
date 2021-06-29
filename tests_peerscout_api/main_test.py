@@ -139,11 +139,9 @@ class TestGetRecommendationHtml:
     def test_should_have_recomendation_heading_when_the_recomendation_not_avaliable(
         self
     ):
-        assert RECOMMENDATION_HEADING in get_recommendation_html(person_ids=[], names=[]) 
+        assert RECOMMENDATION_HEADING in get_recommendation_html(person_ids=[], names=[])
 
     def test_should_have_recomendation_heading_when_the_recomendation_avaliable(
         self
     ):
-        assert RECOMMENDATION_HEADING in get_recommendation_html(person_ids=PERSON_IDS, names=NAMES) 
-
-
+        assert RECOMMENDATION_HEADING in get_recommendation_html(person_ids=PERSON_IDS, names=NAMES)
