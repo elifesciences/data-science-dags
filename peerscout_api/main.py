@@ -35,6 +35,9 @@ LOGGER = logging.getLogger(__name__)
 
 REQUEST_JSON_SCHEMA_PATH = os.path.join(os.path.dirname(__file__), 'input-json-schema.json')
 
+NO_RECOMENDATION_TEXT = ' No recommendation available'
+RECOMMENDATION_HEADING = '<p><strong>Recommended Editors (based on keyword matching):</strong></p>'
+
 
 def get_deployment_env() -> str:
     return os.getenv(
@@ -52,12 +55,11 @@ def get_model_path(deployment_env: str) -> str:
 
 def get_recommendation_html(person_ids: list, names: list) -> str:
     if not person_ids:
-        return '<b>No</b> recommendation available'
+        return RECOMMENDATION_HEADING+NO_RECOMENDATION_TEXT
     formated_name = ''
     for name in names:
         formated_name += "<br />" + name
-    return """<p><strong>Recommended Editors (based on keyword matching):</strong>\
-        %s</p>""" % formated_name
+    return RECOMMENDATION_HEADING+' %s' % formated_name
 
 
 def get_recommendation_json(person_ids: list, names: list) -> dict:
