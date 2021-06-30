@@ -3,6 +3,7 @@ import json
 import logging
 import jsonschema
 
+from google.cloud.bigquery import Client
 from flask import Flask, jsonify, request
 from werkzeug.exceptions import BadRequest
 
@@ -18,8 +19,6 @@ from peerscout_api.recomend_editor import (
     load_model,
     get_editor_recomendations_for_api
 )
-
-from google.cloud.bigquery import Client
 
 
 DEPLOYMENT_ENV_ENV_NAME = "DEPLOYMENT_ENV"
@@ -111,6 +110,7 @@ def get_formated_html_text(
 ) -> str:
     PROJECT_NAME = 'elife-data-pipeline'
     DATASET_NAME = get_deployment_env()
+    TABLE_NAME = 'mv_person'
 
     formated_recomended_name = get_formated_name_for_html(
             recommended_names
@@ -118,14 +118,14 @@ def get_formated_html_text(
     author_suggestion_include_editor_names = get_person_names_from_bq(
             project=PROJECT_NAME,
             dataset=DATASET_NAME,
-            table='mv_person',
+            table=TABLE_NAME,
             person_ids=author_suggestion_include_editor_ids
         )
 
     author_suggestion_exclude_editor_names = get_person_names_from_bq(
         project=PROJECT_NAME,
         dataset=DATASET_NAME,
-        table='mv_person',
+        table=TABLE_NAME,
         person_ids=author_suggestion_exclude_editor_ids
     )
     formated_excluded_name = get_formated_name_for_html(
@@ -141,82 +141,45 @@ def get_formated_html_text(
 
 
 def get_recommendation_html(
-        editor_type: str,
         recommended_person_ids: list,
         recommended_names: list,
-        author_suggestion_exclude_senior_editor_ids: list,
-        author_suggestion_include_senior_editor_ids: list,
-        author_suggestion_exclude_reviewing_editor_ids: list,
-        author_suggestion_include_reviewing_editor_ids: list
+        author_suggestion_exclude_editor_ids: list,
+        author_suggestion_include_editor_ids: list
 ) -> str:
     if not recommended_person_ids:
         return NO_RECOMENDATION_HTML
 
-    if editor_type == 'senior':
-        return get_formated_html_text(
-            recommended_names=recommended_names,
-            author_suggestion_exclude_editor_ids=author_suggestion_exclude_senior_editor_ids,
-            author_suggestion_include_editor_ids=author_suggestion_include_senior_editor_ids
-        )
-    else:
-        return get_formated_html_text(
-            recommended_names=recommended_names,
-            author_suggestion_exclude_editor_ids=author_suggestion_exclude_reviewing_editor_ids,
-            author_suggestion_include_editor_ids=author_suggestion_include_reviewing_editor_ids
-        )
+    return get_formated_html_text(
+        recommended_names=recommended_names,
+        author_suggestion_exclude_editor_ids=author_suggestion_exclude_editor_ids,
+        author_suggestion_include_editor_ids=author_suggestion_include_editor_ids
+    )
 
 
 def get_recommendation_json(
-        editor_type: str,
         recommended_person_ids: list,
         recommended_names: list,
-        author_suggestion_exclude_senior_editor_ids: list,
-        author_suggestion_include_senior_editor_ids: list,
-        author_suggestion_exclude_reviewing_editor_ids: list,
-        author_suggestion_include_reviewing_editor_ids: list
+        author_suggestion_exclude_editor_ids: list,
+        author_suggestion_include_editor_ids: list
 ) -> dict:
     return {
        'person_ids': recommended_person_ids,
        'recommendation_html': get_recommendation_html(
-            editor_type,
-            recommended_person_ids,
-            recommended_names,
-            author_suggestion_exclude_senior_editor_ids,
-            author_suggestion_include_senior_editor_ids,
-            author_suggestion_exclude_reviewing_editor_ids,
-            author_suggestion_include_reviewing_editor_ids
+            recommended_person_ids=recommended_person_ids,
+            recommended_names=recommended_names,
+            author_suggestion_exclude_editor_ids=author_suggestion_exclude_editor_ids,
+            author_suggestion_include_editor_ids=author_suggestion_include_editor_ids
         )
     }
 
 
 def get_response_json(
-        senior_editor_person_ids: list,
-        senior_editor_names: list,
-        reviewing_editor_person_ids: list,
-        reviewing_editor_names: list,
-        author_suggestion_exclude_senior_editor_ids: list,
-        author_suggestion_include_senior_editor_ids: list,
-        author_suggestion_exclude_reviewing_editor_ids: list,
-        author_suggestion_include_reviewing_editor_ids: list,
+        senior_editor_recommendation_json: dict,
+        reviewing_editor_recommendation_json: dict
 ) -> dict:
     return {
-        'senior_editor_recommendation': get_recommendation_json(
-            editor_type='senior',
-            recommended_person_ids=senior_editor_person_ids,
-            recommended_names=senior_editor_names,
-            author_suggestion_exclude_senior_editor_ids=author_suggestion_exclude_senior_editor_ids,
-            author_suggestion_include_senior_editor_ids=author_suggestion_include_senior_editor_ids,
-            author_suggestion_exclude_reviewing_editor_ids=[],
-            author_suggestion_include_reviewing_editor_ids=[]),
-        'reviewing_editor_recommendation': get_recommendation_json(
-            editor_type='reviewing',
-            recommended_person_ids=reviewing_editor_person_ids,
-            recommended_names=reviewing_editor_names,
-            author_suggestion_exclude_senior_editor_ids=[],
-            author_suggestion_include_senior_editor_ids=[],
-            author_suggestion_exclude_reviewing_editor_ids=author_suggestion_exclude_reviewing_editor_ids,
-            author_suggestion_include_reviewing_editor_ids=author_suggestion_include_reviewing_editor_ids,
-            )
+        'senior_editor_recommendation': senior_editor_recommendation_json,
+        'reviewing_editor_recommendation': reviewing_editor_recommendation_json
         }
 
 
@@ -254,18 +217,25 @@ def create_app():
             raise BadRequest() from e
 
         abstract = data['abstract']
-
         author_suggestion = data['author_suggestion']
-        author_suggestion_exclude_senior_editors = author_suggestion['exclude_senior_editors_id']
-        author_suggestion_include_senior_editors = author_suggestion['include_senior_editors_id']
-        author_suggestion_exclude_reviewing_editors = author_suggestion['exclude_reviewing_editors_id']
-        author_suggestion_include_reviewing_editors = author_suggestion['include_reviewing_editors_id']
+        author_suggestion_exclude_senior_editors = author_suggestion[
+            'exclude_senior_editors_id'
+        ]
+        author_suggestion_include_senior_editors = author_suggestion[
+            'include_senior_editors_id'
+        ]
+        author_suggestion_exclude_reviewing_editors = author_suggestion[
+            'exclude_reviewing_editors_id'
+        ]
+        author_suggestion_include_reviewing_editors = author_suggestion[
+            'include_reviewing_editors_id'
+        ]
 
         if not abstract:
-            suggested_senior_editor_person_ids = []
-            suggested_reviewing_editor_person_ids = []
-            suggested_senior_editor_names = []
-            suggested_reviewing_editor_names = []
+            recommeded_senior_editor_ids = []
+            recommeded_senior_editor_names = []
+            recommeded_reviewing_editor_ids = []
+            recommeded_reviewing_editor_names = []
         else:
             extracted_keywords = list(keyword_extractor.iter_extract_keywords(text_list=[abstract]))
 
@@ -274,27 +244,34 @@ def create_app():
                 extracted_keywords,
                 DEFAULT_N_FOR_TOP_N_EDITORS
             )
-
             recomended_reviewing_editors = get_editor_recomendations_for_api(
                 reviewing_editor_model_dict,
                 extracted_keywords,
                 DEFAULT_N_FOR_TOP_N_EDITORS
             )
 
-            suggested_senior_editor_person_ids = recomended_senior_editors['person_id'].to_list()
-            suggested_reviewing_editor_person_ids = recomended_reviewing_editors['person_id'].to_list()
-            suggested_senior_editor_names = recomended_senior_editors['name'].to_list()
-            suggested_reviewing_editor_names = recomended_reviewing_editors['name'].to_list()
+            recommeded_senior_editor_ids = recomended_senior_editors['person_id'].to_list()
+            recommeded_senior_editor_names = recomended_senior_editors['name'].to_list()
+            recommeded_reviewing_editor_ids = recomended_reviewing_editors['person_id'].to_list()
+            recommeded_reviewing_editor_names = recomended_reviewing_editors['name'].to_list()
+
+        json_response_for_senior_editors = get_recommendation_json(
+            recommended_person_ids=recommeded_senior_editor_ids,
+            recommended_names=recommeded_senior_editor_names,
+            author_suggestion_exclude_editor_ids=author_suggestion_exclude_senior_editors,
+            author_suggestion_include_editor_ids=author_suggestion_include_senior_editors
+        )
+
+        json_response_for_reviewing_editors = get_recommendation_json(
+            recommended_person_ids=recommeded_reviewing_editor_ids,
+            recommended_names=recommeded_reviewing_editor_names,
+            author_suggestion_exclude_editor_ids=author_suggestion_exclude_reviewing_editors,
+            author_suggestion_include_editor_ids=author_suggestion_include_reviewing_editors
+        )
 
         return jsonify(get_response_json(
-            senior_editor_person_ids=suggested_senior_editor_person_ids,
-            senior_editor_names=suggested_senior_editor_names,
-            reviewing_editor_person_ids=suggested_reviewing_editor_person_ids,
-            reviewing_editor_names=suggested_reviewing_editor_names,
-            author_suggestion_exclude_senior_editor_ids=author_suggestion_exclude_senior_editors,
-            author_suggestion_include_senior_editor_ids=author_suggestion_include_senior_editors,
-            author_suggestion_exclude_reviewing_editor_ids=author_suggestion_exclude_reviewing_editors,
-            author_suggestion_include_reviewing_editor_ids=author_suggestion_include_reviewing_editors
+            senior_editor_recommendation_json=json_response_for_senior_editors,
+            reviewing_editor_recommendation_json=json_response_for_reviewing_editors
         ))
 
     return app
