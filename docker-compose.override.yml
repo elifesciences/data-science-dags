@@ -41,6 +41,7 @@ services:
     volumes: 
       - ./peerscout_api:/app/api/peerscout_api
       - ~/.aws/credentials:/root/.aws/credentials
+      - ~/.config/gcloud:/root/.config/gcloud
     environment:
       - DEPLOYMENT_ENV=staging
 
