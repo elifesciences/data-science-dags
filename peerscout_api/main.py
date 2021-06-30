@@ -118,25 +118,31 @@ def create_app():
             raise BadRequest() from e
 
         abstract = data['abstract']
-        extracted_keywords = list(keyword_extractor.iter_extract_keywords(text_list=[abstract]))
 
-        recomended_senior_editors = get_editor_recomendations_for_api(
-            senior_editor_model_dict,
-            extracted_keywords,
-            DEFAULT_N_FOR_TOP_N_EDITORS
-        )
+        if not abstract:
+            suggested_senior_editor_person_ids = []
+            suggested_reviewing_editor_person_ids = []
+            suggested_senior_editor_names = []
+            suggested_reviewing_editor_names = []
+        else:
+            extracted_keywords = list(keyword_extractor.iter_extract_keywords(text_list=[abstract]))
+            
+            recomended_senior_editors = get_editor_recomendations_for_api(
+                senior_editor_model_dict,
+                extracted_keywords,
+                DEFAULT_N_FOR_TOP_N_EDITORS
+            )
 
-        recomended_reviewing_editors = get_editor_recomendations_for_api(
-            reviewing_editor_model_dict,
-            extracted_keywords,
-            DEFAULT_N_FOR_TOP_N_EDITORS
-        )
+            recomended_reviewing_editors = get_editor_recomendations_for_api(
+                reviewing_editor_model_dict,
+                extracted_keywords,
+                DEFAULT_N_FOR_TOP_N_EDITORS
+            )
 
-        suggested_senior_editor_person_ids = recomended_senior_editors['person_id'].to_list()
-        suggested_reviewing_editor_person_ids = recomended_reviewing_editors['person_id'].to_list()
-
-        suggested_senior_editor_names = recomended_senior_editors['name'].to_list()
-        suggested_reviewing_editor_names = recomended_reviewing_editors['name'].to_list()
+            suggested_senior_editor_person_ids = recomended_senior_editors['person_id'].to_list()
+            suggested_reviewing_editor_person_ids = recomended_reviewing_editors['person_id'].to_list()
+            suggested_senior_editor_names = recomended_senior_editors['name'].to_list()
+            suggested_reviewing_editor_names = recomended_reviewing_editors['name'].to_list()
 
         return jsonify(get_response_json(
             senior_editor_person_ids=suggested_senior_editor_person_ids,
