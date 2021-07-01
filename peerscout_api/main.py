@@ -51,11 +51,6 @@ RECOMENDATION_HTML = RECOMMENDATION_HEADINGS[0] + '{formated_excluded_name}' + \
     RECOMMENDATION_HEADINGS[1] + '{formated_included_name}' + \
     RECOMMENDATION_HEADINGS[2] + '{formated_recomended_name}'
 
-PERSON_NAME_COLUMN="""IF(
-    middle_name IS NOT NULL,
-    CONCAT(first_name,' ',middle_name,' ',last_name),
-    CONCAT(first_name,' ',last_name)
-)""" 
 
 def get_deployment_env() -> str:
     return os.getenv(
@@ -75,7 +70,6 @@ def get_person_details_from_bq(
         project: str,
         dataset: str,
         table: str,
-        column: str,
         person_ids: list):
 
     client = Client(project=project)
@@ -83,21 +77,25 @@ def get_person_details_from_bq(
     sql = (
         """
         SELECT
-            {column} AS column_name
+            IF(
+                middle_name IS NOT NULL,
+                CONCAT(first_name,' ',middle_name,' ',last_name),
+                CONCAT(first_name,' ',last_name)
+            ) AS person_name,
+            institution
         FROM `{project}.{dataset}.{table}`
         WHERE person_id IN UNNEST({person_ids})
         """.format(
             project=project,
             dataset=dataset,
             table=table,
-            column=column,
             person_ids=person_ids
         )
     )
 
     query_job = client.query(sql)
     results = query_job.result()
-    return [row.column_name for row in results]
+    return [row for row in results]
 
 
 def get_formated_name_for_html(names: list) -> str:
@@ -119,21 +117,28 @@ def get_formated_html_text(
     formated_recomended_name = get_formated_name_for_html(
             recommended_names
         )
-    author_suggestion_include_editor_names = get_person_details_from_bq(
-            project=PROJECT_NAME,
-            dataset=DATASET_NAME,
-            table=TABLE_NAME,
-            column=PERSON_NAME_COLUMN,
-            person_ids=author_suggestion_include_editor_ids
-        )
 
-    author_suggestion_exclude_editor_names = get_person_details_from_bq(
+    author_suggestion_exclude_editor_details = get_person_details_from_bq(
         project=PROJECT_NAME,
         dataset=DATASET_NAME,
         table=TABLE_NAME,
-        column=PERSON_NAME_COLUMN,
         person_ids=author_suggestion_exclude_editor_ids
     )
+    author_suggestion_exclude_editor_names = (
+        [person.get('person_name') for person in author_suggestion_exclude_editor_details]
+    )
+
+    author_suggestion_include_editor_details = get_person_details_from_bq(
+            project=PROJECT_NAME,
+            dataset=DATASET_NAME,
+            table=TABLE_NAME,
+            person_ids=author_suggestion_include_editor_ids
+        )
+
+    author_suggestion_include_editor_names = (
+        [person.get('person_name') for person in author_suggestion_include_editor_details]
+    )
+
     formated_excluded_name = get_formated_name_for_html(
         author_suggestion_exclude_editor_names
     )
