@@ -9,7 +9,7 @@ import pandas as pd
 from peerscout_api.main import (
     create_app,
     # get_recommendation_html,
-    RECOMENDATION_HTML,
+    # RECOMENDATION_HTML,
     # RECOMMENDATION_HEADINGS,
     NO_RECOMENDATION_HTML
 )
@@ -62,6 +62,8 @@ RECOMMENDED_PERSON_IDS = ['1', '2', '3']
 RECOMMENDED_NAMES = ['A', 'B', 'C']
 AUTHOR_SUGGESTED_IDS = ['5']
 
+# FORMATED_SUGGESTED_NAME = "<br />D"
+# FORMATED_RECOMMENDED_NAME = ['<br />A', '<br />B', '<br />C']
 
 # VALID_RECOMENDATION_RESPONSE = {
 #     "reviewing_editor_recommendation": {
@@ -89,11 +91,14 @@ def _get_person_names_from_bq_mock() -> MagicMock:
         yield mock
 
 
-@pytest.fixture(name='get_formated_html_text_mock', autouse=True)
-def _get_formated_html_text_mock() -> MagicMock:
-    with patch.object(target_module, 'get_formated_html_text') as mock:
-        mock.return_value = RECOMENDATION_HTML
-        yield mock
+# @pytest.fixture(name='get_formated_html_text_mock', autouse=True)
+# def _get_formated_html_text_mock() -> MagicMock:
+#     with patch.object(target_module, 'get_formated_html_text') as mock:
+#         mock.return_value = RECOMENDATION_HTML.format(
+#             formated_excluded_name=FORMATED_SUGGESTED_NAME,
+#             formated_included_name=FORMATED_SUGGESTED_NAME,
+#             formated_recomended_name=FORMATED_RECOMMENDED_NAME)
+#         yield mock
 
 
 @pytest.fixture(name='get_editor_recomendations_for_api_mock', autouse=True)
