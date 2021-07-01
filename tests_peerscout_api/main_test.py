@@ -8,8 +8,9 @@ import pandas as pd
 
 from peerscout_api.main import (
     create_app,
-    # get_recommendation_html,
-    # RECOMENDATION_HTML,
+    get_recommendation_html,
+    RECOMENDATION_HTML,
+    RECOMMENDATION_HEADINGS,
     NO_RECOMENDATION_HTML
 )
 
@@ -57,47 +58,41 @@ NO_RECOMENDATION_RESPONSE = {
     }
 }
 
-# RECOMMENDED_PERSON_IDS = ['1', '2', '3']
-# RECOMMENDED_NAMES = ['A', 'B', 'C']
-# AUTHOR_EXCLUDE_IDS = ['5']
-# AUTHOR_INCLUDE_IDS = ['4']
-
-# VALID_RECOMENDATION_RESPONSE = {
-#     "reviewing_editor_recommendation": {
-#         "person_ids": RECOMMENDED_PERSON_IDS,
-#         "recommendation_html": get_recommendation_html(
-#             recommended_person_ids=RECOMMENDED_PERSON_IDS,
-#             recommended_names=RECOMMENDED_NAMES,
-#             author_suggestion_exclude_editor_ids=AUTHOR_EXCLUDE_IDS,
-#             author_suggestion_include_editor_ids=AUTHOR_INCLUDE_IDS)
-#     },
-#     "senior_editor_recommendation": {
-#         "person_ids": RECOMMENDED_PERSON_IDS,
-#         "recommendation_html": get_recommendation_html(
-#             recommended_person_ids=RECOMMENDED_PERSON_IDS,
-#             recommended_names=RECOMMENDED_NAMES,
-#             author_suggestion_exclude_editor_ids=AUTHOR_EXCLUDE_IDS,
-#             author_suggestion_include_editor_ids=AUTHOR_INCLUDE_IDS)
-#     }
-# }
-
-# @pytest.fixture(name='get_formated_name_for_html_mock', autouse=True)
-# def _get_formated_name_for_html_mock() -> MagicMock:
-#     with patch.object(target_module, 'get_formated_name_for_html') as mock:
-#         yield mock
+RECOMMENDED_PERSON_IDS = ['1', '2', '3']
+RECOMMENDED_NAMES = ['A', 'B', 'C']
+AUTHOR_SUGGESTED_IDS = ['5']
 
 
-# @pytest.fixture(name='get_person_names_from_bq_mock', autouse=True)
-# def _get_person_names_from_bq_mock() -> MagicMock:
-#     with patch.object(target_module, 'get_person_names_from_bq') as mock:
-#         yield mock
+VALID_RECOMENDATION_RESPONSE = {
+    "reviewing_editor_recommendation": {
+        "person_ids": RECOMMENDED_PERSON_IDS,
+        "recommendation_html": get_recommendation_html(
+            recommended_person_ids=RECOMMENDED_PERSON_IDS,
+            recommended_names=RECOMMENDED_NAMES,
+            author_suggestion_exclude_editor_ids=AUTHOR_SUGGESTED_IDS,
+            author_suggestion_include_editor_ids=AUTHOR_SUGGESTED_IDS)
+    },
+    "senior_editor_recommendation": {
+        "person_ids": RECOMMENDED_PERSON_IDS,
+        "recommendation_html": get_recommendation_html(
+            recommended_person_ids=RECOMMENDED_PERSON_IDS,
+            recommended_names=RECOMMENDED_NAMES,
+            author_suggestion_exclude_editor_ids=AUTHOR_SUGGESTED_IDS,
+            author_suggestion_include_editor_ids=AUTHOR_SUGGESTED_IDS)
+    }
+}
+
+@pytest.fixture(name='get_person_names_from_bq_mock', autouse=True)
+def _get_person_names_from_bq_mock() -> MagicMock:
+    with patch.object(target_module, 'get_person_names_from_bq') as mock:
+        yield mock
 
 
-# @pytest.fixture(name='get_formated_html_text_mock', autouse=True)
-# def _get_formated_html_text_mock() -> MagicMock:
-#     with patch.object(target_module, 'get_formated_html_text') as mock:
-#         mock.return_value = RECOMENDATION_HTML
-#         yield mock
+@pytest.fixture(name='get_formated_html_text_mock', autouse=True)
+def _get_formated_html_text_mock() -> MagicMock:
+    with patch.object(target_module, 'get_formated_html_text') as mock:
+        mock.return_value = RECOMENDATION_HTML
+        yield mock
 
 
 @pytest.fixture(name='get_editor_recomendations_for_api_mock', autouse=True)
@@ -161,15 +156,24 @@ class TestPeerscoutAPI:
     #     assert _get_ok_json(response) == VALID_RECOMENDATION_RESPONSE
 
 
-# class TestGetRecommendationHtml:
-#     # def test_should_have_editor_exclusion_when_the_recomendation_not_avaliable():
-#     def test_should_have_recomendation_heading_when_the_recomendation_not_avaliable(
-#         self
-#     ):
-#         assert RECOMMENDATION_HEADING in get_recommendation_html(person_ids=[], names=[])
+class TestGetRecommendationHtml:
+    # def test_should_have_editor_exclusion_when_the_recomendation_not_avaliable():
+    def test_should_have_recomendation_heading_when_the_recomendation_not_avaliable(
+        self
+    ):
+        for heading in RECOMMENDATION_HEADINGS:
+            assert heading in get_recommendation_html(
+                recommended_person_ids=[],
+                recommended_names=[],
+                author_suggestion_exclude_editor_ids=[],
+                author_suggestion_include_editor_ids=[])
 
-#     def test_should_have_recomendation_heading_when_the_recomendation_avaliable(
-#         self
-#     ):
-#         assert RECOMMENDATION_HEADING in get_recommendation_html(
-#             person_ids=PERSON_IDS, names=NAMES)
+    def test_should_have_recomendation_heading_when_the_recomendation_avaliable(
+        self
+    ):
+        for heading in RECOMMENDATION_HEADINGS:
+            assert heading in get_recommendation_html(
+                recommended_person_ids=RECOMMENDED_PERSON_IDS,
+                recommended_names=RECOMMENDED_NAMES,
+                author_suggestion_exclude_editor_ids=AUTHOR_SUGGESTED_IDS,
+                author_suggestion_include_editor_ids=AUTHOR_SUGGESTED_IDS)
