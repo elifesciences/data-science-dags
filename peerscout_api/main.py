@@ -82,8 +82,10 @@ def get_person_details_from_bq(
                 CONCAT(first_name,' ',middle_name,' ',last_name),
                 CONCAT(first_name,' ',last_name)
             ) AS person_name,
-            institution
-        FROM `{project}.{dataset}.{table}`
+            institution,
+            address.country AS country
+        FROM `{project}.{dataset}.{table}`,
+        UNNEST(addresses) AS address
         WHERE person_id IN UNNEST({person_ids})
         """.format(
             project=project,
@@ -120,7 +122,7 @@ def get_formated_person_details_for_html(
     )
     person_details = (
         [
-            person.get('person_name') + '; ' + person.get('institution')
+            person.person_name + '; ' + person.institution + ', ' + person.country
             for person in response_person_details
         ]
     )
