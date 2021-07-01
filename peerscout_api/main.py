@@ -47,9 +47,9 @@ NO_RECOMENDATION_HTML = RECOMMENDATION_HEADINGS[0] + NOT_PROVIDED + \
     RECOMMENDATION_HEADINGS[1] + NOT_PROVIDED + \
     RECOMMENDATION_HEADINGS[2] + NO_RECOMENDATION_TEXT
 
-RECOMENDATION_HTML = RECOMMENDATION_HEADINGS[0] + '{formated_excluded_name}' + \
-    RECOMMENDATION_HEADINGS[1] + '{formated_included_name}' + \
-    RECOMMENDATION_HEADINGS[2] + '{formated_recomended_name}'
+RECOMENDATION_HTML = RECOMMENDATION_HEADINGS[0] + '{excluded_editor_details}' + \
+    RECOMMENDATION_HEADINGS[1] + '{included_editor_details}' + \
+    RECOMMENDATION_HEADINGS[2] + '{recommended_editor_details}'
 
 
 def get_deployment_env() -> str:
@@ -144,9 +144,9 @@ def get_formated_html_text(
     )
 
     return RECOMENDATION_HTML.format(
-        formated_excluded_name=formated_suggested_exclude_editor_details,
-        formated_included_name=formated_suggested_include_editor_details,
-        formated_recomended_name=formated_recomended_editor_details)
+        excluded_editor_details=formated_suggested_exclude_editor_details,
+        included_editor_details=formated_suggested_include_editor_details,
+        recommended_editor_details=formated_recomended_editor_details)
 
 
 def get_recommendation_html(
