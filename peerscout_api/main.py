@@ -15,9 +15,9 @@ from elife_data_hub_utils.keyword_extract.extract_keywords import (
     get_keyword_extractor
 )
 
-from peerscout_api.recomend_editor import (
+from peerscout_api.recommend_editor import (
     load_model,
-    get_editor_recomendations_for_api
+    get_editor_recommendations_for_api
 )
 
 
@@ -36,18 +36,18 @@ LOGGER = logging.getLogger(__name__)
 
 REQUEST_JSON_SCHEMA_PATH = os.path.join(os.path.dirname(__file__), 'input-json-schema.json')
 
-NO_RECOMENDATION_TEXT = ' No recommendation available'
+NO_RECOMMENDATION_TEXT = ' No recommendation available'
 NOT_PROVIDED = 'Not provided'
 RECOMMENDATION_HEADINGS = [
     '<p><strong>Author’s requests for Editor exclusions:</strong></p>',
     '<p><strong>Author’s suggestions for Reviewing Editor:</strong></p>',
     '<p><strong>Recommended Editors (based on keyword matching):</strong></p>']
 
-NO_RECOMENDATION_HTML = RECOMMENDATION_HEADINGS[0] + NOT_PROVIDED + \
+NO_RECOMMENDATION_HTML = RECOMMENDATION_HEADINGS[0] + NOT_PROVIDED + \
     RECOMMENDATION_HEADINGS[1] + NOT_PROVIDED + \
-    RECOMMENDATION_HEADINGS[2] + NO_RECOMENDATION_TEXT
+    RECOMMENDATION_HEADINGS[2] + NO_RECOMMENDATION_TEXT
 
-RECOMENDATION_HTML = RECOMMENDATION_HEADINGS[0] + '{excluded_editor_details}' + \
+RECOMMENDATION_HTML = RECOMMENDATION_HEADINGS[0] + '{excluded_editor_details}' + \
     RECOMMENDATION_HEADINGS[1] + '{included_editor_details}' + \
     RECOMMENDATION_HEADINGS[2] + '{recommended_editor_details}'
 
@@ -139,14 +139,14 @@ def get_formated_html_text(
     formated_suggested_include_editor_details = get_formated_person_details_for_html(
         person_ids=author_suggestion_include_editor_ids
     )
-    formated_recomended_editor_details = get_formated_person_details_for_html(
+    formated_recommended_editor_details = get_formated_person_details_for_html(
         person_ids=recommended_person_ids
     )
 
-    return RECOMENDATION_HTML.format(
+    return RECOMMENDATION_HTML.format(
         excluded_editor_details=formated_suggested_exclude_editor_details,
         included_editor_details=formated_suggested_include_editor_details,
-        recommended_editor_details=formated_recomended_editor_details)
+        recommended_editor_details=formated_recommended_editor_details)
 
 
 def get_recommendation_html(
@@ -155,7 +155,7 @@ def get_recommendation_html(
         recommended_person_ids: list
 ) -> str:
     if not recommended_person_ids:
-        return NO_RECOMENDATION_HTML
+        return NO_RECOMMENDATION_HTML
 
     return get_formated_html_text(
         author_suggestion_exclude_editor_ids=author_suggestion_exclude_editor_ids,
@@ -243,19 +243,19 @@ def create_app():
         else:
             extracted_keywords = list(keyword_extractor.iter_extract_keywords(text_list=[abstract]))
 
-            recomended_senior_editors = get_editor_recomendations_for_api(
+            recommended_senior_editors = get_editor_recommendations_for_api(
                 senior_editor_model_dict,
                 extracted_keywords,
                 DEFAULT_N_FOR_TOP_N_EDITORS
             )
-            recomended_reviewing_editors = get_editor_recomendations_for_api(
+            recommended_reviewing_editors = get_editor_recommendations_for_api(
                 reviewing_editor_model_dict,
                 extracted_keywords,
                 DEFAULT_N_FOR_TOP_N_EDITORS
             )
 
-            recommeded_senior_editor_ids = recomended_senior_editors['person_id'].to_list()
-            recommeded_reviewing_editor_ids = recomended_reviewing_editors['person_id'].to_list()
+            recommeded_senior_editor_ids = recommended_senior_editors['person_id'].to_list()
+            recommeded_reviewing_editor_ids = recommended_reviewing_editors['person_id'].to_list()
 
         json_response_for_senior_editors = get_recommendation_json(
             author_suggestion_exclude_editor_ids=author_suggestion_exclude_senior_editors,

@@ -90,7 +90,7 @@ def get_recommended_editors_with_probability(
     ]
 
 
-def get_editor_recomendations_for_api(
+def get_editor_recommendations_for_api(
         model: PeerScoutModelProps,
         extracted_keywords: list,
         top_n_editor: int):
