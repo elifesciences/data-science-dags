@@ -315,7 +315,7 @@ ci-build-and-test:
 		peerscout-api-build \
 		notebook-lint \
 		notebook-nbstripout-check \
-		ci-test-exclude-e2e \
+		ci-test-exclude-e2e
 
 
 ci-clean:
