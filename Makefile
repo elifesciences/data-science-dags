@@ -290,7 +290,7 @@ peerscout-api-dev-pytest:
 	$(PEERSCOUT_API_DEV_DOCKER_PYTHON) -m pytest -v
 
 peerscout-api-dev-pytest-watch:
-	$(PEERSCOUT_API_DEV_DOCKER_PYTHON) -m pytest_watch -- -v
+	$(PEERSCOUT_API_DEV_DOCKER_PYTHON) -m pytest_watch -- -vv
 
 peerscout-api-dev-test: \
 	peerscout-api-dev-lint peerscout-api-dev-pytest
@@ -315,9 +315,7 @@ ci-build-and-test:
 		peerscout-api-build \
 		notebook-lint \
 		notebook-nbstripout-check \
-		ci-test-exclude-e2e \
-		peerscout-api-dev-build \
-		peerscout-api-dev-test
+		ci-test-exclude-e2e
 
 
 ci-clean:
