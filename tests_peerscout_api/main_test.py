@@ -8,9 +8,9 @@ import pandas as pd
 
 from peerscout_api.main import (
     create_app,
-    get_recommendation_html,
+    # get_recommendation_html,
     RECOMENDATION_HTML,
-    RECOMMENDATION_HEADINGS,
+    # RECOMMENDATION_HEADINGS,
     NO_RECOMENDATION_HTML
 )
 
