@@ -16,7 +16,7 @@ curl \
     http://localhost:8090/api/peerscout
 ```
 
-or 
+to test empty abstract response:
 
 ```bash
 curl \
