@@ -62,8 +62,6 @@ NO_RECOMENDATION_RESPONSE = {
 # AUTHOR_EXCLUDE_IDS = ['5']
 # AUTHOR_INCLUDE_IDS = ['4']
 
-
-
 # VALID_RECOMENDATION_RESPONSE = {
 #     "reviewing_editor_recommendation": {
 #         "person_ids": RECOMMENDED_PERSON_IDS,
@@ -100,6 +98,7 @@ NO_RECOMENDATION_RESPONSE = {
 #     with patch.object(target_module, 'get_formated_html_text') as mock:
 #         mock.return_value = RECOMENDATION_HTML
 #         yield mock
+
 
 @pytest.fixture(name='get_editor_recomendations_for_api_mock', autouse=True)
 def _get_editor_recomendations_for_api_mock() -> MagicMock:
