@@ -8,9 +8,9 @@ import pandas as pd
 
 from peerscout_api.main import (
     create_app,
-    # get_recommendation_html,
-    # RECOMENDATION_HTML,
-    # RECOMMENDATION_HEADINGS,
+    get_recommendation_html,
+    RECOMENDATION_HTML,
+    RECOMMENDATION_HEADINGS,
     NO_RECOMENDATION_HTML
 )
 
@@ -62,27 +62,27 @@ RECOMMENDED_PERSON_IDS = ['1', '2', '3']
 RECOMMENDED_NAMES = ['A', 'B', 'C']
 AUTHOR_SUGGESTED_IDS = ['5']
 
-# FORMATED_SUGGESTED_NAME = "<br />D"
-# FORMATED_RECOMMENDED_NAME = ['<br />A', '<br />B', '<br />C']
+FORMATED_SUGGESTED_NAME = "<br />D"
+FORMATED_RECOMMENDED_NAME = ['<br />A', '<br />B', '<br />C']
 
-# VALID_RECOMENDATION_RESPONSE = {
-#     "reviewing_editor_recommendation": {
-#         "person_ids": RECOMMENDED_PERSON_IDS,
-#         "recommendation_html": get_recommendation_html(
-#             recommended_person_ids=RECOMMENDED_PERSON_IDS,
-#             recommended_names=RECOMMENDED_NAMES,
-#             author_suggestion_exclude_editor_ids=AUTHOR_SUGGESTED_IDS,
-#             author_suggestion_include_editor_ids=AUTHOR_SUGGESTED_IDS)
-#     },
-#     "senior_editor_recommendation": {
-#         "person_ids": RECOMMENDED_PERSON_IDS,
-#         "recommendation_html": get_recommendation_html(
-#             recommended_person_ids=RECOMMENDED_PERSON_IDS,
-#             recommended_names=RECOMMENDED_NAMES,
-#             author_suggestion_exclude_editor_ids=AUTHOR_SUGGESTED_IDS,
-#             author_suggestion_include_editor_ids=AUTHOR_SUGGESTED_IDS)
-#     }
-# }
+VALID_RECOMENDATION_RESPONSE = {
+    "reviewing_editor_recommendation": {
+        "person_ids": RECOMMENDED_PERSON_IDS,
+        "recommendation_html": get_recommendation_html(
+            recommended_person_ids=RECOMMENDED_PERSON_IDS,
+            recommended_names=RECOMMENDED_NAMES,
+            author_suggestion_exclude_editor_ids=AUTHOR_SUGGESTED_IDS,
+            author_suggestion_include_editor_ids=AUTHOR_SUGGESTED_IDS)
+    },
+    "senior_editor_recommendation": {
+        "person_ids": RECOMMENDED_PERSON_IDS,
+        "recommendation_html": get_recommendation_html(
+            recommended_person_ids=RECOMMENDED_PERSON_IDS,
+            recommended_names=RECOMMENDED_NAMES,
+            author_suggestion_exclude_editor_ids=AUTHOR_SUGGESTED_IDS,
+            author_suggestion_include_editor_ids=AUTHOR_SUGGESTED_IDS)
+    }
+}
 
 
 @pytest.fixture(name='get_person_names_from_bq_mock', autouse=True)
@@ -162,24 +162,24 @@ class TestPeerscoutAPI:
     #     assert _get_ok_json(response) == VALID_RECOMENDATION_RESPONSE
 
 
-# class TestGetRecommendationHtml:
-#     # def test_should_have_editor_exclusion_when_the_recomendation_not_avaliable():
-#     def test_should_have_recomendation_heading_when_the_recomendation_not_avaliable(
-#         self
-#     ):
-#         for heading in RECOMMENDATION_HEADINGS:
-#             assert heading in get_recommendation_html(
-#                 recommended_person_ids=[],
-#                 recommended_names=[],
-#                 author_suggestion_exclude_editor_ids=[],
-#                 author_suggestion_include_editor_ids=[])
+class TestGetRecommendationHtml:
+    # def test_should_have_editor_exclusion_when_the_recomendation_not_avaliable():
+    def test_should_have_recomendation_heading_when_the_recomendation_not_avaliable(
+        self
+    ):
+        for heading in RECOMMENDATION_HEADINGS:
+            assert heading in get_recommendation_html(
+                recommended_person_ids=[],
+                recommended_names=[],
+                author_suggestion_exclude_editor_ids=[],
+                author_suggestion_include_editor_ids=[])
 
-#     def test_should_have_recomendation_heading_when_the_recomendation_avaliable(
-#         self
-#     ):
-#         for heading in RECOMMENDATION_HEADINGS:
-#             assert heading in get_recommendation_html(
-#                 recommended_person_ids=RECOMMENDED_PERSON_IDS,
-#                 recommended_names=RECOMMENDED_NAMES,
-#                 author_suggestion_exclude_editor_ids=AUTHOR_SUGGESTED_IDS,
-#                 author_suggestion_include_editor_ids=AUTHOR_SUGGESTED_IDS)
+    def test_should_have_recomendation_heading_when_the_recomendation_avaliable(
+        self
+    ):
+        for heading in RECOMMENDATION_HEADINGS:
+            assert heading in get_recommendation_html(
+                recommended_person_ids=RECOMMENDED_PERSON_IDS,
+                recommended_names=RECOMMENDED_NAMES,
+                author_suggestion_exclude_editor_ids=AUTHOR_SUGGESTED_IDS,
+                author_suggestion_include_editor_ids=AUTHOR_SUGGESTED_IDS)
