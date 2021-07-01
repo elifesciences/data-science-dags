@@ -82,6 +82,7 @@ VALID_RECOMENDATION_RESPONSE = {
     }
 }
 
+
 @pytest.fixture(name='get_person_names_from_bq_mock', autouse=True)
 def _get_person_names_from_bq_mock() -> MagicMock:
     with patch.object(target_module, 'get_person_names_from_bq') as mock:
