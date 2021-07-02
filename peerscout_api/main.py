@@ -52,11 +52,11 @@ RECOMMENDATION_HTML = RECOMMENDATION_HEADINGS[0] + '{excluded_editor_details}' +
     RECOMMENDATION_HEADINGS[2] + '{recommended_editor_details}'
 
 QUERY = """
-    SELECT 
+    SELECT
         IF(
             person.middle_name IS NOT NULL,
             CONCAT(person.first_name,' ',person.middle_name,' ',person.last_name),
-            CONCAT(person.first_name,' ',person.last_name) 
+            CONCAT(person.first_name,' ',person.last_name)
         ) AS person_name,
         person.institution,
         address.country,
@@ -67,11 +67,11 @@ QUERY = """
     UNNEST(person.addresses) AS address
     INNER JOIN `{project}.{dataset}.mv_Editorial_Editor_Profile` AS profile
     ON person.person_id = profile.Person_ID
-    LEFT JOIN 
-    (SELECT 
-        DISTINCT 
+    LEFT JOIN
+    (SELECT DISTINCT
         Person.Person_ID AS person_id,
-        CAST(ROUND(PERCENTILE_CONT(Initial_Submission.Reviewing_Editor.Consultation.Days_To_Respond, 0.5
+        CAST(ROUND(PERCENTILE_CONT(
+            Initial_Submission.Reviewing_Editor.Consultation.Days_To_Respond, 0.5
             ) OVER (PARTITION BY Person.Person_ID),2) AS STRING) AS days_to_respond,
         CAST(COUNT(DISTINCT Initial_Submission.Reviewing_Editor.Consultation.Request_Version_ID
             ) OVER (PARTITION BY Person.Person_ID) AS STRING) AS requests,
@@ -83,12 +83,14 @@ QUERY = """
             ) OVER (PARTITION BY Person.Person_ID) AS STRING) AS no_of_assigments,
         CAST(COUNT(DISTINCT Full_Submission.Reviewing_Editor.Assigned_Version_ID
             ) OVER (PARTITION BY Person.Person_ID) AS STRING) AS no_full_submissions,
-        CAST(PERCENTILE_CONT(Full_Submission.Reviewing_Editor.Submission_Received_To_Decision_Complete, 0.5
-            ) OVER (PARTITION BY Person.Person_ID) AS STRING) AS decision_time, 
-        FROM 
+        CAST(PERCENTILE_CONT(
+            Full_Submission.Reviewing_Editor.Submission_Received_To_Decision_Complete, 0.5
+            ) OVER (PARTITION BY Person.Person_ID) AS STRING) AS decision_time,
+        FROM
         `{project}.{dataset}.mv_Editorial_Editor_Workload_Event`,
         UNNEST(Person.Roles) AS person_role
-        WHERE DATE(Event_Timestamp)BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL 12 MONTH) AND CURRENT_DATE()
+        WHERE DATE(Event_Timestamp)
+            BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL 12 MONTH) AND CURRENT_DATE()
         AND person_role.Role_Name='Editorial Board Member'
         AND Person.Person_ID IN UNNEST({person_ids})
     ) AS event
@@ -160,14 +162,18 @@ def get_formated_person_details_for_html(
                 + '<br /><a href=' + person.Website_URL + '>Website</a> | <a href='
                 + person.PubMed_URL + '>PubMed</a>'
                 # stats for initial submission
-                + ('<br />Days to respond: ' + person.days_to_respond if person.days_to_respond else '')
+                + ('<br />Days to respond: ' + person.days_to_respond
+                    if person.days_to_respond else '')
                 + ('; Requests: ' + person.requests if person.requests else '')
                 + ('; Responses: ' + person.responses if person.responses else '')
                 + ('; Response rate: ' + person.response_rate + '%' if person.response_rate else '')
                 # stats for full submission
-                + ('<br />No. of current assignments: ' + person.no_of_assigments if person.no_of_assigments else '')
-                + ('; Full submissions in 12 months: ' + person.no_full_submissions if person.no_full_submissions else '')
-                + ('; Decision time: ' + person.decision_time + ' days' if person.decision_time else '')
+                + ('<br />No. of current assignments: ' + person.no_of_assigments
+                    if person.no_of_assigments else '')
+                + ('; Full submissions in 12 months: ' + person.no_full_submissions
+                    if person.no_full_submissions else '')
+                + ('; Decision time: ' + person.decision_time + ' days'
+                    if person.decision_time else '')
                 + '</p>'
                 for person in result_person_details
             ]
