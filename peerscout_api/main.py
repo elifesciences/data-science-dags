@@ -159,7 +159,8 @@ def get_formated_person_details_for_html(
                 + '<p><a href=' + person.Website_URL + '>Website</a> | <a href='
                 + person.PubMed_URL + '>PubMed</a></p>'
                 #  (c if condition else '')
-                + ('<p>Days to respond: ' + person.days_to_respond + '; ' if person.days_to_respond else '')
+                + ('<p>Days to respond: ' + person.days_to_respond if person.days_to_respond else '')
+                + ('; Requests: ' + person.requests if person.requests else '')
                 + '</p>'
                 for person in result_person_details
             ]
