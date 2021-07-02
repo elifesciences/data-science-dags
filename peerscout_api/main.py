@@ -167,6 +167,7 @@ def get_formated_person_details_for_html(
                 # stats for full submission
                 + ('<br />No. of current assignments: ' + person.no_of_assigments if person.no_of_assigments else '')
                 + ('; Full submissions in 12 months: ' + person.no_full_submissions if person.no_full_submissions else '')
+                + ('; Decision time: ' + person.decision_time + ' days' if person.decision_time else '')
                 + '</p>'
                 for person in result_person_details
             ]
