@@ -51,6 +51,51 @@ RECOMMENDATION_HTML = RECOMMENDATION_HEADINGS[0] + '{excluded_editor_details}' +
     RECOMMENDATION_HEADINGS[1] + '{included_editor_details}' + \
     RECOMMENDATION_HEADINGS[2] + '{recommended_editor_details}'
 
+QUERY = """
+    SELECT 
+        IF(
+            person.middle_name IS NOT NULL,
+            CONCAT(person.first_name,' ',person.middle_name,' ',person.last_name),
+            CONCAT(person.first_name,' ',person.last_name) 
+        ) AS person_name,
+        person.institution,
+        address.country,
+        profile.Website_URL,
+        profile.PubMed_URL,
+        event.*
+    FROM `{project}.{dataset}.mv_person` AS person,
+    UNNEST(person.addresses) AS address
+    INNER JOIN `{project}.{dataset}.mv_Editorial_Editor_Profile` AS profile
+    ON person.person_id = profile.Person_ID
+    LEFT JOIN 
+    (SELECT 
+        DISTINCT 
+        Person.Person_ID AS person_id,
+        ROUND(PERCENTILE_CONT(Initial_Submission.Reviewing_Editor.Consultation.Days_To_Respond, 0.5
+            ) OVER (PARTITION BY Person.Person_ID),2) AS days_to_respond,
+        COUNT(DISTINCT Initial_Submission.Reviewing_Editor.Consultation.Request_Version_ID
+            ) OVER (PARTITION BY Person.Person_ID) AS requests,
+        COUNT(DISTINCT Initial_Submission.Reviewing_Editor.Consultation.Response_Version_ID
+            ) OVER (PARTITION BY Person.Person_ID) AS responses,
+        CAST(ROUND(AVG(Initial_Submission.Reviewing_Editor.Consultation.Has_Response_Ratio
+            ) OVER (PARTITION BY Person.Person_ID)*100,0) AS INT64) AS response_rate,
+        MAX(Full_Submission.Reviewing_Editor.Current_Assignment_Count
+            ) OVER (PARTITION BY Person.Person_ID) AS number_of_assigments,
+        COUNT(DISTINCT Full_Submission.Reviewing_Editor.Assigned_Version_ID
+            ) OVER (PARTITION BY Person.Person_ID) AS number_full_submissions,
+        PERCENTILE_CONT(Full_Submission.Reviewing_Editor.Submission_Received_To_Decision_Complete, 0.5
+            ) OVER (PARTITION BY Person.Person_ID) AS decision_time, 
+        FROM 
+        `{project}.{dataset}.mv_Editorial_Editor_Workload_Event`,
+        UNNEST(Person.Roles) AS person_role
+        WHERE DATE(Event_Timestamp)BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL 12 MONTH) AND CURRENT_DATE()
+        AND person_role.Role_Name='Editorial Board Member'
+        AND Person.Person_ID IN UNNEST({person_ids})
+    ) AS event
+    ON person.person_id = event.person_id
+    WHERE person.person_id IN UNNEST({person_ids})
+"""
+
 
 def get_deployment_env() -> str:
     return os.getenv(
@@ -69,33 +114,14 @@ def get_model_path(deployment_env: str) -> str:
 def get_person_details_from_bq(
         project: str,
         dataset: str,
-        table1: str,
-        table2: str,
         person_ids: list):
 
     client = Client(project=project)
 
-    sql = ("""
-        SELECT
-            IF(
-                t1.middle_name IS NOT NULL,
-                CONCAT(t1.first_name,' ',t1.middle_name,' ',t1.last_name),
-                CONCAT(t1.first_name,' ',t1.last_name)
-            ) AS person_name,
-            t1.institution,
-            address.country AS country,
-            t2.Website_URL,
-            t2.PubMed_URL
-        FROM `{project}.{dataset}.{table1}` AS t1,
-        UNNEST(t1.addresses) AS address
-        INNER JOIN `{project}.{dataset}.{table2}` AS t2
-        ON t1.person_id = t2.Person_ID
-        WHERE t1.person_id IN UNNEST({person_ids})
-        """.format(
+    sql = (
+        QUERY.format(
             project=project,
             dataset=dataset,
-            table1=table1,
-            table2=table2,
             person_ids=person_ids
         )
     )
@@ -118,14 +144,10 @@ def get_formated_person_details_for_html(
 ) -> str:
     PROJECT_NAME = 'elife-data-pipeline'
     DATASET_NAME = get_deployment_env()
-    TABLE_NAME_PERSON = 'mv_person'
-    TABLE_NAME_URL = 'mv_Editorial_Editor_Profile'
 
     result_person_details = get_person_details_from_bq(
         project=PROJECT_NAME,
         dataset=DATASET_NAME,
-        table1=TABLE_NAME_PERSON,
-        table2=TABLE_NAME_URL,
         person_ids=person_ids
     )
 
