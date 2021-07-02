@@ -164,6 +164,8 @@ def get_formated_person_details_for_html(
                 + ('; Requests: ' + person.requests if person.requests else '')
                 + ('; Responses: ' + person.responses if person.responses else '')
                 + ('; Response rate: ' + person.response_rate + '%' if person.response_rate else '')
+                # stats for full submission
+                + ('<br />No. of current assignments: ' + person.no_of_assigments if person.no_of_assigments else '')
                 + '</p>'
                 for person in result_person_details
             ]
