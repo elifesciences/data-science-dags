@@ -69,28 +69,33 @@ def get_model_path(deployment_env: str) -> str:
 def get_person_details_from_bq(
         project: str,
         dataset: str,
-        table: str,
+        table1: str,
+        table2: str,
         person_ids: list):
 
     client = Client(project=project)
 
-    sql = (
-        """
+    sql = ("""
         SELECT
             IF(
-                middle_name IS NOT NULL,
-                CONCAT(first_name,' ',middle_name,' ',last_name),
-                CONCAT(first_name,' ',last_name)
+                t1.middle_name IS NOT NULL,
+                CONCAT(t1.first_name,' ',t1.middle_name,' ',t1.last_name),
+                CONCAT(t1.first_name,' ',t1.last_name)
             ) AS person_name,
-            institution,
-            address.country AS country
-        FROM `{project}.{dataset}.{table}`,
-        UNNEST(addresses) AS address
-        WHERE person_id IN UNNEST({person_ids})
+            t1.institution,
+            address.country AS country,
+            t2.Website_URL,
+            t2.PubMed_URL
+        FROM `{project}.{dataset}.{table1}` AS t1,
+        UNNEST(t1.addresses) AS address
+        INNER JOIN `{project}.{dataset}.{table2}` AS t2
+        ON t1.person_id = t2.Person_ID
+        WHERE t1.person_id IN UNNEST({person_ids})
         """.format(
             project=project,
             dataset=dataset,
-            table=table,
+            table1=table1,
+            table2=table2,
             person_ids=person_ids
         )
     )
@@ -108,24 +113,39 @@ def format_details_for_html(details: list) -> str:
 
 
 def get_formated_person_details_for_html(
-    person_ids: list
+    person_ids: list,
+    is_person_recommended: bool
 ) -> str:
     PROJECT_NAME = 'elife-data-pipeline'
     DATASET_NAME = get_deployment_env()
-    TABLE_NAME = 'mv_person'
+    TABLE_NAME_PERSON = 'mv_person'
+    TABLE_NAME_URL = 'mv_Editorial_Editor_Profile'
 
-    response_person_details = get_person_details_from_bq(
+    result_person_details = get_person_details_from_bq(
         project=PROJECT_NAME,
         dataset=DATASET_NAME,
-        table=TABLE_NAME,
+        table1=TABLE_NAME_PERSON,
+        table2=TABLE_NAME_URL,
         person_ids=person_ids
     )
-    person_details = (
-        [
-            person.person_name + '; ' + person.institution + ', ' + person.country
-            for person in response_person_details
-        ]
-    )
+
+    if is_person_recommended:
+        person_details = (
+            [
+                person.person_name + '<p>' + person.institution + ', ' + person.country + '</p>'
+                + '<p><a href=' + person.Website_URL + '>Website</a> | <a href='
+                + person.PubMed_URL + '>PubMed</a></p>'
+                for person in result_person_details
+            ]
+        )
+    else:
+        person_details = (
+            [
+                person.person_name + '; ' + person.institution + ', ' + person.country
+                for person in result_person_details
+            ]
+        )
+
     return format_details_for_html(details=person_details)
 
 
@@ -136,13 +156,16 @@ def get_formated_html_text(
 ) -> str:
 
     formated_suggested_exclude_editor_details = get_formated_person_details_for_html(
-        person_ids=author_suggestion_exclude_editor_ids
+        person_ids=author_suggestion_exclude_editor_ids,
+        is_person_recommended=False
     )
     formated_suggested_include_editor_details = get_formated_person_details_for_html(
-        person_ids=author_suggestion_include_editor_ids
+        person_ids=author_suggestion_include_editor_ids,
+        is_person_recommended=False
     )
     formated_recommended_editor_details = get_formated_person_details_for_html(
-        person_ids=recommended_person_ids
+        person_ids=recommended_person_ids,
+        is_person_recommended=True
     )
 
     return RECOMMENDATION_HTML.format(
