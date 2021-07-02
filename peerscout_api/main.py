@@ -71,20 +71,20 @@ QUERY = """
     (SELECT 
         DISTINCT 
         Person.Person_ID AS person_id,
-        ROUND(PERCENTILE_CONT(Initial_Submission.Reviewing_Editor.Consultation.Days_To_Respond, 0.5
-            ) OVER (PARTITION BY Person.Person_ID),2) AS days_to_respond,
-        COUNT(DISTINCT Initial_Submission.Reviewing_Editor.Consultation.Request_Version_ID
-            ) OVER (PARTITION BY Person.Person_ID) AS requests,
-        COUNT(DISTINCT Initial_Submission.Reviewing_Editor.Consultation.Response_Version_ID
-            ) OVER (PARTITION BY Person.Person_ID) AS responses,
-        CAST(ROUND(AVG(Initial_Submission.Reviewing_Editor.Consultation.Has_Response_Ratio
-            ) OVER (PARTITION BY Person.Person_ID)*100,0) AS INT64) AS response_rate,
-        MAX(Full_Submission.Reviewing_Editor.Current_Assignment_Count
-            ) OVER (PARTITION BY Person.Person_ID) AS number_of_assigments,
-        COUNT(DISTINCT Full_Submission.Reviewing_Editor.Assigned_Version_ID
-            ) OVER (PARTITION BY Person.Person_ID) AS number_full_submissions,
-        PERCENTILE_CONT(Full_Submission.Reviewing_Editor.Submission_Received_To_Decision_Complete, 0.5
-            ) OVER (PARTITION BY Person.Person_ID) AS decision_time, 
+        CAST(ROUND(PERCENTILE_CONT(Initial_Submission.Reviewing_Editor.Consultation.Days_To_Respond, 0.5
+            ) OVER (PARTITION BY Person.Person_ID),2) AS STRING) AS days_to_respond,
+        CAST(COUNT(DISTINCT Initial_Submission.Reviewing_Editor.Consultation.Request_Version_ID
+            ) OVER (PARTITION BY Person.Person_ID) AS STRING) AS requests,
+        CAST(COUNT(DISTINCT Initial_Submission.Reviewing_Editor.Consultation.Response_Version_ID
+            ) OVER (PARTITION BY Person.Person_ID) AS STRING) AS responses,
+        CAST(CAST(ROUND(AVG(Initial_Submission.Reviewing_Editor.Consultation.Has_Response_Ratio
+            ) OVER (PARTITION BY Person.Person_ID)*100,0) AS INT64) AS STRING) AS response_rate,
+        CAST(MAX(Full_Submission.Reviewing_Editor.Current_Assignment_Count
+            ) OVER (PARTITION BY Person.Person_ID) AS STRING) AS number_of_assigments,
+        CAST(COUNT(DISTINCT Full_Submission.Reviewing_Editor.Assigned_Version_ID
+            ) OVER (PARTITION BY Person.Person_ID) AS STRING) AS number_full_submissions,
+        CAST(PERCENTILE_CONT(Full_Submission.Reviewing_Editor.Submission_Received_To_Decision_Complete, 0.5
+            ) OVER (PARTITION BY Person.Person_ID) AS STRING) AS decision_time, 
         FROM 
         `{project}.{dataset}.mv_Editorial_Editor_Workload_Event`,
         UNNEST(Person.Roles) AS person_role
@@ -150,13 +150,17 @@ def get_formated_person_details_for_html(
         dataset=DATASET_NAME,
         person_ids=person_ids
     )
-
+# Days to respond: 1.1; Requests: 15; Responses: 15; Response rate: 100%
+# No. of current assignments: 0; Full submissions in 12 months: 1; Decision time: 55 days.
     if is_person_recommended:
         person_details = (
             [
                 person.person_name + '<p>' + person.institution + ', ' + person.country + '</p>'
                 + '<p><a href=' + person.Website_URL + '>Website</a> | <a href='
                 + person.PubMed_URL + '>PubMed</a></p>'
+                #  (c if condition else '')
+                + ('<p>Days to respond: ' + person.days_to_respond + '; ' if person.days_to_respond else '')
+                + '</p>'
                 for person in result_person_details
             ]
         )
