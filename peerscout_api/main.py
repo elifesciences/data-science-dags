@@ -80,9 +80,9 @@ QUERY = """
         CAST(CAST(ROUND(AVG(Initial_Submission.Reviewing_Editor.Consultation.Has_Response_Ratio
             ) OVER (PARTITION BY Person.Person_ID)*100,0) AS INT64) AS STRING) AS response_rate,
         CAST(MAX(Full_Submission.Reviewing_Editor.Current_Assignment_Count
-            ) OVER (PARTITION BY Person.Person_ID) AS STRING) AS number_of_assigments,
+            ) OVER (PARTITION BY Person.Person_ID) AS STRING) AS no_of_assigments,
         CAST(COUNT(DISTINCT Full_Submission.Reviewing_Editor.Assigned_Version_ID
-            ) OVER (PARTITION BY Person.Person_ID) AS STRING) AS number_full_submissions,
+            ) OVER (PARTITION BY Person.Person_ID) AS STRING) AS no_full_submissions,
         CAST(PERCENTILE_CONT(Full_Submission.Reviewing_Editor.Submission_Received_To_Decision_Complete, 0.5
             ) OVER (PARTITION BY Person.Person_ID) AS STRING) AS decision_time, 
         FROM 
@@ -155,12 +155,15 @@ def get_formated_person_details_for_html(
     if is_person_recommended:
         person_details = (
             [
-                person.person_name + '<p>' + person.institution + ', ' + person.country + '</p>'
-                + '<p><a href=' + person.Website_URL + '>Website</a> | <a href='
-                + person.PubMed_URL + '>PubMed</a></p>'
-                #  (c if condition else '')
-                + ('<p>Days to respond: ' + person.days_to_respond if person.days_to_respond else '')
+                '<p>'
+                + person.person_name + '<br />' + person.institution + ', ' + person.country
+                + '<br /><a href=' + person.Website_URL + '>Website</a> | <a href='
+                + person.PubMed_URL + '>PubMed</a>'
+                # stats for initial submission
+                + ('<br />Days to respond: ' + person.days_to_respond if person.days_to_respond else '')
                 + ('; Requests: ' + person.requests if person.requests else '')
+                + ('; Responses: ' + person.responses if person.responses else '')
+                + ('; Response rate: ' + person.response_rate + '%' if person.response_rate else '')
                 + '</p>'
                 for person in result_person_details
             ]
