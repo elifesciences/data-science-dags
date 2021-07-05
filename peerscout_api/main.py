@@ -159,6 +159,10 @@ def get_formated_person_details_for_html(
             [
                 '<p>'
                 + person.person_name + '<br />' + person.institution + ', ' + person.country
+                # limited availability
+                + ('<br /><span style=\'color:red;\'><strong>!</strong></span> Limited availability: '
+                    + person.availability if person.availability else '')
+                # urls
                 + '<br /><a href=' + person.Website_URL + '>Website</a> | <a href='
                 + person.PubMed_URL + '>PubMed</a>'
                 # stats for initial submission
