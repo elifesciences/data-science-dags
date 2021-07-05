@@ -62,6 +62,7 @@ QUERY = """
         address.country,
         profile.Website_URL,
         profile.PubMed_URL,
+        profile.Current_Availability AS availability,
         event.*
     FROM `{project}.{dataset}.mv_person` AS person,
     UNNEST(person.addresses) AS address
@@ -152,13 +153,16 @@ def get_formated_person_details_for_html(
         dataset=DATASET_NAME,
         person_ids=person_ids
     )
-# Days to respond: 1.1; Requests: 15; Responses: 15; Response rate: 100%
-# No. of current assignments: 0; Full submissions in 12 months: 1; Decision time: 55 days.
+
     if is_person_recommended:
         person_details = (
             [
                 '<p>'
                 + person.person_name + '<br />' + person.institution + ', ' + person.country
+                # limited availability
+                + ('<br /><span style=\'color:red;\'><strong>!</strong></span> Limited availability: '
+                    + person.availability if person.availability else '')
+                # urls
                 + '<br /><a href=' + person.Website_URL + '>Website</a> | <a href='
                 + person.PubMed_URL + '>PubMed</a>'
                 # stats for initial submission
