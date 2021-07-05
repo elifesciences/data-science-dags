@@ -53,19 +53,14 @@ RECOMMENDATION_HTML = RECOMMENDATION_HEADINGS[0] + '{excluded_editor_details}' +
 
 QUERY = """
     SELECT
-        IF(
-            person.middle_name IS NOT NULL,
-            CONCAT(person.first_name,' ',person.middle_name,' ',person.last_name),
-            CONCAT(person.first_name,' ',person.last_name)
-        ) AS person_name,
+        person.Name,
         person.institution,
-        address.country,
+        person.Primary_Address.Country
         profile.Website_URL,
         profile.PubMed_URL,
         profile.Current_Availability AS availability,
         event.*
-    FROM `{project}.{dataset}.mv_person` AS person,
-    UNNEST(person.addresses) AS address
+    FROM `{project}.{dataset}.mv_Editorial_Person` AS person
     INNER JOIN `{project}.{dataset}.mv_Editorial_Editor_Profile` AS profile
     ON person.person_id = profile.Person_ID
     LEFT JOIN
