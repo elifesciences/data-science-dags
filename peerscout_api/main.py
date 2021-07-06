@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+from typing import NamedTuple, Optional
 import jsonschema
 
 from google.cloud.bigquery import Client
@@ -94,6 +95,22 @@ QUERY = """
 LOGGER = logging.getLogger(__name__)
 
 
+class PersonProps(NamedTuple):
+    person_name: str
+    institution: Optional[str] = None
+    country: Optional[str] = None
+    availability: Optional[str] = None
+    Website_URL: Optional[str] = None
+    PubMed_URL: Optional[str] = None
+    days_to_respond: Optional[str] = None
+    requests: Optional[str] = None
+    responses: Optional[str] = None
+    response_rate: Optional[str] = None
+    no_of_assigments: Optional[str] = None
+    no_full_submissions: Optional[str] = None
+    decision_time: Optional[str] = None
+
+
 def get_deployment_env() -> str:
     return os.getenv(
         DEPLOYMENT_ENV_ENV_NAME,
@@ -141,41 +158,45 @@ def get_person_details_from_bq(
     )
 
 
-def get_html_text_for_recomended_person(
-    person
-):
+def get_html_text_for_recommended_person(
+    person: PersonProps
+) -> str:
     return (
         '<p>'
-        + person.person_name + '<br />' + person.institution + ', ' + person.country
+        + person.person_name
+        + (('<br />' + person.institution) if person.institution else '')
+        + ((', ' + person.country) if person.country else '')
         # limited availability
-        + ('<br /><span style=\'color:red;\'><strong>!</strong></span> Limited availability: '
-            + person.availability if person.availability else '')
+        + (('<br /><span style=\'color:red;\'><strong>!</strong></span> Limited availability: '
+            + person.availability) if person.availability else '')
         # urls
-        + '<br /><a href=' + person.Website_URL + '>Website</a> | <a href='
-        + person.PubMed_URL + '>PubMed</a>'
+        + (('<br /><a href=' + person.Website_URL + '>Website</a>') if person.Website_URL else '')
+        + (' | ' if person.Website_URL and person.PubMed_URL else '')
+        + (('<a href=' + person.PubMed_URL + '>PubMed</a>') if person.PubMed_URL else '')
         # stats for initial submission
-        + ('<br />Days to respond: ' + person.days_to_respond
+        + (('<br />Days to respond: ' + person.days_to_respond)
             if person.days_to_respond else '')
-        + ('; Requests: ' + person.requests if person.requests else '')
-        + ('; Responses: ' + person.responses if person.responses else '')
-        + ('; Response rate: ' + person.response_rate + '%' if person.response_rate else '')
+        + (('; Requests: ' + person.requests) if person.requests else '')
+        + (('; Responses: ' + person.responses) if person.responses else '')
+        + (('; Response rate: ' + person.response_rate + '%') if person.response_rate else '')
         # stats for full submission
-        + ('<br />No. of current assignments: ' + person.no_of_assigments
+        + (('<br />No. of current assignments: ' + person.no_of_assigments)
             if person.no_of_assigments else '')
-        + ('; Full submissions in 12 months: ' + person.no_full_submissions
+        + (('; Full submissions in 12 months: ' + person.no_full_submissions)
             if person.no_full_submissions else '')
-        + ('; Decision time: ' + person.decision_time + ' days'
+        + (('; Decision time: ' + person.decision_time + ' days')
             if person.decision_time else '')
         + '</p>'
     )
 
 
-def get_html_text_for_suggested_person(
-    person
+def get_html_text_for_author_suggested_person(
+    person: PersonProps
 ):
-    return (
-        person.person_name + '; ' + person.institution + ', ' + person.country
-    )
+    if not person.institution:
+        return f'{person.person_name}'
+
+    return f'{person.person_name}; {person.institution}'
 
 
 def get_list_of_person_details_with_html_text(
@@ -186,14 +207,14 @@ def get_list_of_person_details_with_html_text(
     if is_person_recommended:
         person_details = (
             [
-                get_html_text_for_recomended_person(person)
+                get_html_text_for_recommended_person(person)
                 for person in result_of_person_details_from_bq
             ]
         )
     else:
         person_details = (
             [
-                get_html_text_for_suggested_person(person)
+                get_html_text_for_author_suggested_person(person)
                 for person in result_of_person_details_from_bq
             ]
         )
