@@ -142,7 +142,7 @@ def query_bq_for_person_details(
 
     query_job = client.query(sql)
     results = query_job.result()
-    return [row for row in results]
+    return list(results)
 
 
 def get_person_details_from_bq(
