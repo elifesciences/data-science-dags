@@ -37,9 +37,9 @@ DEFAULT_N_FOR_TOP_N_EDITORS = 3
 NO_RECOMMENDATION_TEXT = ' No recommendation available'
 NOT_PROVIDED = 'Not provided'
 RECOMMENDATION_HEADINGS = [
-    '<p><strong>Author’s requests for Editor exclusions:</strong></p>',
-    '<p><strong>Author’s suggestions for Reviewing Editor:</strong></p>',
-    '<p><strong>Recommended Editors (based on keyword matching):</strong></p>']
+    '<h4>Author&rsquo;s requests for Editor exclusions:</h4>',
+    '<h4>Author’s suggestions for Reviewing Editor:</h4>',
+    '<h4>Recommended Editors (based on keyword matching):</h4>']
 
 RECOMMENDATION_HTML = RECOMMENDATION_HEADINGS[0] + '{excluded_editor_details}' + \
     RECOMMENDATION_HEADINGS[1] + '{included_editor_details}' + \
@@ -76,7 +76,7 @@ QUERY = """
         CAST(MAX(Full_Submission.Reviewing_Editor.Current_Assignment_Count
             ) OVER (PARTITION BY Person.Person_ID) AS STRING) AS no_of_assigments,
         CAST(COUNT(DISTINCT Full_Submission.Reviewing_Editor.Assigned_Version_ID
-            ) OVER (PARTITION BY Person.Person_ID) AS STRING) AS no_full_submissions,
+            ) OVER (PARTITION BY Person.Person_ID) AS STRING) AS no_of_full_submissions,
         CAST(PERCENTILE_CONT(
             Full_Submission.Reviewing_Editor.Submission_Received_To_Decision_Complete, 0.5
             ) OVER (PARTITION BY Person.Person_ID) AS STRING) AS decision_time,
@@ -107,7 +107,7 @@ class PersonProps(NamedTuple):
     responses: Optional[str] = None
     response_rate: Optional[str] = None
     no_of_assigments: Optional[str] = None
-    no_full_submissions: Optional[str] = None
+    no_of_full_submissions: Optional[str] = None
     decision_time: Optional[str] = None
 
 
@@ -162,10 +162,10 @@ def get_html_text_for_recommended_person(
     person: PersonProps
 ) -> str:
     return (
-        '<p>'
-        + person.person_name
-        + (('<br />' + person.institution) if person.institution else '')
-        + ((', ' + person.country) if person.country else '')
+        person.person_name
+        + ('<br />' if person.institution else '')
+        + (person.institution if person.institution else '')
+        + ((', ' + person.country) if (person.country and person.institution) else '')
         # limited availability
         + (('<br /><span style=\'color:red;\'><strong>!</strong></span> Limited availability: '
             + person.availability) if person.availability else '')
@@ -206,26 +206,25 @@ def get_html_text_for_recommended_person(
         # stats for full submission
         + ('<br />' if (
             person.no_of_assigments
-            or person.no_full_submissions
+            or person.no_of_full_submissions
             or person.decision_time
         ) else '')
         + (('No. of current assignments: ' + person.no_of_assigments)
             if person.no_of_assigments else '')
         + ('; ' if (
             person.no_of_assigments
-            and person.no_full_submissions
+            and person.no_of_full_submissions
             ) else '')
-        + (('Full submissions in 12 months: ' + person.no_full_submissions)
-            if person.no_full_submissions else '')
+        + (('Full submissions in 12 months: ' + person.no_of_full_submissions)
+            if person.no_of_full_submissions else '')
         + ('; ' if (
             (
                 person.no_of_assigments
-                or person.no_full_submissions)
+                or person.no_of_full_submissions)
             and person.decision_time
             ) else '')
         + (('Decision time: ' + person.decision_time + ' days')
             if person.decision_time else '')
-        + '</p>'
     )
 
 
@@ -238,48 +237,30 @@ def get_html_text_for_author_suggested_person(
     return f'{person.person_name}; {person.institution}'
 
 
-def get_list_of_person_details_with_html_text(
-    result_of_person_details_from_bq,
-    is_person_recommended: bool
+def get_list_of_recommended_person_details_with_html_text(
+    result_of_person_details_from_bq
 ) -> list:
 
-    if is_person_recommended:
-        person_details = (
-            [
-                get_html_text_for_recommended_person(person)
-                for person in result_of_person_details_from_bq
-            ]
-        )
-    else:
-        person_details = (
-            [
-                get_html_text_for_author_suggested_person(person)
-                for person in result_of_person_details_from_bq
-            ]
-        )
-
-    return person_details
-
-
-def add_line_break_in_list_of_html_person_details(details: list) -> str:
-    line_break_added_detail = ''
-    for detail in details:
-        line_break_added_detail += "<br />" + detail
-    return line_break_added_detail
-
-
-def get_html_formated_person_details(
-    person_ids: list,
-    is_person_recommended: bool
-) -> str:
-    return add_line_break_in_list_of_html_person_details(
-        get_list_of_person_details_with_html_text(
-            get_person_details_from_bq(
-                person_ids=person_ids
-            ),
-            is_person_recommended=is_person_recommended
-        )
+    person_details = (
+        [
+            get_html_text_for_recommended_person(person)
+            for person in result_of_person_details_from_bq
+        ]
     )
+    return '<br /><br />'.join(person_details)
+
+
+def get_list_of_author_suggested_person_details_with_html_text(
+    result_of_person_details_from_bq
+) -> list:
+
+    person_details = (
+        [
+            get_html_text_for_author_suggested_person(person)
+            for person in result_of_person_details_from_bq
+        ]
+    )
+    return '<br />'.join(person_details)
 
 
 def add_html_formated_person_details_to_recommendation_html(
@@ -288,18 +269,24 @@ def add_html_formated_person_details_to_recommendation_html(
         recommended_person_ids: list,
 ) -> str:
 
-    formated_suggested_exclude_editor_details = get_html_formated_person_details(
-        person_ids=author_suggestion_exclude_editor_ids,
-        is_person_recommended=False
-    )
-    formated_suggested_include_editor_details = get_html_formated_person_details(
-        person_ids=author_suggestion_include_editor_ids,
-        is_person_recommended=False
-    )
-    formated_recommended_editor_details = get_html_formated_person_details(
-        person_ids=recommended_person_ids,
-        is_person_recommended=True
-    )
+    formated_suggested_exclude_editor_details = \
+        get_list_of_author_suggested_person_details_with_html_text(
+            get_person_details_from_bq(
+                person_ids=author_suggestion_exclude_editor_ids
+            )
+        )
+    formated_suggested_include_editor_details = \
+        get_list_of_author_suggested_person_details_with_html_text(
+            get_person_details_from_bq(
+                person_ids=author_suggestion_include_editor_ids
+            )
+        )
+    formated_recommended_editor_details = \
+        get_list_of_recommended_person_details_with_html_text(
+            get_person_details_from_bq(
+                person_ids=recommended_person_ids
+            )
+        )
 
     return RECOMMENDATION_HTML.format(
         excluded_editor_details=formated_suggested_exclude_editor_details,
