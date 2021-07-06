@@ -66,6 +66,26 @@ RECOMMENDED_NAMES = ['name1', 'name2', 'name3']
 SUGGESTED_PERSON_IDS_TO_INC = ['id4', 'id5']
 SUGGESTED_PERSON_IDS_TO_EXC = ['id6']
 
+PERSON_NAME_HTML = "John Matt"
+INSTITUTION_HTML = "University of Nowhereland"
+COUNTRY_HTML = ", Nowhere"
+AVAILABILITY_HTML = (
+    "<br /><span style=\'color:red;\'><strong>!</strong></span>"
+    + " Limited availability: Sundays only until 3th August 2021"
+)
+WEBSITE_HTML = "<a href=http://universityofnowhereland.edu>Website</a>"
+PUBMED_HTML = "<a href=http://universityofnowherelandpubmed.edu>PubMed</a>"
+DAYS_TO_RESPOND_HTML = "Days to respond: 0.9"
+REQUESTS_HTML = "Requests: 13"
+RESPONSES_HTML = "Responses: 12"
+RESPONSE_RATE_HTML = "Response rate: 80%"
+NO_OF_ASSIGMENTS_HTML = "No. of current assignments: 0"
+NO_OF_FULL_SUBMISSIONS_HTML = "Full submissions in 12 months: 4"
+DECISION_TIME_HTML = "Decision time: 43 days"
+
+LINE_BREAK = '<br />'
+SEMI_COLUMN = '; '
+PIPE = ' | '
 
 VALID_RECOMMENDATION_RESPONSE = {
     "reviewing_editor_recommendation": {
@@ -172,13 +192,12 @@ class TestGetRecommendationHtml:
                 recommended_person_ids=RECOMMENDED_PERSON_IDS)
 
 
-# pylint: disable=line-too-long
 class TestGetHtmlTextForRecommendedPerson:
     def test_should_have_person_name_if_there_is_no_other_information(self):
         person = PersonProps(
             person_name='John Matt'
         )
-        expected_result_of_html = """<p>John Matt</p>"""
+        expected_result_of_html = PERSON_NAME_HTML
         assert get_html_text_for_recommended_person(person) == expected_result_of_html
 
     def test_should_have_all_fields_provided(self):
@@ -194,21 +213,34 @@ class TestGetHtmlTextForRecommendedPerson:
             responses='12',
             response_rate='80',
             no_of_assigments='0',
-            no_full_submissions='4',
+            no_of_full_submissions='4',
             decision_time='43'
         )
-        expected_result_of_html = """<p>John Matt<br />University of Nowhereland, Nowhere<br /><span style=\'color:red;\'><strong>!</strong></span> Limited availability: Sundays only until 3th August 2021<br /><a href=http://universityofnowhereland.edu>Website</a> | <a href=http://universityofnowherelandpubmed.edu>PubMed</a><br />Days to respond: 0.9; Requests: 13; Responses: 12; Response rate: 80%<br />No. of current assignments: 0; Full submissions in 12 months: 4; Decision time: 43 days</p>"""
-        assert get_html_text_for_recommended_person(person) == expected_result_of_html
-
-    def test_should_have_website_if_it_is_provided(self):
-        person = PersonProps(
-            person_name='John Matt',
-            institution='University of Nowhereland',
-            country='Nowhere',
-            availability='Sundays only until 3th August 2021',
-            Website_URL='http://universityofnowhereland.edu'
+        expected_result_of_html = (
+            PERSON_NAME_HTML
+            + LINE_BREAK
+            + INSTITUTION_HTML
+            + COUNTRY_HTML
+            + AVAILABILITY_HTML
+            + LINE_BREAK
+            + WEBSITE_HTML
+            + PIPE
+            + PUBMED_HTML
+            + LINE_BREAK
+            + DAYS_TO_RESPOND_HTML
+            + SEMI_COLUMN
+            + REQUESTS_HTML
+            + SEMI_COLUMN
+            + RESPONSES_HTML
+            + SEMI_COLUMN
+            + RESPONSE_RATE_HTML
+            + LINE_BREAK
+            + NO_OF_ASSIGMENTS_HTML
+            + SEMI_COLUMN
+            + NO_OF_FULL_SUBMISSIONS_HTML
+            + SEMI_COLUMN
+            + DECISION_TIME_HTML
         )
-        expected_result_of_html = """<p>John Matt<br />University of Nowhereland, Nowhere<br /><span style=\'color:red;\'><strong>!</strong></span> Limited availability: Sundays only until 3th August 2021<br /><a href=http://universityofnowhereland.edu>Website</a></p>"""
         assert get_html_text_for_recommended_person(person) == expected_result_of_html
 
     def test_should_have_website_pubmed_if_they_are_provided(self):
@@ -218,53 +250,78 @@ class TestGetHtmlTextForRecommendedPerson:
             Website_URL='http://universityofnowhereland.edu',
             PubMed_URL='http://universityofnowherelandpubmed.edu',
         )
-        expected_result_of_html = """<p>John Matt<br />University of Nowhereland<br /><a href=http://universityofnowhereland.edu>Website</a> | <a href=http://universityofnowherelandpubmed.edu>PubMed</a></p>"""
+        expected_result_of_html = (
+            PERSON_NAME_HTML
+            + LINE_BREAK
+            + INSTITUTION_HTML
+            + LINE_BREAK
+            + WEBSITE_HTML
+            + PIPE
+            + PUBMED_HTML
+        )
         assert get_html_text_for_recommended_person(person) == expected_result_of_html
 
     def test_should_have_stats_for_initial_submission_provided(self):
         person = PersonProps(
             person_name='John Matt',
-            institution='University of Nowhereland',
-            country='Nowhere',
             days_to_respond='0.9',
             requests='13',
             responses='12',
             response_rate='80'
         )
-        expected_result_of_html = """<p>John Matt<br />University of Nowhereland, Nowhere<br />Days to respond: 0.9; Requests: 13; Responses: 12; Response rate: 80%</p>"""
+        expected_result_of_html = (
+            PERSON_NAME_HTML
+            + LINE_BREAK
+            + DAYS_TO_RESPOND_HTML
+            + SEMI_COLUMN
+            + REQUESTS_HTML
+            + SEMI_COLUMN
+            + RESPONSES_HTML
+            + SEMI_COLUMN
+            + RESPONSE_RATE_HTML
+        )
         assert get_html_text_for_recommended_person(person) == expected_result_of_html
 
     def test_should_have_response_rate_even_the_other_stats_not_provided(self):
         person = PersonProps(
             person_name='John Matt',
-            institution='University of Nowhereland',
-            country='Nowhere',
             response_rate='80'
         )
-        expected_result_of_html = """<p>John Matt<br />University of Nowhereland, Nowhere<br />Response rate: 80%</p>"""
+        expected_result_of_html = (
+            PERSON_NAME_HTML
+            + LINE_BREAK
+            + RESPONSE_RATE_HTML
+        )
         assert get_html_text_for_recommended_person(person) == expected_result_of_html
 
     def test_should_have_stats_for_full_submission_provided(self):
         person = PersonProps(
             person_name='John Matt',
-            institution='University of Nowhereland',
-            requests='13',
-            responses='12',
-            response_rate='80',
             no_of_assigments='0',
-            no_full_submissions='4',
+            no_of_full_submissions='4',
             decision_time='43'
         )
-        expected_result_of_html = """<p>John Matt<br />University of Nowhereland<br />Requests: 13; Responses: 12; Response rate: 80%<br />No. of current assignments: 0; Full submissions in 12 months: 4; Decision time: 43 days</p>"""
+        expected_result_of_html = (
+            PERSON_NAME_HTML
+            + LINE_BREAK
+            + NO_OF_ASSIGMENTS_HTML
+            + SEMI_COLUMN
+            + NO_OF_FULL_SUBMISSIONS_HTML
+            + SEMI_COLUMN
+            + DECISION_TIME_HTML
+        )
         assert get_html_text_for_recommended_person(person) == expected_result_of_html
 
     def test_should_have_decision_time_even_the_other_stats_not_provided(self):
         person = PersonProps(
             person_name='John Matt',
-            institution='University of Nowhereland',
             decision_time='43'
         )
-        expected_result_of_html = """<p>John Matt<br />University of Nowhereland<br />Decision time: 43 days</p>"""
+        expected_result_of_html = (
+            PERSON_NAME_HTML
+            + LINE_BREAK
+            + DECISION_TIME_HTML
+        )
         assert get_html_text_for_recommended_person(person) == expected_result_of_html
 
 
@@ -274,12 +331,16 @@ class TestGetHtmlTextForAuthorSuggestedPerson:
             person_name='John Matt',
             institution='University of Nowhereland'
         )
-        expected_result_of_html = 'John Matt; University of Nowhereland'
+        expected_result_of_html = (
+            PERSON_NAME_HTML
+            + SEMI_COLUMN
+            + INSTITUTION_HTML
+        )
         assert get_html_text_for_author_suggested_person(person) == expected_result_of_html
 
     def test_should_only_have_person_name_if_there_is_no_institution(self):
         person = PersonProps(
             person_name='John Matt'
         )
-        expected_result_of_html = 'John Matt'
+        expected_result_of_html = PERSON_NAME_HTML
         assert get_html_text_for_author_suggested_person(person) == expected_result_of_html
