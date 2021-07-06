@@ -170,21 +170,60 @@ def get_html_text_for_recommended_person(
         + (('<br /><span style=\'color:red;\'><strong>!</strong></span> Limited availability: '
             + person.availability) if person.availability else '')
         # urls
-        + (('<br /><a href=' + person.Website_URL + '>Website</a>') if person.Website_URL else '')
-        + (' | ' if person.Website_URL and person.PubMed_URL else '')
+        + ('<br />' if (person.Website_URL or person.PubMed_URL) else '')
+        + (('<a href=' + person.Website_URL + '>Website</a>') if person.Website_URL else '')
+        + (' | ' if (person.Website_URL and person.PubMed_URL) else '')
         + (('<a href=' + person.PubMed_URL + '>PubMed</a>') if person.PubMed_URL else '')
         # stats for initial submission
-        + (('<br />Days to respond: ' + person.days_to_respond)
+        + ('<br />' if (
+            person.days_to_respond
+            or person.requests
+            or person.responses
+            or person.response_rate
+        ) else '')
+        + (('Days to respond: ' + person.days_to_respond)
             if person.days_to_respond else '')
-        + (('; Requests: ' + person.requests) if person.requests else '')
-        + (('; Responses: ' + person.responses) if person.responses else '')
-        + (('; Response rate: ' + person.response_rate + '%') if person.response_rate else '')
+        + ('; ' if (
+            person.days_to_respond
+            and person.requests
+            ) else '')
+        + (('Requests: ' + person.requests) if person.requests else '')
+        + ('; ' if (
+            (
+                person.days_to_respond
+                or person.requests)
+            and person.responses
+            ) else '')
+        + (('Responses: ' + person.responses) if person.responses else '')
+        + ('; ' if (
+            (
+                person.days_to_respond
+                or person.requests
+                or person.responses)
+            and person.response_rate
+            ) else '')
+        + (('Response rate: ' + person.response_rate + '%') if person.response_rate else '')
         # stats for full submission
-        + (('<br />No. of current assignments: ' + person.no_of_assigments)
+        + ('<br />' if (
+            person.no_of_assigments
+            or person.no_full_submissions
+            or person.decision_time
+        ) else '')
+        + (('No. of current assignments: ' + person.no_of_assigments)
             if person.no_of_assigments else '')
-        + (('; Full submissions in 12 months: ' + person.no_full_submissions)
+        + ('; ' if (
+            person.no_of_assigments
+            and person.no_full_submissions
+            ) else '')
+        + (('Full submissions in 12 months: ' + person.no_full_submissions)
             if person.no_full_submissions else '')
-        + (('; Decision time: ' + person.decision_time + ' days')
+        + ('; ' if (
+            (
+                person.no_of_assigments
+                or person.no_full_submissions)
+            and person.decision_time
+            ) else '')
+        + (('Decision time: ' + person.decision_time + ' days')
             if person.decision_time else '')
         + '</p>'
     )
