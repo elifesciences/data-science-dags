@@ -13,7 +13,7 @@ make peerscout-api-start
 curl \
     --request POST \
     --data '@example-data/peerscout-api-request1.json' \
-    http://localhost:8090/api/peerscout
+    http://localhost:8090/api/peerscout | jq .
 ```
 
 to test empty abstract response:
@@ -22,5 +22,5 @@ to test empty abstract response:
 curl \
     --request POST \
     --data '@example-data/peerscout-api-request2.json' \
-    http://localhost:8090/api/peerscout
+    http://localhost:8090/api/peerscout  | jq .
 ```
