@@ -5,6 +5,7 @@ from typing import NamedTuple, Optional
 import jsonschema
 
 from google.cloud.bigquery import Client
+from google.cloud import bigquery
 from flask import Flask, jsonify, request
 from werkzeug.exceptions import BadRequest
 
@@ -97,12 +98,15 @@ def query_bq_for_person_details(
     sql = (
         sql_file.format(
             project=project,
-            dataset=dataset,
-            person_ids=person_ids
+            dataset=dataset
         )
     )
 
-    query_job = client.query(sql)
+    job_config = bigquery.QueryJobConfig(query_parameters=[
+        bigquery.ArrayQueryParameter("person_ids", "STRING", person_ids)
+    ])
+
+    query_job = client.query(sql, job_config=job_config)
     results = query_job.result()
     return list(results)
 

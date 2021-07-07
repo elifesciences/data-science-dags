@@ -33,7 +33,7 @@ LEFT JOIN
     WHERE DATE(Event_Timestamp)
         BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL 12 MONTH) AND CURRENT_DATE()
     AND person_role.Role_Name='Editorial Board Member'
-    AND Person.Person_ID IN UNNEST({person_ids})
+    AND Person.Person_ID IN UNNEST(@person_ids)
 ) AS event
 ON person.person_id = event.person_id
-WHERE person.person_id IN UNNEST({person_ids})
+WHERE person.person_id IN UNNEST(@person_ids)
