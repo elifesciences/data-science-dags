@@ -5,13 +5,16 @@ from flask.testing import FlaskClient
 
 import pytest
 import pandas as pd
+# from werkzeug.wrappers.response import Response
 
 from peerscout_api.main import (
     create_app,
+    get_html_text_for_recommended_person,
+    get_html_text_for_author_suggested_person,
+    PersonProps,
     get_recommendation_html,
-    # RECOMENDATION_HTML,
     RECOMMENDATION_HEADINGS,
-    NO_RECOMENDATION_HTML
+    NO_RECOMMENDATION_HTML
 )
 
 import peerscout_api.main as target_module
@@ -47,63 +50,72 @@ INPUT_DATA_VALID = {
 
 INPUT_DATA_WTIHOUT_ABSTRACT = {**INPUT_DATA_VALID, "abstract": ""}
 
-NO_RECOMENDATION_RESPONSE = {
+NO_RECOMMENDATION_RESPONSE = {
     "reviewing_editor_recommendation": {
         "person_ids": [],
-        "recommendation_html": NO_RECOMENDATION_HTML
+        "recommendation_html": NO_RECOMMENDATION_HTML
     },
     "senior_editor_recommendation": {
         "person_ids": [],
-        "recommendation_html": NO_RECOMENDATION_HTML
+        "recommendation_html": NO_RECOMMENDATION_HTML
     }
 }
 
-RECOMMENDED_PERSON_IDS = ['1', '2', '3']
-RECOMMENDED_NAMES = ['A', 'B', 'C']
-AUTHOR_SUGGESTED_IDS = ['5']
+RECOMMENDED_PERSON_IDS = ['id1', 'id2', 'id3']
+RECOMMENDED_NAMES = ['name1', 'name2', 'name3']
+SUGGESTED_PERSON_IDS_TO_INC = ['id4', 'id5']
+SUGGESTED_PERSON_IDS_TO_EXC = ['id6']
 
-FORMATED_SUGGESTED_NAME = "<br />D"
-FORMATED_RECOMMENDED_NAME = ['<br />A', '<br />B', '<br />C']
+PERSON_NAME_HTML = "John Matt"
+INSTITUTION_HTML = "University of Nowhereland"
+COUNTRY_HTML = ", Nowhere"
+AVAILABILITY_HTML = (
+    "<br /><span style=\'color:red;\'><strong>!</strong></span>"
+    + " Limited availability: Sundays only until 3th August 2021"
+)
+WEBSITE_HTML = "<a href=http://universityofnowhereland.edu>Website</a>"
+PUBMED_HTML = "<a href=http://universityofnowherelandpubmed.edu>PubMed</a>"
+DAYS_TO_RESPOND_HTML = "Days to respond: 0.9"
+REQUESTS_HTML = "Requests: 13"
+RESPONSES_HTML = "Responses: 12"
+RESPONSE_RATE_HTML = "Response rate: 80%"
+NO_OF_ASSIGMENTS_HTML = "No. of current assignments: 0"
+NO_OF_FULL_SUBMISSIONS_HTML = "Full submissions in 12 months: 4"
+DECISION_TIME_HTML = "Decision time: 43 days"
 
-VALID_RECOMENDATION_RESPONSE = {
-    "reviewing_editor_recommendation": {
-        "person_ids": RECOMMENDED_PERSON_IDS,
-        "recommendation_html": get_recommendation_html(
-            recommended_person_ids=RECOMMENDED_PERSON_IDS,
-            recommended_names=RECOMMENDED_NAMES,
-            author_suggestion_exclude_editor_ids=AUTHOR_SUGGESTED_IDS,
-            author_suggestion_include_editor_ids=AUTHOR_SUGGESTED_IDS)
-    },
-    "senior_editor_recommendation": {
-        "person_ids": RECOMMENDED_PERSON_IDS,
-        "recommendation_html": get_recommendation_html(
-            recommended_person_ids=RECOMMENDED_PERSON_IDS,
-            recommended_names=RECOMMENDED_NAMES,
-            author_suggestion_exclude_editor_ids=AUTHOR_SUGGESTED_IDS,
-            author_suggestion_include_editor_ids=AUTHOR_SUGGESTED_IDS)
+LINE_BREAK = '<br />'
+SEMI_COLUMN = '; '
+PIPE = ' | '
+
+
+def get_valid_recommendation_response():
+    return {
+        "reviewing_editor_recommendation": {
+            "person_ids": RECOMMENDED_PERSON_IDS,
+            "recommendation_html": get_recommendation_html(
+                author_suggestion_exclude_editor_ids=SUGGESTED_PERSON_IDS_TO_EXC,
+                author_suggestion_include_editor_ids=SUGGESTED_PERSON_IDS_TO_INC,
+                recommended_person_ids=RECOMMENDED_PERSON_IDS)
+        },
+        "senior_editor_recommendation": {
+            "person_ids": RECOMMENDED_PERSON_IDS,
+            "recommendation_html": get_recommendation_html(
+                author_suggestion_exclude_editor_ids=SUGGESTED_PERSON_IDS_TO_EXC,
+                author_suggestion_include_editor_ids=SUGGESTED_PERSON_IDS_TO_INC,
+                recommended_person_ids=RECOMMENDED_PERSON_IDS)
+        }
     }
-}
 
 
-@pytest.fixture(name='get_person_names_from_bq_mock', autouse=True)
-def _get_person_names_from_bq_mock() -> MagicMock:
-    with patch.object(target_module, 'get_person_names_from_bq') as mock:
+@pytest.fixture(name='query_bq_for_person_details_mock', autouse=True)
+def _query_bq_for_person_details_mock() -> MagicMock:
+    with patch.object(target_module, 'query_bq_for_person_details') as mock:
         yield mock
 
 
-# @pytest.fixture(name='get_formated_html_text_mock', autouse=True)
-# def _get_formated_html_text_mock() -> MagicMock:
-#     with patch.object(target_module, 'get_formated_html_text') as mock:
-#         mock.return_value = RECOMENDATION_HTML.format(
-#             formated_excluded_name=FORMATED_SUGGESTED_NAME,
-#             formated_included_name=FORMATED_SUGGESTED_NAME,
-#             formated_recomended_name=FORMATED_RECOMMENDED_NAME)
-#         yield mock
-
-
-@pytest.fixture(name='get_editor_recomendations_for_api_mock', autouse=True)
-def _get_editor_recomendations_for_api_mock() -> MagicMock:
-    with patch.object(target_module, 'get_editor_recomendations_for_api') as mock:
+@pytest.fixture(name='get_editor_recommendations_for_api_mock', autouse=True)
+def _get_editor_recommendations_for_api_mock() -> MagicMock:
+    with patch.object(target_module, 'get_editor_recommendations_for_api') as mock:
         mock.return_value = pd.DataFrame(columns=['person_id', 'name'])
         yield mock
 
@@ -148,38 +160,189 @@ class TestPeerscoutAPI:
         test_client: FlaskClient
     ):
         response = test_client.post('/api/peerscout', json=INPUT_DATA_WTIHOUT_ABSTRACT)
-        assert _get_ok_json(response) == NO_RECOMENDATION_RESPONSE
+        assert _get_ok_json(response) == NO_RECOMMENDATION_RESPONSE
 
-    # def test_should_respond_with_recomendation(
-    #     self,
-    #     test_client: FlaskClient,
-    #     get_editor_recomendations_for_api_mock: MagicMock
-    # ):
-    #     get_editor_recomendations_for_api_mock.return_value = pd.DataFrame(
-    #         {'person_id': RECOMMENDED_PERSON_IDS, 'name': RECOMMENDED_NAMES}
-    #     )
-    #     response = test_client.post('/api/peerscout', json=INPUT_DATA_VALID)
-    #     assert _get_ok_json(response) == VALID_RECOMENDATION_RESPONSE
+    def test_should_respond_with_recomendation(
+        self,
+        test_client: FlaskClient,
+        get_editor_recommendations_for_api_mock: MagicMock
+    ):
+        get_editor_recommendations_for_api_mock.return_value = pd.DataFrame(
+            {'person_id': RECOMMENDED_PERSON_IDS, 'name': RECOMMENDED_NAMES}
+        )
+        response = test_client.post('/api/peerscout', json=INPUT_DATA_VALID)
+        assert _get_ok_json(response) == get_valid_recommendation_response()
 
 
 class TestGetRecommendationHtml:
-    # def test_should_have_editor_exclusion_when_the_recomendation_not_avaliable():
     def test_should_have_recomendation_heading_when_the_recomendation_not_avaliable(
         self
     ):
         for heading in RECOMMENDATION_HEADINGS:
             assert heading in get_recommendation_html(
-                recommended_person_ids=[],
-                recommended_names=[],
                 author_suggestion_exclude_editor_ids=[],
-                author_suggestion_include_editor_ids=[])
+                author_suggestion_include_editor_ids=[],
+                recommended_person_ids=[])
 
     def test_should_have_recomendation_heading_when_the_recomendation_avaliable(
         self
     ):
         for heading in RECOMMENDATION_HEADINGS:
             assert heading in get_recommendation_html(
-                recommended_person_ids=RECOMMENDED_PERSON_IDS,
-                recommended_names=RECOMMENDED_NAMES,
-                author_suggestion_exclude_editor_ids=AUTHOR_SUGGESTED_IDS,
-                author_suggestion_include_editor_ids=AUTHOR_SUGGESTED_IDS)
+                author_suggestion_exclude_editor_ids=SUGGESTED_PERSON_IDS_TO_EXC,
+                author_suggestion_include_editor_ids=SUGGESTED_PERSON_IDS_TO_INC,
+                recommended_person_ids=RECOMMENDED_PERSON_IDS)
+
+
+class TestGetHtmlTextForRecommendedPerson:
+    def test_should_have_person_name_if_there_is_no_other_information(self):
+        person = PersonProps(
+            person_name='John Matt'
+        )
+        expected_result_of_html = PERSON_NAME_HTML
+        assert get_html_text_for_recommended_person(person) == expected_result_of_html
+
+    def test_should_have_all_fields_provided(self):
+        person = PersonProps(
+            person_name='John Matt',
+            institution='University of Nowhereland',
+            country='Nowhere',
+            availability='Sundays only until 3th August 2021',
+            website='http://universityofnowhereland.edu',
+            pubmed='http://universityofnowherelandpubmed.edu',
+            days_to_respond='0.9',
+            requests='13',
+            responses='12',
+            response_rate='80',
+            no_of_assigments='0',
+            no_of_full_submissions='4',
+            decision_time='43'
+        )
+        expected_result_of_html = (
+            PERSON_NAME_HTML
+            + LINE_BREAK
+            + INSTITUTION_HTML
+            + COUNTRY_HTML
+            + AVAILABILITY_HTML
+            + LINE_BREAK
+            + WEBSITE_HTML
+            + PIPE
+            + PUBMED_HTML
+            + LINE_BREAK
+            + DAYS_TO_RESPOND_HTML
+            + SEMI_COLUMN
+            + REQUESTS_HTML
+            + SEMI_COLUMN
+            + RESPONSES_HTML
+            + SEMI_COLUMN
+            + RESPONSE_RATE_HTML
+            + LINE_BREAK
+            + NO_OF_ASSIGMENTS_HTML
+            + SEMI_COLUMN
+            + NO_OF_FULL_SUBMISSIONS_HTML
+            + SEMI_COLUMN
+            + DECISION_TIME_HTML
+        )
+        assert get_html_text_for_recommended_person(person) == expected_result_of_html
+
+    def test_should_have_website_pubmed_if_they_are_provided(self):
+        person = PersonProps(
+            person_name='John Matt',
+            institution='University of Nowhereland',
+            website='http://universityofnowhereland.edu',
+            pubmed='http://universityofnowherelandpubmed.edu',
+        )
+        expected_result_of_html = (
+            PERSON_NAME_HTML
+            + LINE_BREAK
+            + INSTITUTION_HTML
+            + LINE_BREAK
+            + WEBSITE_HTML
+            + PIPE
+            + PUBMED_HTML
+        )
+        assert get_html_text_for_recommended_person(person) == expected_result_of_html
+
+    def test_should_have_stats_for_initial_submission_provided(self):
+        person = PersonProps(
+            person_name='John Matt',
+            days_to_respond='0.9',
+            requests='13',
+            responses='12',
+            response_rate='80'
+        )
+        expected_result_of_html = (
+            PERSON_NAME_HTML
+            + LINE_BREAK
+            + DAYS_TO_RESPOND_HTML
+            + SEMI_COLUMN
+            + REQUESTS_HTML
+            + SEMI_COLUMN
+            + RESPONSES_HTML
+            + SEMI_COLUMN
+            + RESPONSE_RATE_HTML
+        )
+        assert get_html_text_for_recommended_person(person) == expected_result_of_html
+
+    def test_should_have_response_rate_even_the_other_stats_not_provided(self):
+        person = PersonProps(
+            person_name='John Matt',
+            response_rate='80'
+        )
+        expected_result_of_html = (
+            PERSON_NAME_HTML
+            + LINE_BREAK
+            + RESPONSE_RATE_HTML
+        )
+        assert get_html_text_for_recommended_person(person) == expected_result_of_html
+
+    def test_should_have_stats_for_full_submission_provided(self):
+        person = PersonProps(
+            person_name='John Matt',
+            no_of_assigments='0',
+            no_of_full_submissions='4',
+            decision_time='43'
+        )
+        expected_result_of_html = (
+            PERSON_NAME_HTML
+            + LINE_BREAK
+            + NO_OF_ASSIGMENTS_HTML
+            + SEMI_COLUMN
+            + NO_OF_FULL_SUBMISSIONS_HTML
+            + SEMI_COLUMN
+            + DECISION_TIME_HTML
+        )
+        assert get_html_text_for_recommended_person(person) == expected_result_of_html
+
+    def test_should_have_decision_time_even_the_other_stats_not_provided(self):
+        person = PersonProps(
+            person_name='John Matt',
+            decision_time='43'
+        )
+        expected_result_of_html = (
+            PERSON_NAME_HTML
+            + LINE_BREAK
+            + DECISION_TIME_HTML
+        )
+        assert get_html_text_for_recommended_person(person) == expected_result_of_html
+
+
+class TestGetHtmlTextForAuthorSuggestedPerson:
+    def test_should_have_person_name_and_institution(self):
+        person = PersonProps(
+            person_name='John Matt',
+            institution='University of Nowhereland'
+        )
+        expected_result_of_html = (
+            PERSON_NAME_HTML
+            + SEMI_COLUMN
+            + INSTITUTION_HTML
+        )
+        assert get_html_text_for_author_suggested_person(person) == expected_result_of_html
+
+    def test_should_only_have_person_name_if_there_is_no_institution(self):
+        person = PersonProps(
+            person_name='John Matt'
+        )
+        expected_result_of_html = PERSON_NAME_HTML
+        assert get_html_text_for_author_suggested_person(person) == expected_result_of_html

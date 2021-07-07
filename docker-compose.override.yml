@@ -47,6 +47,5 @@ services:
 
   peerscout-api-dev:
     volumes: 
-      - ~/.config/gcloud:/root/.config/gcloud
       - ./peerscout_api:/app/api/peerscout_api
       - ./tests_peerscout_api:/app/api/tests_peerscout_api

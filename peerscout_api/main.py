@@ -1,9 +1,11 @@
 import os
 import json
 import logging
+from typing import NamedTuple, Optional
 import jsonschema
 
 from google.cloud.bigquery import Client
+from google.cloud import bigquery
 from flask import Flask, jsonify, request
 from werkzeug.exceptions import BadRequest
 
@@ -27,77 +29,46 @@ DATA_SCIENCE_STATE_PATH_ENV_NAME = "DATA_SCIENCE_STATE_PATH"
 DEFAULT_STATE_PATH_FORMAT = (
     "s3://{env}-elife-data-pipeline/airflow-config/data-science/state"
 )
+REQUEST_JSON_SCHEMA_PATH = os.path.join(os.path.dirname(__file__), 'input-json-schema.json')
 
 SENIOR_EDITOR_MODEL_NAME = 'senior_editor_model.joblib'
 REVIEWING_EDITOR_MODEL_NAME = 'reviewing_editor_model.joblib'
 DEFAULT_N_FOR_TOP_N_EDITORS = 3
 
-LOGGER = logging.getLogger(__name__)
-
-REQUEST_JSON_SCHEMA_PATH = os.path.join(os.path.dirname(__file__), 'input-json-schema.json')
-
 NO_RECOMMENDATION_TEXT = ' No recommendation available'
 NOT_PROVIDED = 'Not provided'
 RECOMMENDATION_HEADINGS = [
-    '<p><strong>Author’s requests for Editor exclusions:</strong></p>',
-    '<p><strong>Author’s suggestions for Reviewing Editor:</strong></p>',
-    '<p><strong>Recommended Editors (based on keyword matching):</strong></p>']
-
-NO_RECOMMENDATION_HTML = RECOMMENDATION_HEADINGS[0] + NOT_PROVIDED + \
-    RECOMMENDATION_HEADINGS[1] + NOT_PROVIDED + \
-    RECOMMENDATION_HEADINGS[2] + NO_RECOMMENDATION_TEXT
+    '<h4>Author&rsquo;s requests for Editor exclusions:</h4>',
+    '<h4>Author’s suggestions for Reviewing Editor:</h4>',
+    '<h4>Recommended Editors (based on keyword matching):</h4>']
 
 RECOMMENDATION_HTML = RECOMMENDATION_HEADINGS[0] + '{excluded_editor_details}' + \
     RECOMMENDATION_HEADINGS[1] + '{included_editor_details}' + \
     RECOMMENDATION_HEADINGS[2] + '{recommended_editor_details}'
 
-QUERY = """
-    SELECT
-        IF(
-            person.middle_name IS NOT NULL,
-            CONCAT(person.first_name,' ',person.middle_name,' ',person.last_name),
-            CONCAT(person.first_name,' ',person.last_name)
-        ) AS person_name,
-        person.institution,
-        address.country,
-        profile.Website_URL,
-        profile.PubMed_URL,
-        profile.Current_Availability AS availability,
-        event.*
-    FROM `{project}.{dataset}.mv_person` AS person,
-    UNNEST(person.addresses) AS address
-    INNER JOIN `{project}.{dataset}.mv_Editorial_Editor_Profile` AS profile
-    ON person.person_id = profile.Person_ID
-    LEFT JOIN
-    (SELECT DISTINCT
-        Person.Person_ID AS person_id,
-        CAST(ROUND(PERCENTILE_CONT(
-            Initial_Submission.Reviewing_Editor.Consultation.Days_To_Respond, 0.5
-            ) OVER (PARTITION BY Person.Person_ID),2) AS STRING) AS days_to_respond,
-        CAST(COUNT(DISTINCT Initial_Submission.Reviewing_Editor.Consultation.Request_Version_ID
-            ) OVER (PARTITION BY Person.Person_ID) AS STRING) AS requests,
-        CAST(COUNT(DISTINCT Initial_Submission.Reviewing_Editor.Consultation.Response_Version_ID
-            ) OVER (PARTITION BY Person.Person_ID) AS STRING) AS responses,
-        CAST(CAST(ROUND(AVG(Initial_Submission.Reviewing_Editor.Consultation.Has_Response_Ratio
-            ) OVER (PARTITION BY Person.Person_ID)*100,0) AS INT64) AS STRING) AS response_rate,
-        CAST(MAX(Full_Submission.Reviewing_Editor.Current_Assignment_Count
-            ) OVER (PARTITION BY Person.Person_ID) AS STRING) AS no_of_assigments,
-        CAST(COUNT(DISTINCT Full_Submission.Reviewing_Editor.Assigned_Version_ID
-            ) OVER (PARTITION BY Person.Person_ID) AS STRING) AS no_full_submissions,
-        CAST(PERCENTILE_CONT(
-            Full_Submission.Reviewing_Editor.Submission_Received_To_Decision_Complete, 0.5
-            ) OVER (PARTITION BY Person.Person_ID) AS STRING) AS decision_time,
-        FROM
-        `{project}.{dataset}.mv_Editorial_Editor_Workload_Event`,
-        UNNEST(Person.Roles) AS person_role
-        WHERE DATE(Event_Timestamp)
-            BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL 12 MONTH) AND CURRENT_DATE()
-        AND person_role.Role_Name='Editorial Board Member'
-        AND Person.Person_ID IN UNNEST({person_ids})
-    ) AS event
-    ON person.person_id = event.person_id
-    WHERE person.person_id IN UNNEST({person_ids})
-"""
+NO_RECOMMENDATION_HTML = RECOMMENDATION_HEADINGS[0] + NOT_PROVIDED + \
+    RECOMMENDATION_HEADINGS[1] + NOT_PROVIDED + \
+    RECOMMENDATION_HEADINGS[2] + NO_RECOMMENDATION_TEXT
+
+QUERY_PATH = os.path.join(os.path.dirname(__file__), 'person_details_and_stats.sql')
+
+LOGGER = logging.getLogger(__name__)
+
+
+class PersonProps(NamedTuple):
+    person_name: str
+    institution: Optional[str] = None
+    country: Optional[str] = None
+    availability: Optional[str] = None
+    website: Optional[str] = None
+    pubmed: Optional[str] = None
+    days_to_respond: Optional[str] = None
+    requests: Optional[str] = None
+    responses: Optional[str] = None
+    response_rate: Optional[str] = None
+    no_of_assigments: Optional[str] = None
+    no_of_full_submissions: Optional[str] = None
+    decision_time: Optional[str] = None
 
 
 def get_deployment_env() -> str:
@@ -114,103 +85,170 @@ def get_model_path(deployment_env: str) -> str:
     )
 
 
-def get_person_details_from_bq(
+def query_bq_for_person_details(
         project: str,
         dataset: str,
         person_ids: list):
 
     client = Client(project=project)
 
+    with open(QUERY_PATH) as f:
+        sql_file = f.read()
+
     sql = (
-        QUERY.format(
+        sql_file.format(
             project=project,
-            dataset=dataset,
-            person_ids=person_ids
+            dataset=dataset
         )
     )
 
-    query_job = client.query(sql)
+    job_config = bigquery.QueryJobConfig(query_parameters=[
+        bigquery.ArrayQueryParameter("person_ids", "STRING", person_ids)
+    ])
+
+    query_job = client.query(sql, job_config=job_config)
     results = query_job.result()
-    return [row for row in results]
+    return list(results)
 
 
-def format_details_for_html(details: list) -> str:
-    formated_detail = ''
-    for detail in details:
-        formated_detail += "<br />" + detail
-    return formated_detail
-
-
-def get_formated_person_details_for_html(
-    person_ids: list,
-    is_person_recommended: bool
-) -> str:
+def get_person_details_from_bq(
+    person_ids: list
+):
     PROJECT_NAME = 'elife-data-pipeline'
     DATASET_NAME = get_deployment_env()
 
-    result_person_details = get_person_details_from_bq(
+    return query_bq_for_person_details(
         project=PROJECT_NAME,
         dataset=DATASET_NAME,
         person_ids=person_ids
     )
 
-    if is_person_recommended:
-        person_details = (
-            [
-                '<p>'
-                + person.person_name + '<br />' + person.institution + ', ' + person.country
-                # limited availability
-                + ('<br /><span style=\'color:red;\'><strong>!</strong></span> Limited availability: '
-                    + person.availability if person.availability else '')
-                # urls
-                + '<br /><a href=' + person.Website_URL + '>Website</a> | <a href='
-                + person.PubMed_URL + '>PubMed</a>'
-                # stats for initial submission
-                + ('<br />Days to respond: ' + person.days_to_respond
-                    if person.days_to_respond else '')
-                + ('; Requests: ' + person.requests if person.requests else '')
-                + ('; Responses: ' + person.responses if person.responses else '')
-                + ('; Response rate: ' + person.response_rate + '%' if person.response_rate else '')
-                # stats for full submission
-                + ('<br />No. of current assignments: ' + person.no_of_assigments
-                    if person.no_of_assigments else '')
-                + ('; Full submissions in 12 months: ' + person.no_full_submissions
-                    if person.no_full_submissions else '')
-                + ('; Decision time: ' + person.decision_time + ' days'
-                    if person.decision_time else '')
-                + '</p>'
-                for person in result_person_details
-            ]
-        )
-    else:
-        person_details = (
-            [
-                person.person_name + '; ' + person.institution + ', ' + person.country
-                for person in result_person_details
-            ]
-        )
 
-    return format_details_for_html(details=person_details)
+def get_html_text_for_recommended_person(
+    person: PersonProps
+) -> str:
+    return (
+        person.person_name
+        + ('<br />' if person.institution else '')
+        + (person.institution if person.institution else '')
+        + ((', ' + person.country) if (person.country and person.institution) else '')
+        + (('<br /><span style=\'color:red;\'><strong>!</strong></span> Limited availability: '
+            + person.availability) if person.availability else '')
+        + ('<br />' if (person.website or person.pubmed) else '')
+        + (('<a href=' + person.website + '>Website</a>') if person.website else '')
+        + (' | ' if (person.website and person.pubmed) else '')
+        + (('<a href=' + person.pubmed + '>PubMed</a>') if person.pubmed else '')
+        + ('<br />' if (
+            person.days_to_respond
+            or person.requests
+            or person.responses
+            or person.response_rate
+        ) else '')
+        + (('Days to respond: ' + person.days_to_respond)
+            if person.days_to_respond else '')
+        + ('; ' if (
+            person.days_to_respond
+            and person.requests
+            ) else '')
+        + (('Requests: ' + person.requests) if person.requests else '')
+        + ('; ' if (
+            (
+                person.days_to_respond
+                or person.requests)
+            and person.responses
+            ) else '')
+        + (('Responses: ' + person.responses) if person.responses else '')
+        + ('; ' if (
+            (
+                person.days_to_respond
+                or person.requests
+                or person.responses)
+            and person.response_rate
+            ) else '')
+        + (('Response rate: ' + person.response_rate + '%') if person.response_rate else '')
+        + ('<br />' if (
+            person.no_of_assigments
+            or person.no_of_full_submissions
+            or person.decision_time
+        ) else '')
+        + (('No. of current assignments: ' + person.no_of_assigments)
+            if person.no_of_assigments else '')
+        + ('; ' if (
+            person.no_of_assigments
+            and person.no_of_full_submissions
+            ) else '')
+        + (('Full submissions in 12 months: ' + person.no_of_full_submissions)
+            if person.no_of_full_submissions else '')
+        + ('; ' if (
+            (
+                person.no_of_assigments
+                or person.no_of_full_submissions)
+            and person.decision_time
+            ) else '')
+        + (('Decision time: ' + person.decision_time + ' days')
+            if person.decision_time else '')
+    )
 
 
-def get_formated_html_text(
+def get_html_text_for_author_suggested_person(
+    person: PersonProps
+):
+    if not person.institution:
+        return f'{person.person_name}'
+
+    return f'{person.person_name}; {person.institution}'
+
+
+def get_list_of_recommended_person_details_with_html_text(
+    result_of_person_details_from_bq
+) -> list:
+
+    person_details = (
+        [
+            get_html_text_for_recommended_person(person)
+            for person in result_of_person_details_from_bq
+        ]
+    )
+    return '<br /><br />'.join(person_details)
+
+
+def get_list_of_author_suggested_person_details_with_html_text(
+    result_of_person_details_from_bq
+) -> list:
+
+    person_details = (
+        [
+            get_html_text_for_author_suggested_person(person)
+            for person in result_of_person_details_from_bq
+        ]
+    )
+    return '<br />'.join(person_details)
+
+
+def add_html_formated_person_details_to_recommendation_html(
         author_suggestion_exclude_editor_ids: list,
         author_suggestion_include_editor_ids: list,
         recommended_person_ids: list,
 ) -> str:
 
-    formated_suggested_exclude_editor_details = get_formated_person_details_for_html(
-        person_ids=author_suggestion_exclude_editor_ids,
-        is_person_recommended=False
-    )
-    formated_suggested_include_editor_details = get_formated_person_details_for_html(
-        person_ids=author_suggestion_include_editor_ids,
-        is_person_recommended=False
-    )
-    formated_recommended_editor_details = get_formated_person_details_for_html(
-        person_ids=recommended_person_ids,
-        is_person_recommended=True
-    )
+    formated_suggested_exclude_editor_details = \
+        get_list_of_author_suggested_person_details_with_html_text(
+            get_person_details_from_bq(
+                person_ids=author_suggestion_exclude_editor_ids
+            )
+        )
+    formated_suggested_include_editor_details = \
+        get_list_of_author_suggested_person_details_with_html_text(
+            get_person_details_from_bq(
+                person_ids=author_suggestion_include_editor_ids
+            )
+        )
+    formated_recommended_editor_details = \
+        get_list_of_recommended_person_details_with_html_text(
+            get_person_details_from_bq(
+                person_ids=recommended_person_ids
+            )
+        )
 
     return RECOMMENDATION_HTML.format(
         excluded_editor_details=formated_suggested_exclude_editor_details,
@@ -226,7 +264,7 @@ def get_recommendation_html(
     if not recommended_person_ids:
         return NO_RECOMMENDATION_HTML
 
-    return get_formated_html_text(
+    return add_html_formated_person_details_to_recommendation_html(
         author_suggestion_exclude_editor_ids=author_suggestion_exclude_editor_ids,
         author_suggestion_include_editor_ids=author_suggestion_include_editor_ids,
         recommended_person_ids=recommended_person_ids
