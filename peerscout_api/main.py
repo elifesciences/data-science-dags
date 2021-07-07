@@ -166,15 +166,12 @@ def get_html_text_for_recommended_person(
         + ('<br />' if person.institution else '')
         + (person.institution if person.institution else '')
         + ((', ' + person.country) if (person.country and person.institution) else '')
-        # limited availability
         + (('<br /><span style=\'color:red;\'><strong>!</strong></span> Limited availability: '
             + person.availability) if person.availability else '')
-        # urls
         + ('<br />' if (person.website or person.pubmed) else '')
         + (('<a href=' + person.website + '>Website</a>') if person.website else '')
         + (' | ' if (person.website and person.pubmed) else '')
         + (('<a href=' + person.pubmed + '>PubMed</a>') if person.pubmed else '')
-        # stats for initial submission
         + ('<br />' if (
             person.days_to_respond
             or person.requests
@@ -203,7 +200,6 @@ def get_html_text_for_recommended_person(
             and person.response_rate
             ) else '')
         + (('Response rate: ' + person.response_rate + '%') if person.response_rate else '')
-        # stats for full submission
         + ('<br />' if (
             person.no_of_assigments
             or person.no_of_full_submissions
