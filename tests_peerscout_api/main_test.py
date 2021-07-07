@@ -208,8 +208,8 @@ class TestGetHtmlTextForRecommendedPerson:
             institution='University of Nowhereland',
             country='Nowhere',
             availability='Sundays only until 3th August 2021',
-            Website_URL='http://universityofnowhereland.edu',
-            PubMed_URL='http://universityofnowherelandpubmed.edu',
+            website='http://universityofnowhereland.edu',
+            pubmed='http://universityofnowherelandpubmed.edu',
             days_to_respond='0.9',
             requests='13',
             responses='12',
@@ -249,8 +249,8 @@ class TestGetHtmlTextForRecommendedPerson:
         person = PersonProps(
             person_name='John Matt',
             institution='University of Nowhereland',
-            Website_URL='http://universityofnowhereland.edu',
-            PubMed_URL='http://universityofnowherelandpubmed.edu',
+            website='http://universityofnowhereland.edu',
+            pubmed='http://universityofnowherelandpubmed.edu',
         )
         expected_result_of_html = (
             PERSON_NAME_HTML

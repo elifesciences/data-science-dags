@@ -54,8 +54,8 @@ QUERY = """
         person.Name AS person_name,
         person.institution,
         person.Primary_Address.Country AS country,
-        profile.Website_URL,
-        profile.PubMed_URL,
+        profile.Website_URL AS website,
+        profile.PubMed_URL AS pubmed,
         profile.Current_Availability AS availability,
         event.*
     FROM `{project}.{dataset}.mv_Editorial_Person` AS person
@@ -100,8 +100,8 @@ class PersonProps(NamedTuple):
     institution: Optional[str] = None
     country: Optional[str] = None
     availability: Optional[str] = None
-    Website_URL: Optional[str] = None
-    PubMed_URL: Optional[str] = None
+    website: Optional[str] = None
+    pubmed: Optional[str] = None
     days_to_respond: Optional[str] = None
     requests: Optional[str] = None
     responses: Optional[str] = None
@@ -170,10 +170,10 @@ def get_html_text_for_recommended_person(
         + (('<br /><span style=\'color:red;\'><strong>!</strong></span> Limited availability: '
             + person.availability) if person.availability else '')
         # urls
-        + ('<br />' if (person.Website_URL or person.PubMed_URL) else '')
-        + (('<a href=' + person.Website_URL + '>Website</a>') if person.Website_URL else '')
-        + (' | ' if (person.Website_URL and person.PubMed_URL) else '')
-        + (('<a href=' + person.PubMed_URL + '>PubMed</a>') if person.PubMed_URL else '')
+        + ('<br />' if (person.website or person.pubmed) else '')
+        + (('<a href=' + person.website + '>Website</a>') if person.website else '')
+        + (' | ' if (person.website and person.pubmed) else '')
+        + (('<a href=' + person.pubmed + '>PubMed</a>') if person.pubmed else '')
         # stats for initial submission
         + ('<br />' if (
             person.days_to_respond
