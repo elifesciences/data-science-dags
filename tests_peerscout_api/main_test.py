@@ -87,22 +87,24 @@ LINE_BREAK = '<br />'
 SEMI_COLUMN = '; '
 PIPE = ' | '
 
-VALID_RECOMMENDATION_RESPONSE = {
-    "reviewing_editor_recommendation": {
-        "person_ids": RECOMMENDED_PERSON_IDS,
-        "recommendation_html": get_recommendation_html(
-            author_suggestion_exclude_editor_ids=SUGGESTED_PERSON_IDS_TO_EXC,
-            author_suggestion_include_editor_ids=SUGGESTED_PERSON_IDS_TO_INC,
-            recommended_person_ids=RECOMMENDED_PERSON_IDS)
-    },
-    "senior_editor_recommendation": {
-        "person_ids": RECOMMENDED_PERSON_IDS,
-        "recommendation_html": get_recommendation_html(
-            author_suggestion_exclude_editor_ids=SUGGESTED_PERSON_IDS_TO_EXC,
-            author_suggestion_include_editor_ids=SUGGESTED_PERSON_IDS_TO_INC,
-            recommended_person_ids=RECOMMENDED_PERSON_IDS)
+
+def get_valid_recommendation_response():
+    return {
+        "reviewing_editor_recommendation": {
+            "person_ids": RECOMMENDED_PERSON_IDS,
+            "recommendation_html": get_recommendation_html(
+                author_suggestion_exclude_editor_ids=SUGGESTED_PERSON_IDS_TO_EXC,
+                author_suggestion_include_editor_ids=SUGGESTED_PERSON_IDS_TO_INC,
+                recommended_person_ids=RECOMMENDED_PERSON_IDS)
+        },
+        "senior_editor_recommendation": {
+            "person_ids": RECOMMENDED_PERSON_IDS,
+            "recommendation_html": get_recommendation_html(
+                author_suggestion_exclude_editor_ids=SUGGESTED_PERSON_IDS_TO_EXC,
+                author_suggestion_include_editor_ids=SUGGESTED_PERSON_IDS_TO_INC,
+                recommended_person_ids=RECOMMENDED_PERSON_IDS)
+        }
     }
-}
 
 
 @pytest.fixture(name='query_bq_for_person_details_mock', autouse=True)
@@ -169,7 +171,7 @@ class TestPeerscoutAPI:
             {'person_id': RECOMMENDED_PERSON_IDS, 'name': RECOMMENDED_NAMES}
         )
         response = test_client.post('/api/peerscout', json=INPUT_DATA_VALID)
-        assert _get_ok_json(response) == VALID_RECOMMENDATION_RESPONSE
+        assert _get_ok_json(response) == get_valid_recommendation_response()
 
 
 class TestGetRecommendationHtml:
