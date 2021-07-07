@@ -66,13 +66,13 @@ QUERY = """
         Person.Person_ID AS person_id,
         CAST(ROUND(PERCENTILE_CONT(
             Initial_Submission.Reviewing_Editor.Consultation.Days_To_Respond, 0.5
-            ) OVER (PARTITION BY Person.Person_ID),2) AS STRING) AS days_to_respond,
+            ) OVER (PARTITION BY Person.Person_ID),1) AS STRING) AS days_to_respond,
         CAST(COUNT(DISTINCT Initial_Submission.Reviewing_Editor.Consultation.Request_Version_ID
             ) OVER (PARTITION BY Person.Person_ID) AS STRING) AS requests,
         CAST(COUNT(DISTINCT Initial_Submission.Reviewing_Editor.Consultation.Response_Version_ID
             ) OVER (PARTITION BY Person.Person_ID) AS STRING) AS responses,
-        CAST(CAST(ROUND(AVG(Initial_Submission.Reviewing_Editor.Consultation.Has_Response_Ratio
-            ) OVER (PARTITION BY Person.Person_ID)*100,0) AS INT64) AS STRING) AS response_rate,
+        CAST(ROUND(AVG(Initial_Submission.Reviewing_Editor.Consultation.Has_Response_Ratio
+            ) OVER (PARTITION BY Person.Person_ID)*100,1) AS STRING) AS response_rate,
         CAST(MAX(Full_Submission.Reviewing_Editor.Current_Assignment_Count
             ) OVER (PARTITION BY Person.Person_ID) AS STRING) AS no_of_assigments,
         CAST(COUNT(DISTINCT Full_Submission.Reviewing_Editor.Assigned_Version_ID
