@@ -13,14 +13,13 @@ elifePipeline {
         stage 'Build and run tests', {
             // Note: we are using staging source dataset in ci
             //   because some source tables or views may not be present in ci
-            options {
-                timeout(time: 30, unit: 'MINUTES')
-            }
             try {
-                sh "make IMAGE_TAG=${commit} REVISION=${commit} \
-                    DATA_SCIENCE_SOURCE_DATASET=staging \
-                    DATA_SCIENCE_OUTPUT_DATASET=ci \
-                    ci-build-and-test"
+                timeout(time: 30, unit: 'MINUTES') {
+                    sh "make IMAGE_TAG=${commit} REVISION=${commit} \
+                        DATA_SCIENCE_SOURCE_DATASET=staging \
+                        DATA_SCIENCE_OUTPUT_DATASET=ci \
+                        ci-build-and-test"
+                }
             } finally {
                 sh "make ci-clean"
             }
