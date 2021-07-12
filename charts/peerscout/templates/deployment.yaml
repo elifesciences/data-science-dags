@@ -49,12 +49,16 @@ spec:
             initialDelaySeconds: 1
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-        {{- if .Values.env }}
+          {{- if .Values.env }}
           env:
-        {{- range $key, $value := .Values.env }}
+          {{- range $key, $value := .Values.env }}
           - name: {{ $key }}
             value: "{{ $value }}"
         {{- end }}
+        {{- end }}
+        {{- if .Values.volumeMounts }}
+        volumeMounts:
+          {{- toYaml .Values.volumeMounts | nindent 12 }}
         {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -67,4 +71,8 @@ spec:
       {{- with .Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.volumes }}
+      volumes:
+        {{- toYaml .Values.volumes | nindent 8 }}
       {{- end }}
