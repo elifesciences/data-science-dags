@@ -81,3 +81,6 @@ affinity: {}
 env: {}
   # name:
   # value:
+
+volumeMounts: []
+volumes: []    
