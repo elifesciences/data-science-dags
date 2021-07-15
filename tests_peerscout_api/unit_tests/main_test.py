@@ -50,6 +50,8 @@ INPUT_DATA_VALID = {
 
 INPUT_DATA_WTIHOUT_ABSTRACT = {**INPUT_DATA_VALID, "abstract": ""}
 
+INPUT_DATA_WTIH_WEAK_ABSTRACT = {**INPUT_DATA_VALID, "abstract": "abc bcd efg"}
+
 NO_RECOMMENDATION_RESPONSE = {
     "reviewing_editor_recommendation": {
         "person_ids": [],
@@ -160,6 +162,13 @@ class TestPeerscoutAPI:
         test_client: FlaskClient
     ):
         response = test_client.post('/api/peerscout', json=INPUT_DATA_WTIHOUT_ABSTRACT)
+        assert _get_ok_json(response) == NO_RECOMMENDATION_RESPONSE
+
+    def test_should_respond_no_recomendation_with_weak_abstract(
+        self,
+        test_client: FlaskClient
+    ):
+        response = test_client.post('/api/peerscout', json=INPUT_DATA_WTIH_WEAK_ABSTRACT)
         assert _get_ok_json(response) == NO_RECOMMENDATION_RESPONSE
 
     def test_should_respond_with_recomendation(
