@@ -36,10 +36,11 @@ request_json = """{
     }
 }"""
 
+
 def test_get_response_json():
     # to run test locally use url below:
     # url = 'http://localhost:8090/api/peerscout'
-    
+
     url = 'http://peerscout-api:8080/api/peerscout'
     headers = {'Content-Type': 'application/json'}
 
