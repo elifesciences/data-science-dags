@@ -265,14 +265,35 @@ airflow-start:
 airflow-stop:
 	$(AIRFLOW_DOCKER_COMPOSE) down
 
+
+wait-for-peerscout-api:
+	docker-compose run --rm wait-for-it \
+		"peerscout-api:8080" \
+		--timeout=30 \
+		--strict\
+		-- echo "PeerScout API is up"
+
 peerscout-api-build:
 	$(PEERSCOUT_API_DOCKER_COMPOSE) build peerscout-api
 
 peerscout-api-start: 
-	$(PEERSCOUT_API_DOCKER_COMPOSE) run --rm -p '8090:8080' -e FLASK_ENV=development peerscout-api
+	$(PEERSCOUT_API_DOCKER_COMPOSE) up -d peerscout-api
+
+peerscout-api-start-and-wait:
+	$(MAKE) peerscout-api-start
+	$(MAKE) wait-for-peerscout-api
+
+peerscout-api-end2end-test:
+	$(PEERSCOUT_API_DEV_DOCKER_PYTHON) -m pytest ./tests_peerscout_api/end2end_tests -v
+
+peerscout-api-start-and-end2end-test: \
+	peerscout-api-start-and-wait peerscout-api-end2end-test
 
 peerscout-api-stop:
 	$(PEERSCOUT_API_DOCKER_COMPOSE) down
+
+peerscout-api-dev-start: 
+	$(PEERSCOUT_API_DOCKER_COMPOSE) run --rm -p '8090:8080' -e FLASK_ENV=development peerscout-api
 
 peerscout-api-dev-build:
 	$(PEERSCOUT_API_DOCKER_COMPOSE) build peerscout-api-dev
@@ -287,10 +308,10 @@ peerscout-api-dev-lint: \
 	peerscout-api-dev-flake8 peerscout-api-dev-pylint
 
 peerscout-api-dev-pytest:
-	$(PEERSCOUT_API_DEV_DOCKER_PYTHON) -m pytest -v
+	$(PEERSCOUT_API_DEV_DOCKER_PYTHON) -m pytest ./tests_peerscout_api/unit_tests -v
 
 peerscout-api-dev-pytest-watch:
-	$(PEERSCOUT_API_DEV_DOCKER_PYTHON) -m pytest_watch -- -vv
+	$(PEERSCOUT_API_DEV_DOCKER_PYTHON) -m pytest_watch -- ./tests_peerscout_api/unit_tests -vv
 
 peerscout-api-dev-test: \
 	peerscout-api-dev-lint peerscout-api-dev-pytest
@@ -317,7 +338,8 @@ ci-build-and-test:
 		notebook-nbstripout-check \
 		ci-test-exclude-e2e \
 		peerscout-api-dev-build \
-		peerscout-api-dev-test
+		peerscout-api-dev-test \
+		peerscout-api-start-and-end2end-test
 
 
 ci-clean:
