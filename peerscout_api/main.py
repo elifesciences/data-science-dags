@@ -225,28 +225,54 @@ def get_list_of_author_suggested_person_details_with_html_text(
     return '<br />'.join(person_details)
 
 
+def pick_person_id_from_bq_result(
+    bq_person_detail_sql_result,
+    person_ids_to_pick: list
+) -> list:
+    picked_person_details = []
+    for result in bq_person_detail_sql_result:
+        for person_id in person_ids_to_pick:
+            if person_id == result.person_id:
+                picked_person_details.append(result)
+
+    return picked_person_details
+
+
 def add_html_formated_person_details_to_recommendation_html(
         author_suggestion_exclude_editor_ids: list,
         author_suggestion_include_editor_ids: list,
         recommended_person_ids: list,
 ) -> str:
 
+    all_editor_ids = (
+        author_suggestion_exclude_editor_ids
+        + author_suggestion_include_editor_ids
+        + recommended_person_ids
+    )
+
+    result_person_details = get_person_details_from_bq(
+        person_ids=all_editor_ids
+    )
+
     formated_suggested_exclude_editor_details = \
         get_list_of_author_suggested_person_details_with_html_text(
-            get_person_details_from_bq(
-                person_ids=author_suggestion_exclude_editor_ids
+            pick_person_id_from_bq_result(
+                result_person_details,
+                author_suggestion_exclude_editor_ids
             )
         )
     formated_suggested_include_editor_details = \
         get_list_of_author_suggested_person_details_with_html_text(
-            get_person_details_from_bq(
-                person_ids=author_suggestion_include_editor_ids
+            pick_person_id_from_bq_result(
+                result_person_details,
+                author_suggestion_include_editor_ids
             )
         )
     formated_recommended_editor_details = \
         get_list_of_recommended_person_details_with_html_text(
-            get_person_details_from_bq(
-                person_ids=recommended_person_ids
+            pick_person_id_from_bq_result(
+                result_person_details,
+                recommended_person_ids
             )
         )
 
