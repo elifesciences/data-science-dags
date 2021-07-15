@@ -125,5 +125,4 @@ def get_editor_recommendations_for_api(
         for predicted_editor in row
     ])
 
-    return prediction_results_flat_df.sort_values(
-        'score', ascending=False).head(top_n_editor)
+    return prediction_results_flat_df.head(top_n_editor)
