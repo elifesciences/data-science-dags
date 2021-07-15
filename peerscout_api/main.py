@@ -228,8 +228,8 @@ def get_list_of_author_suggested_person_details_with_html_text(
 def pick_person_id_from_bq_result(
     bq_person_detail_sql_result,
     person_ids_to_pick: list
-)->list:
-    picked_person_details= []
+) -> list:
+    picked_person_details = []
     for result in bq_person_detail_sql_result:
         for person_id in person_ids_to_pick:
             if person_id == result.person_id:
