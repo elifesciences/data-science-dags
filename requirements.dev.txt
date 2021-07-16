@@ -3,3 +3,4 @@ nbstripout==0.5.0
 pylint==2.6.0
 pytest==6.2.4
 pytest-watch==4.2.0
+requests==2.26.0
