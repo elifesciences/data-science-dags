@@ -116,6 +116,13 @@ services:
       dockerfile: Dockerfile.peerscout_api
       target: runtime
     image: elifesciences/data-science-dags_peerscout-api:${IMAGE_TAG}
+    environment:
+      # because of there is no model in ci, we are using stating
+      - DEPLOYMENT_ENV=staging
+      - GOOGLE_APPLICATION_CREDENTIALS=/root/credentials.json
+    volumes: 
+      - ~/.aws/credentials:/root/.aws/credentials
+      - ./credentials.json:/root/credentials.json
 
   peerscout-api-dev:
     build:
