@@ -117,7 +117,7 @@ services:
       target: runtime
     image: elifesciences/data-science-dags_peerscout-api:${IMAGE_TAG}
     environment:
-      # because of there is no model in ci, we are using stating
+      # because of there is no model in ci, we are using staging
       - DEPLOYMENT_ENV=staging
       - GOOGLE_APPLICATION_CREDENTIALS=/root/credentials.json
     volumes: 
