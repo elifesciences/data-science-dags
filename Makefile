@@ -269,7 +269,7 @@ airflow-stop:
 wait-for-peerscout-api:
 	docker-compose run --rm wait-for-it \
 		"peerscout-api:8080" \
-		--timeout=120 \
+		--timeout=30 \
 		--strict\
 		-- echo "PeerScout API is up"
 
