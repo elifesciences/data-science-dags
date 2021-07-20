@@ -13,15 +13,18 @@ elifePipeline {
         stage 'Build and run tests', {
             // Note: we are using staging source dataset in ci
             //   because some source tables or views may not be present in ci
-            try {
-                timeout(time: 30, unit: 'MINUTES') {
-                    sh "make IMAGE_TAG=${commit} REVISION=${commit} \
-                        DATA_SCIENCE_SOURCE_DATASET=staging \
-                        DATA_SCIENCE_OUTPUT_DATASET=ci \
-                        ci-build-and-test"
+            withDataPipelineGcpCredentials {
+                try {
+                    timeout(time: 30, unit: 'MINUTES') {
+                        sh "make IMAGE_TAG=${commit} REVISION=${commit} \
+                            DATA_SCIENCE_SOURCE_DATASET=staging \
+                            DATA_SCIENCE_OUTPUT_DATASET=ci \
+                            ci-build-and-test"
+                    }
+                } finally {
+                    sh "docker-compose logs"
+                    sh "make ci-clean"
                 }
-            } finally {
-                sh "make ci-clean"
             }
         }
 
@@ -53,6 +56,14 @@ elifePipeline {
     }
 }
 
+def withDataPipelineGcpCredentials(doSomething) {
+    try {
+        sh 'vault.sh kv get -field credentials secret/containers/data-pipeline/gcp > credentials.json'
+        doSomething()
+    } finally {
+        sh 'echo > credentials.json'
+    }
+}
 
 def triggerImageBuild(jenkins_image_building_ci_pipeline, gitUrl, gitCommitRef){
     build job: jenkins_image_building_ci_pipeline,  wait: false, parameters: [string(name: 'gitUrl', value: gitUrl), string(name: 'gitCommitRef', value: gitCommitRef)]
