@@ -49,3 +49,5 @@ services:
     volumes: 
       - ./peerscout_api:/app/api/peerscout_api
       - ./tests_peerscout_api:/app/api/tests_peerscout_api
+    environment: 
+      - PEERSCOUT_API_URL=http://peerscout-api:8080/api/peerscout
