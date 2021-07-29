@@ -5,7 +5,7 @@ SELECT
     person.Primary_Address.Country AS country,
     profile.Website_URL AS website,
     profile.PubMed_URL AS pubmed,
-    profile.Current_Availability AS availability,
+    profile.Dates_Not_Available_CSV AS availability,
     event.* except(Person_ID)
 FROM `{project}.{dataset}.mv_Editorial_Person` AS person
 INNER JOIN `{project}.{dataset}.mv_Editorial_Editor_Profile` AS profile
