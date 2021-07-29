@@ -9,7 +9,7 @@ lxml==4.6.3
 pandas-gbq==0.15.0
 pyarrow==4.0.1
 PyICU==2.7.4
-google-cloud-bigquery==2.20.0
+google-cloud-bigquery==2.23.1
 s3path==0.3.2
 scikit-learn==0.24.2
 six==1.16.0
