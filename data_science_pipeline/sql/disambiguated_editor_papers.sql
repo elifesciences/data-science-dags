@@ -50,7 +50,7 @@ t_pubmed_id_with_priority_by_person_id AS (
         THEN 6
       ELSE 1000 - author_match_score
     END AS priority
-  FROM `elife-data-pipeline.de_dev.data_science_disambiguated_editor_papers_details`
+  FROM `{project}.{dataset}.data_science_disambiguated_editor_papers_details`
 ),
 
 t_priority_count_by_person_id AS (
