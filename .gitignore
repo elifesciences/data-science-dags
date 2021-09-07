@@ -16,3 +16,4 @@ launch_*.py
 
 *.pyc
 .env.local
+.python-version
