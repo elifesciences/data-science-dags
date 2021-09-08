@@ -334,7 +334,6 @@ ci-build-and-test:
 		airflow-dev-build \
 		jupyter-build \
 		peerscout-api-build \
-		notebook-lint \
 		ci-test-exclude-e2e \
 		peerscout-api-dev-build \
 		peerscout-api-dev-test \
