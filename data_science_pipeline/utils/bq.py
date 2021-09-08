@@ -197,19 +197,6 @@ def df_as_jsonl_file_without_null(df: pd.DataFrame, **kwargs) -> ContextManager[
         yield jsonl_file
 
 
-def delete_bq_table(
-    project_id: str = None,
-    table_name: str = None
-):
-    client = get_client(project_id=project_id)
-    table_id = '{project_id}.{table_name}'.format(
-        project_id=project_id,
-        table_name=table_name
-    )
-    client.delete_table(table_id, not_found_ok=True)
-    LOGGER.info("Deleted table '{}'.".format(table_id))
-
-
 def to_gbq(
         df: pd.DataFrame,
         destination_table: str,
