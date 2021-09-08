@@ -335,6 +335,7 @@ ci-build-and-test:
 		jupyter-build \
 		peerscout-api-build \
 		ci-test-exclude-e2e \
+		notebook-lint \
 		peerscout-api-dev-build \
 		peerscout-api-dev-test \
 		peerscout-api-start-and-end2end-test
