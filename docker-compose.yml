@@ -31,6 +31,7 @@ services:
     volumes:
       # we need the notebooks mount to run the tests (since we don't copy them in)
       - ./notebooks:/home/jovyan/data-science-dags/notebooks
+      - ./notebooks_tmp:/tmp
   
   airflow-image:
     build:
