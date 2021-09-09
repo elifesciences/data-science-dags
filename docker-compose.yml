@@ -31,7 +31,6 @@ services:
     volumes:
       # we need the notebooks mount to run the tests (since we don't copy them in)
       - ./notebooks:/home/jovyan/data-science-dags/notebooks
-      - ./notebooks_tmp:/tmp
   
   airflow-image:
     build:
@@ -110,6 +109,8 @@ services:
       bash -c "sudo install -D /tmp/credentials.json -m 644 -t /home/airflow/.config/gcloud
       && sudo install -D /tmp/.aws-credentials -m 644 --no-target-directory /home/airflow/.aws/credentials
       && ./worker.sh tcp://dask-scheduler:8786"
+    volumes:
+      - ./tmp:/tmp
 
   peerscout-api:
     build:
