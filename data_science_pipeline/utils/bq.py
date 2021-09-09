@@ -96,6 +96,7 @@ def load_file_into_bq(
 
         # Waits for table cloud_data_store to complete
         job.result()
+        LOGGER.info('File size is : %s', os.path.getsize(filename))
         LOGGER.info(
             "Loaded %s rows into %s:%s.",
             job.output_rows,
