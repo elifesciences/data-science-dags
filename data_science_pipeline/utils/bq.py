@@ -248,3 +248,64 @@ def run_query_and_save_to_table(  # pylint: disable=too-many-arguments
     if LOGGER.isEnabledFor(logging.DEBUG):
         sample_result = list(islice(result, 3))
         LOGGER.debug("sample_result: %s", sample_result)
+
+
+def does_bq_table_exist(
+        client: Client,
+        project: str,
+        dataset: str,
+        table: str
+    ):
+    table_id = ".".join([project, dataset, table])
+    try:
+        client.get_table(table_id)
+        LOGGER.info("Table %s already exists.", table_id)
+        return True
+    except:
+        return False
+
+
+def create_or_replace_bq_view(
+        query: str,
+        project: str,
+        dataset: str,
+        view_name: str
+    ):
+    client = get_client(project_id=project)
+    view_id = ".".join([project, dataset, view_name])
+    view = bigquery.Table(view_id)
+    view.view_query = query
+    if not does_bq_table_exist(client, project, dataset, view_name):
+        view = client.create_table(view)
+        LOGGER.info("Created %s: %s", view.table_type, str(view.reference))
+    else:
+        client.delete_table(view_id, not_found_ok=True)
+        LOGGER.info("Deleted view %s", view_id)
+        view = client.create_table(view)
+        LOGGER.info("Recreated %s: %s", view.table_type, str(view.reference))
+
+
+def materialize_given_view(
+        project: str,
+        dataset: str,
+        source_view_name: str,
+        mview_prefix='m'
+    ):
+    client = get_client(project_id=project)
+    source_view = ".".join([project, dataset, source_view_name])
+    destination_mview_name = "".join([mview_prefix, source_view_name])
+    destination_mview = ".".join([project, dataset, destination_mview_name])
+    LOGGER.info("view %s is been materializing", source_view)
+    job_config = bigquery.QueryJobConfig()
+    sql ='''
+        CREATE OR REPLACE TABLE {destination_mview}
+        AS SELECT *
+        FROM  {source_view}
+    '''.format(
+            source_view=source_view,
+            destination_mview=destination_mview
+        )
+
+    query_job = client.query(sql, job_config=job_config)
+    query_job.result()
+    LOGGER.info("mv %s has been created", destination_mview)
