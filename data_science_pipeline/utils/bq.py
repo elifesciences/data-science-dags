@@ -5,9 +5,11 @@ from contextlib import contextmanager
 from itertools import islice
 from typing import Iterable, List, Tuple, ContextManager
 
+
 import pandas as pd
 
 import google.cloud.exceptions
+from google.cloud.exceptions import NotFound
 from google.cloud import bigquery
 from google.cloud.bigquery.schema import SchemaField
 from google.cloud.bigquery import (
@@ -261,9 +263,8 @@ def does_bq_table_exist(
         client.get_table(table_id)
         LOGGER.info("Table %s already exists.", table_id)
         return True
-    # pylint disable-broad-except
-    except Exception as e:
-        LOGGER.info("Table not exist. %s", e)
+    except NotFound as e:
+        LOGGER.info("Table %s not exist. Ref %s", table_id, e.resp.status)
         return False
 
 
