@@ -42,6 +42,8 @@ with create_dag(
                 'max_editors': 1000
             }
         ) >> create_run_notebook_operator(
+            notebook_filename='peerscout/peerscout-create-view-editor-pubmed-ids.ipynb'
+        ) >> create_run_notebook_operator(
             notebook_filename=(
                 'peerscout/peerscout-get-editor-pubmed-external-manuscript-summary.ipynb'
             ),
