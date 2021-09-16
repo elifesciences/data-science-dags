@@ -255,13 +255,13 @@ def does_bq_table_exist(
         project: str,
         dataset: str,
         table: str
-    ):
+):
     table_id = ".".join([project, dataset, table])
-    try:
+    try: 
         client.get_table(table_id)
         LOGGER.info("Table %s already exists.", table_id)
         return True
-    except:  # pylint: disable=bare-except
+    except Exception: # pylint: disable=bare-except
         return False
 
 
@@ -270,7 +270,7 @@ def create_or_replace_bq_view(
         project: str,
         dataset: str,
         view_name: str
-    ):
+):
     client = get_client(project_id=project)
     view_id = ".".join([project, dataset, view_name])
     view = bigquery.Table(view_id)
@@ -290,14 +290,14 @@ def materialize_given_view(
         dataset: str,
         source_view_name: str,
         mview_prefix='m'
-    ):
+):
     client = get_client(project_id=project)
     source_view = ".".join([project, dataset, source_view_name])
     destination_mview_name = "".join([mview_prefix, source_view_name])
     destination_mview = ".".join([project, dataset, destination_mview_name])
     LOGGER.info("view %s is been materializing", source_view)
     job_config = bigquery.QueryJobConfig()
-    sql ='''
+    sql = '''
         CREATE OR REPLACE TABLE {destination_mview}
         AS SELECT *
         FROM  {source_view}
