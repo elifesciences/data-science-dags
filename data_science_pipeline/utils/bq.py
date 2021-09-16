@@ -262,7 +262,7 @@ def does_bq_table_exist(
         LOGGER.info("Table %s already exists.", table_id)
         return True
     except Exception as e:
-        LOGGER.info("Table %s not exist.", table_id)
+        LOGGER.info("Table not exist. %s", e)
         return False
 
 
