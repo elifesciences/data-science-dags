@@ -261,7 +261,7 @@ def does_bq_table_exist(
         client.get_table(table_id)
         LOGGER.info("Table %s already exists.", table_id)
         return True
-    except:
+    except:  # pylint: disable=bare-except
         return False
 
 
