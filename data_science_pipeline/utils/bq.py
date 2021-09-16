@@ -263,8 +263,7 @@ def does_bq_table_exist(
         client.get_table(table_id)
         LOGGER.info("Table %s already exists.", table_id)
         return True
-    except NotFound as e:
-        LOGGER.info("Table %s not exist. Ref %s", table_id, e.resp.status)
+    except NotFound:
         return False
 
 
