@@ -257,11 +257,11 @@ def does_bq_table_exist(
         table: str
 ):
     table_id = ".".join([project, dataset, table])
-    try: 
+    try:
         client.get_table(table_id)
         LOGGER.info("Table %s already exists.", table_id)
         return True
-    except Exception: # pylint: disable=bare-except
+    except: # pylint: disable=broad-except
         return False
 
 
