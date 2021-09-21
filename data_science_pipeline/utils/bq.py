@@ -9,7 +9,6 @@ from typing import Iterable, List, Tuple, ContextManager
 import pandas as pd
 
 import google.cloud.exceptions
-from google.cloud.exceptions import NotFound
 from google.cloud import bigquery
 from google.cloud.bigquery.schema import SchemaField
 from google.cloud.bigquery import (
