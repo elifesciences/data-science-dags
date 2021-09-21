@@ -2,7 +2,7 @@ WITH t_editor_pubmed_ids AS (
   SELECT
     *,
     ROW_NUMBER() OVER(PARTITION BY name ORDER BY provenance.imported_timestamp DESC) AS name_row_number
-  FROM `{project}.{dataset}.data_science_editor_pubmed_ids`
+  FROM `{project}.{dataset}.mv_data_science_editor_pubmed_ids`
 )
 
 SELECT
