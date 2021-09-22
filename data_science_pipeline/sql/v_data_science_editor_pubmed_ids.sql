@@ -2,7 +2,7 @@ WITH t_data_science_editor_pubmed_ids_with_rn AS (
     SELECT 
         *,
         ROW_NUMBER() OVER (PARTITION BY person_id ORDER BY provenance.imported_timestamp DESC) as rn
-    FROM `{project}.{dataset}.mv_data_science_editor_pubmed_ids` AS pubmed_ids
+    FROM `{project}.{dataset}.data_science_editor_pubmed_ids` AS pubmed_ids
 ),
 
 t_latest_data_science_editor_pubmed_ids AS (
