@@ -37,10 +37,14 @@ DEFAULT_N_FOR_TOP_N_EDITORS = 3
 
 NO_RECOMMENDATION_TEXT = ' No recommendation available'
 NOT_PROVIDED = 'Not provided'
+
+EDITOR_TYPE_FOR_SENIOR_EDITOR = 'Senior'
+EDITOR_TYPE_FOR_REVIEWING_EDITOR = 'Reviewing'
+
 RECOMMENDATION_HEADINGS = [
-    '<h4>Author&rsquo;s requests for Editor exclusions:</h4>',
-    '<h4>Author’s suggestions for Reviewing Editor:</h4>',
-    '<h4>Recommended Editors (based on keyword matching):</h4>']
+    '<h4>Author Requested {editor_type} Editor Exclusions:</h4>',
+    '<h4>Author Suggested {editor_type} Editors:</h4>',
+    '<h4>Recommended {editor_type} Editors (based on keyword matching):</h4>']
 
 RECOMMENDATION_HTML = RECOMMENDATION_HEADINGS[0] + '{excluded_editor_details}' + \
     RECOMMENDATION_HEADINGS[1] + '{included_editor_details}' + \
@@ -242,6 +246,7 @@ def add_html_formated_person_details_to_recommendation_html(
         author_suggestion_exclude_editor_ids: list,
         author_suggestion_include_editor_ids: list,
         recommended_person_ids: list,
+        editor_type: str
 ) -> str:
 
     all_editor_ids = (
@@ -279,35 +284,40 @@ def add_html_formated_person_details_to_recommendation_html(
     return RECOMMENDATION_HTML.format(
         excluded_editor_details=formated_suggested_exclude_editor_details,
         included_editor_details=formated_suggested_include_editor_details,
-        recommended_editor_details=formated_recommended_editor_details)
+        recommended_editor_details=formated_recommended_editor_details,
+        editor_type=editor_type)
 
 
 def get_recommendation_html(
         author_suggestion_exclude_editor_ids: list,
         author_suggestion_include_editor_ids: list,
-        recommended_person_ids: list
+        recommended_person_ids: list,
+        editor_type: str
 ) -> str:
     if not recommended_person_ids:
-        return NO_RECOMMENDATION_HTML
+        return NO_RECOMMENDATION_HTML.format(editor_type=editor_type)
 
     return add_html_formated_person_details_to_recommendation_html(
         author_suggestion_exclude_editor_ids=author_suggestion_exclude_editor_ids,
         author_suggestion_include_editor_ids=author_suggestion_include_editor_ids,
-        recommended_person_ids=recommended_person_ids
+        recommended_person_ids=recommended_person_ids,
+        editor_type=editor_type
     )
 
 
 def get_recommendation_json(
         recommended_person_ids: list,
         author_suggestion_exclude_editor_ids: list,
-        author_suggestion_include_editor_ids: list
+        author_suggestion_include_editor_ids: list,
+        editor_type: str
 ) -> dict:
     return {
        'person_ids': recommended_person_ids,
        'recommendation_html': get_recommendation_html(
             author_suggestion_exclude_editor_ids=author_suggestion_exclude_editor_ids,
             author_suggestion_include_editor_ids=author_suggestion_include_editor_ids,
-            recommended_person_ids=recommended_person_ids
+            recommended_person_ids=recommended_person_ids,
+            editor_type=editor_type
         )
     }
 
@@ -393,13 +403,15 @@ def create_app():
         json_response_for_senior_editors = get_recommendation_json(
             author_suggestion_exclude_editor_ids=author_suggestion_exclude_senior_editors,
             author_suggestion_include_editor_ids=author_suggestion_include_senior_editors,
-            recommended_person_ids=recommeded_senior_editor_ids
+            recommended_person_ids=recommeded_senior_editor_ids,
+            editor_type=EDITOR_TYPE_FOR_SENIOR_EDITOR
         )
 
         json_response_for_reviewing_editors = get_recommendation_json(
             author_suggestion_exclude_editor_ids=author_suggestion_exclude_reviewing_editors,
             author_suggestion_include_editor_ids=author_suggestion_include_reviewing_editors,
-            recommended_person_ids=recommeded_reviewing_editor_ids
+            recommended_person_ids=recommeded_reviewing_editor_ids,
+            editor_type=EDITOR_TYPE_FOR_REVIEWING_EDITOR
         )
 
         return jsonify(get_response_json(
