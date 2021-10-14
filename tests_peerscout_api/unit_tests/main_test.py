@@ -65,7 +65,7 @@ NO_RECOMMENDATION_RESPONSE = {
     }
 }
 
-EDITOR_TYPE_MOCK = '{editor_type}'
+EDITOR_TYPE = 'EditorType1'
 
 RECOMMENDED_PERSON_IDS = ['id1', 'id2', 'id3']
 RECOMMENDED_NAMES = ['name1', 'name2', 'name3']
@@ -213,23 +213,25 @@ class TestPeerscoutAPI:
 class TestGetRecommendationHtml:
     def test_should_have_recomendation_heading_when_the_recomendation_not_avaliable(
         self
-    ):
+    ):  
         for heading in RECOMMENDATION_HEADINGS:
+            heading = heading.format(editor_type=EDITOR_TYPE)
             assert heading in get_recommendation_html(
                 author_suggestion_exclude_editor_ids=[],
                 author_suggestion_include_editor_ids=[],
                 recommended_person_ids=[],
-                editor_type=EDITOR_TYPE_MOCK)
+                editor_type=EDITOR_TYPE)
 
     def test_should_have_recomendation_heading_when_the_recomendation_avaliable(
         self
     ):
         for heading in RECOMMENDATION_HEADINGS:
+            heading = heading.format(editor_type=EDITOR_TYPE)
             assert heading in get_recommendation_html(
                 author_suggestion_exclude_editor_ids=SUGGESTED_PERSON_IDS_TO_EXC,
                 author_suggestion_include_editor_ids=SUGGESTED_PERSON_IDS_TO_INC,
                 recommended_person_ids=RECOMMENDED_PERSON_IDS,
-                editor_type=EDITOR_TYPE_MOCK)
+                editor_type=EDITOR_TYPE)
 
 
 class TestGetHtmlTextForRecommendedPerson:
