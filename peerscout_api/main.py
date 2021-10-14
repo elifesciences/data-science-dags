@@ -248,7 +248,10 @@ def get_list_of_author_suggested_person_details_with_html_text(
             for person in result_of_person_details_from_bq
         ]
     )
-    return '<br />'.join(person_details)
+    if person_details != []:
+        return '<br />'.join(person_details)
+    else:
+        return NOT_PROVIDED
 
 
 def pick_person_id_from_bq_result(
