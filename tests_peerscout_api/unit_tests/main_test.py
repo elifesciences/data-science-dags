@@ -8,9 +8,11 @@ import pandas as pd
 # from werkzeug.wrappers.response import Response
 
 from peerscout_api.main import (
+    NOT_PROVIDED,
     create_app,
     get_html_text_for_recommended_person,
     get_html_text_for_author_suggested_person,
+    get_list_of_author_suggested_person_details_with_html_text,
     PersonProps,
     get_recommendation_html,
     RECOMMENDATION_HEADINGS,
@@ -379,6 +381,16 @@ class TestGetHtmlTextForAuthorSuggestedPerson:
             + INSTITUTION_HTML
         )
         assert get_html_text_for_author_suggested_person(person) == expected_result_of_html
+
+    def test_should_display_not_provided_when_there_is_no_author_suggestion(self):
+        expected_result_of_html = (
+            NOT_PROVIDED
+        )
+        assert (
+            get_list_of_author_suggested_person_details_with_html_text([])
+            ==
+            expected_result_of_html
+        )
 
     def test_should_only_have_person_name_if_there_is_no_institution(self):
         person = PersonProps(
