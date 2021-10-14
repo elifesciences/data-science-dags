@@ -25,4 +25,4 @@ def test_get_response_json():
         assert resp.status_code == 200
         LOGGER.info('reponse: %s', resp)
         resp_body = resp.json()
-        assert '<h4>' in resp_body['reviewing_editor_recommendation']['recommendation_html']
+        assert '<h4 style=' in resp_body['reviewing_editor_recommendation']['recommendation_html']

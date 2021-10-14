@@ -9,10 +9,6 @@ from google.cloud import bigquery
 from flask import Flask, jsonify, request
 from werkzeug.exceptions import BadRequest
 
-from elife_data_hub_utils.keyword_extract.spacy_keyword import (
-    DEFAULT_SPACY_LANGUAGE_MODEL_NAME
-)
-
 from elife_data_hub_utils.keyword_extract.extract_keywords import (
     get_keyword_extractor
 )
@@ -22,6 +18,8 @@ from peerscout_api.recommend_editor import (
     get_editor_recommendations_for_api
 )
 
+DEFAULT_SPACY_LANGUAGE_MODEL_NAME = "en_core_web_sm"
+SPACY_LANGUAGE_MODEL_NAME_ENV_VALUE = "SPACY_LANGUAGE_MODEL_NAME"
 
 DEPLOYMENT_ENV_ENV_NAME = "DEPLOYMENT_ENV"
 DEFAULT_DEPLOYMENT_ENV_VALUE = "ci"
@@ -37,10 +35,31 @@ DEFAULT_N_FOR_TOP_N_EDITORS = 3
 
 NO_RECOMMENDATION_TEXT = ' No recommendation available'
 NOT_PROVIDED = 'Not provided'
+
+EDITOR_TYPE_FOR_SENIOR_EDITOR = 'Senior'
+EDITOR_TYPE_FOR_REVIEWING_EDITOR = 'Reviewing'
+
+HEADING_STYLE = """
+    font-family:sans-serif;
+    color:black;
+    margin-bottom: 5px;
+    font-size: 1.02em;
+    font-weight: bold;
+"""
+
 RECOMMENDATION_HEADINGS = [
-    '<h4>Author&rsquo;s requests for Editor exclusions:</h4>',
-    '<h4>Author’s suggestions for Reviewing Editor:</h4>',
-    '<h4>Recommended Editors (based on keyword matching):</h4>']
+    (
+        '<h4 style="margin-top: 20px;'
+        + HEADING_STYLE
+        + '">Author Requested {editor_type} Editor Exclusions:</h4>'),
+    (
+        '<h4 style="margin-top: 15px;'
+        + HEADING_STYLE
+        + '">Author Suggested {editor_type} Editors:</h4>'),
+    (
+        '<h4 style="margin-top: 15px;'
+        + HEADING_STYLE
+        + '">Recommended {editor_type} Editors (based on keyword matching):</h4>')]
 
 RECOMMENDATION_HTML = RECOMMENDATION_HEADINGS[0] + '{excluded_editor_details}' + \
     RECOMMENDATION_HEADINGS[1] + '{included_editor_details}' + \
@@ -75,6 +94,13 @@ def get_deployment_env() -> str:
     return os.getenv(
         DEPLOYMENT_ENV_ENV_NAME,
         DEFAULT_DEPLOYMENT_ENV_VALUE
+    )
+
+
+def get_spacy_language_model_env() -> str:
+    return os.getenv(
+        SPACY_LANGUAGE_MODEL_NAME_ENV_VALUE,
+        DEFAULT_SPACY_LANGUAGE_MODEL_NAME
     )
 
 
@@ -135,9 +161,9 @@ def get_html_text_for_recommended_person(
         + (('<br /><span style=\'color:red;\'><strong>!</strong></span> Limited availability: '
             + person.availability) if person.availability else '')
         + ('<br />' if (person.website or person.pubmed) else '')
-        + (('<a href=' + person.website + '>Website</a>') if person.website else '')
+        + (('<a href=' + person.website + ' target="_blank">Website</a>') if person.website else '')
         + (' | ' if (person.website and person.pubmed) else '')
-        + (('<a href=' + person.pubmed + '>PubMed</a>') if person.pubmed else '')
+        + (('<a href=' + person.pubmed + ' target="_blank">PubMed</a>') if person.pubmed else '')
         + ('<br />' if (
             person.days_to_respond
             or person.requests
@@ -222,7 +248,10 @@ def get_list_of_author_suggested_person_details_with_html_text(
             for person in result_of_person_details_from_bq
         ]
     )
-    return '<br />'.join(person_details)
+    if person_details:
+        return '<br />'.join(person_details)
+    else:
+        return NOT_PROVIDED
 
 
 def pick_person_id_from_bq_result(
@@ -242,6 +271,7 @@ def add_html_formated_person_details_to_recommendation_html(
         author_suggestion_exclude_editor_ids: list,
         author_suggestion_include_editor_ids: list,
         recommended_person_ids: list,
+        editor_type: str
 ) -> str:
 
     all_editor_ids = (
@@ -279,35 +309,40 @@ def add_html_formated_person_details_to_recommendation_html(
     return RECOMMENDATION_HTML.format(
         excluded_editor_details=formated_suggested_exclude_editor_details,
         included_editor_details=formated_suggested_include_editor_details,
-        recommended_editor_details=formated_recommended_editor_details)
+        recommended_editor_details=formated_recommended_editor_details,
+        editor_type=editor_type)
 
 
 def get_recommendation_html(
         author_suggestion_exclude_editor_ids: list,
         author_suggestion_include_editor_ids: list,
-        recommended_person_ids: list
+        recommended_person_ids: list,
+        editor_type: str
 ) -> str:
     if not recommended_person_ids:
-        return NO_RECOMMENDATION_HTML
+        return NO_RECOMMENDATION_HTML.format(editor_type=editor_type)
 
     return add_html_formated_person_details_to_recommendation_html(
         author_suggestion_exclude_editor_ids=author_suggestion_exclude_editor_ids,
         author_suggestion_include_editor_ids=author_suggestion_include_editor_ids,
-        recommended_person_ids=recommended_person_ids
+        recommended_person_ids=recommended_person_ids,
+        editor_type=editor_type
     )
 
 
 def get_recommendation_json(
         recommended_person_ids: list,
         author_suggestion_exclude_editor_ids: list,
-        author_suggestion_include_editor_ids: list
+        author_suggestion_include_editor_ids: list,
+        editor_type: str
 ) -> dict:
     return {
        'person_ids': recommended_person_ids,
        'recommendation_html': get_recommendation_html(
             author_suggestion_exclude_editor_ids=author_suggestion_exclude_editor_ids,
             author_suggestion_include_editor_ids=author_suggestion_include_editor_ids,
-            recommended_person_ids=recommended_person_ids
+            recommended_person_ids=recommended_person_ids,
+            editor_type=editor_type
         )
     }
 
@@ -324,7 +359,7 @@ def get_response_json(
 
 def create_app():
     app = Flask(__name__)
-    keyword_extractor = get_keyword_extractor(DEFAULT_SPACY_LANGUAGE_MODEL_NAME)
+    keyword_extractor = get_keyword_extractor(get_spacy_language_model_env())
 
     MODEL_PATH = get_model_path(get_deployment_env())
     senior_editor_model_dict = load_model(MODEL_PATH, SENIOR_EDITOR_MODEL_NAME)
@@ -393,13 +428,15 @@ def create_app():
         json_response_for_senior_editors = get_recommendation_json(
             author_suggestion_exclude_editor_ids=author_suggestion_exclude_senior_editors,
             author_suggestion_include_editor_ids=author_suggestion_include_senior_editors,
-            recommended_person_ids=recommeded_senior_editor_ids
+            recommended_person_ids=recommeded_senior_editor_ids,
+            editor_type=EDITOR_TYPE_FOR_SENIOR_EDITOR
         )
 
         json_response_for_reviewing_editors = get_recommendation_json(
             author_suggestion_exclude_editor_ids=author_suggestion_exclude_reviewing_editors,
             author_suggestion_include_editor_ids=author_suggestion_include_reviewing_editors,
-            recommended_person_ids=recommeded_reviewing_editor_ids
+            recommended_person_ids=recommeded_reviewing_editor_ids,
+            editor_type=EDITOR_TYPE_FOR_REVIEWING_EDITOR
         )
 
         return jsonify(get_response_json(

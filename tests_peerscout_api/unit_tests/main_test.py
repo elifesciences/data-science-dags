@@ -8,13 +8,17 @@ import pandas as pd
 # from werkzeug.wrappers.response import Response
 
 from peerscout_api.main import (
+    NOT_PROVIDED,
     create_app,
     get_html_text_for_recommended_person,
     get_html_text_for_author_suggested_person,
+    get_list_of_author_suggested_person_details_with_html_text,
     PersonProps,
     get_recommendation_html,
     RECOMMENDATION_HEADINGS,
-    NO_RECOMMENDATION_HTML
+    NO_RECOMMENDATION_HTML,
+    EDITOR_TYPE_FOR_REVIEWING_EDITOR,
+    EDITOR_TYPE_FOR_SENIOR_EDITOR
 )
 
 import peerscout_api.main as target_module
@@ -63,6 +67,8 @@ NO_RECOMMENDATION_RESPONSE = {
     }
 }
 
+EDITOR_TYPE = 'EditorType1'
+
 RECOMMENDED_PERSON_IDS = ['id1', 'id2', 'id3']
 RECOMMENDED_NAMES = ['name1', 'name2', 'name3']
 SUGGESTED_PERSON_IDS_TO_INC = ['id4', 'id5']
@@ -75,8 +81,8 @@ AVAILABILITY_HTML = (
     "<br /><span style=\'color:red;\'><strong>!</strong></span>"
     + " Limited availability: Sundays only until 3th August 2021"
 )
-WEBSITE_HTML = "<a href=http://universityofnowhereland.edu>Website</a>"
-PUBMED_HTML = "<a href=http://universityofnowherelandpubmed.edu>PubMed</a>"
+WEBSITE_HTML = '<a href=http://universityofnowhereland.edu target="_blank">Website</a>'
+PUBMED_HTML = '<a href=http://universityofnowherelandpubmed.edu target="_blank">PubMed</a>'
 DAYS_TO_RESPOND_HTML = "Days to respond: 0.9"
 REQUESTS_HTML = "Requests: 13"
 RESPONSES_HTML = "Responses: 12"
@@ -97,14 +103,37 @@ def get_valid_recommendation_response():
             "recommendation_html": get_recommendation_html(
                 author_suggestion_exclude_editor_ids=SUGGESTED_PERSON_IDS_TO_EXC,
                 author_suggestion_include_editor_ids=SUGGESTED_PERSON_IDS_TO_INC,
-                recommended_person_ids=RECOMMENDED_PERSON_IDS)
+                recommended_person_ids=RECOMMENDED_PERSON_IDS,
+                editor_type=EDITOR_TYPE_FOR_REVIEWING_EDITOR)
         },
         "senior_editor_recommendation": {
             "person_ids": RECOMMENDED_PERSON_IDS,
             "recommendation_html": get_recommendation_html(
                 author_suggestion_exclude_editor_ids=SUGGESTED_PERSON_IDS_TO_EXC,
                 author_suggestion_include_editor_ids=SUGGESTED_PERSON_IDS_TO_INC,
-                recommended_person_ids=RECOMMENDED_PERSON_IDS)
+                recommended_person_ids=RECOMMENDED_PERSON_IDS,
+                editor_type=EDITOR_TYPE_FOR_SENIOR_EDITOR)
+        }
+    }
+
+
+def get_valid_no_recommendation_response():
+    return {
+        "reviewing_editor_recommendation": {
+            "person_ids": [],
+            "recommendation_html": get_recommendation_html(
+                author_suggestion_exclude_editor_ids=[],
+                author_suggestion_include_editor_ids=[],
+                recommended_person_ids=[],
+                editor_type=EDITOR_TYPE_FOR_REVIEWING_EDITOR)
+        },
+        "senior_editor_recommendation": {
+            "person_ids": [],
+            "recommendation_html": get_recommendation_html(
+                author_suggestion_exclude_editor_ids=[],
+                author_suggestion_include_editor_ids=[],
+                recommended_person_ids=[],
+                editor_type=EDITOR_TYPE_FOR_SENIOR_EDITOR)
         }
     }
 
@@ -162,14 +191,14 @@ class TestPeerscoutAPI:
         test_client: FlaskClient
     ):
         response = test_client.post('/api/peerscout', json=INPUT_DATA_WTIHOUT_ABSTRACT)
-        assert _get_ok_json(response) == NO_RECOMMENDATION_RESPONSE
+        assert _get_ok_json(response) == get_valid_no_recommendation_response()
 
     def test_should_respond_no_recomendation_with_weak_abstract(
         self,
         test_client: FlaskClient
     ):
         response = test_client.post('/api/peerscout', json=INPUT_DATA_WTIH_WEAK_ABSTRACT)
-        assert _get_ok_json(response) == NO_RECOMMENDATION_RESPONSE
+        assert _get_ok_json(response) == get_valid_no_recommendation_response()
 
     def test_should_respond_with_recomendation(
         self,
@@ -188,19 +217,23 @@ class TestGetRecommendationHtml:
         self
     ):
         for heading in RECOMMENDATION_HEADINGS:
+            heading = heading.format(editor_type=EDITOR_TYPE)
             assert heading in get_recommendation_html(
                 author_suggestion_exclude_editor_ids=[],
                 author_suggestion_include_editor_ids=[],
-                recommended_person_ids=[])
+                recommended_person_ids=[],
+                editor_type=EDITOR_TYPE)
 
     def test_should_have_recomendation_heading_when_the_recomendation_avaliable(
         self
     ):
         for heading in RECOMMENDATION_HEADINGS:
+            heading = heading.format(editor_type=EDITOR_TYPE)
             assert heading in get_recommendation_html(
                 author_suggestion_exclude_editor_ids=SUGGESTED_PERSON_IDS_TO_EXC,
                 author_suggestion_include_editor_ids=SUGGESTED_PERSON_IDS_TO_INC,
-                recommended_person_ids=RECOMMENDED_PERSON_IDS)
+                recommended_person_ids=RECOMMENDED_PERSON_IDS,
+                editor_type=EDITOR_TYPE)
 
 
 class TestGetHtmlTextForRecommendedPerson:
@@ -348,6 +381,16 @@ class TestGetHtmlTextForAuthorSuggestedPerson:
             + INSTITUTION_HTML
         )
         assert get_html_text_for_author_suggested_person(person) == expected_result_of_html
+
+    def test_should_display_not_provided_when_there_is_no_author_suggestion(self):
+        expected_result_of_html = (
+            NOT_PROVIDED
+        )
+        assert (
+            get_list_of_author_suggested_person_details_with_html_text([])
+            ==
+            expected_result_of_html
+        )
 
     def test_should_only_have_person_name_if_there_is_no_institution(self):
         person = PersonProps(
