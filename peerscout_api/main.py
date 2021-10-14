@@ -9,10 +9,6 @@ from google.cloud import bigquery
 from flask import Flask, jsonify, request
 from werkzeug.exceptions import BadRequest
 
-from elife_data_hub_utils.keyword_extract.spacy_keyword import (
-    DEFAULT_SPACY_LANGUAGE_MODEL_NAME
-)
-
 from elife_data_hub_utils.keyword_extract.extract_keywords import (
     get_keyword_extractor
 )
@@ -22,6 +18,8 @@ from peerscout_api.recommend_editor import (
     get_editor_recommendations_for_api
 )
 
+DEFAULT_SPACY_LANGUAGE_MODEL_NAME="en_core_web_sm"
+SPACY_LANGUAGE_MODEL_NAME_ENV_VALUE = "SPACY_LANGUAGE_MODEL_NAME"
 
 DEPLOYMENT_ENV_ENV_NAME = "DEPLOYMENT_ENV"
 DEFAULT_DEPLOYMENT_ENV_VALUE = "ci"
@@ -41,10 +39,27 @@ NOT_PROVIDED = 'Not provided'
 EDITOR_TYPE_FOR_SENIOR_EDITOR = 'Senior'
 EDITOR_TYPE_FOR_REVIEWING_EDITOR = 'Reviewing'
 
+HEADING_STYLE="""
+    font-family:sans-serif;
+    color:black;
+    margin-bottom: 5px;
+    font-size: 1.02em;
+    font-weight: bold;
+"""
+
 RECOMMENDATION_HEADINGS = [
-    '<h4>Author Requested {editor_type} Editor Exclusions:</h4>',
-    '<h4>Author Suggested {editor_type} Editors:</h4>',
-    '<h4>Recommended {editor_type} Editors (based on keyword matching):</h4>']
+    (
+        '<h4 style="margin-top: 20px;'
+        + HEADING_STYLE
+        + '">Author Requested {editor_type} Editor Exclusions:</h4>'),
+    (
+        '<h4 style="margin-top: 15px;'
+        + HEADING_STYLE
+        + '">Author Suggested {editor_type} Editors:</h4>'),
+    (
+        '<h4 style="margin-top: 15px;'
+        + HEADING_STYLE
+        + '">Recommended {editor_type} Editors (based on keyword matching):</h4>')]
 
 RECOMMENDATION_HTML = RECOMMENDATION_HEADINGS[0] + '{excluded_editor_details}' + \
     RECOMMENDATION_HEADINGS[1] + '{included_editor_details}' + \
@@ -79,6 +94,13 @@ def get_deployment_env() -> str:
     return os.getenv(
         DEPLOYMENT_ENV_ENV_NAME,
         DEFAULT_DEPLOYMENT_ENV_VALUE
+    )
+
+
+def get_spacy_language_model_env() -> str:
+    return os.getenv(
+        SPACY_LANGUAGE_MODEL_NAME_ENV_VALUE,
+        DEFAULT_SPACY_LANGUAGE_MODEL_NAME
     )
 
 
@@ -334,7 +356,7 @@ def get_response_json(
 
 def create_app():
     app = Flask(__name__)
-    keyword_extractor = get_keyword_extractor(DEFAULT_SPACY_LANGUAGE_MODEL_NAME)
+    keyword_extractor = get_keyword_extractor(get_spacy_language_model_env())
 
     MODEL_PATH = get_model_path(get_deployment_env())
     senior_editor_model_dict = load_model(MODEL_PATH, SENIOR_EDITOR_MODEL_NAME)
