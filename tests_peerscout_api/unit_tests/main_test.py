@@ -75,8 +75,8 @@ AVAILABILITY_HTML = (
     "<br /><span style=\'color:red;\'><strong>!</strong></span>"
     + " Limited availability: Sundays only until 3th August 2021"
 )
-WEBSITE_HTML = "<a href=http://universityofnowhereland.edu>Website</a>"
-PUBMED_HTML = "<a href=http://universityofnowherelandpubmed.edu>PubMed</a>"
+WEBSITE_HTML = '<a href=http://universityofnowhereland.edu target="_blank">Website</a>'
+PUBMED_HTML = '<a href=http://universityofnowherelandpubmed.edu target="_blank">PubMed</a>'
 DAYS_TO_RESPOND_HTML = "Days to respond: 0.9"
 REQUESTS_HTML = "Requests: 13"
 RESPONSES_HTML = "Responses: 12"
