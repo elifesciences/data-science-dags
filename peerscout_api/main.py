@@ -18,7 +18,7 @@ from peerscout_api.recommend_editor import (
     get_editor_recommendations_for_api
 )
 
-DEFAULT_SPACY_LANGUAGE_MODEL_NAME="en_core_web_sm"
+DEFAULT_SPACY_LANGUAGE_MODEL_NAME = "en_core_web_sm"
 SPACY_LANGUAGE_MODEL_NAME_ENV_VALUE = "SPACY_LANGUAGE_MODEL_NAME"
 
 DEPLOYMENT_ENV_ENV_NAME = "DEPLOYMENT_ENV"
@@ -39,7 +39,7 @@ NOT_PROVIDED = 'Not provided'
 EDITOR_TYPE_FOR_SENIOR_EDITOR = 'Senior'
 EDITOR_TYPE_FOR_REVIEWING_EDITOR = 'Reviewing'
 
-HEADING_STYLE="""
+HEADING_STYLE = """
     font-family:sans-serif;
     color:black;
     margin-bottom: 5px;
