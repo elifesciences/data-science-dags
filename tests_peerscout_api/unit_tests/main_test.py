@@ -213,7 +213,7 @@ class TestPeerscoutAPI:
 class TestGetRecommendationHtml:
     def test_should_have_recomendation_heading_when_the_recomendation_not_avaliable(
         self
-    ):  
+    ):
         for heading in RECOMMENDATION_HEADINGS:
             heading = heading.format(editor_type=EDITOR_TYPE)
             assert heading in get_recommendation_html(
