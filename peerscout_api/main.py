@@ -135,9 +135,9 @@ def get_html_text_for_recommended_person(
         + (('<br /><span style=\'color:red;\'><strong>!</strong></span> Limited availability: '
             + person.availability) if person.availability else '')
         + ('<br />' if (person.website or person.pubmed) else '')
-        + (('<a href=' + person.website + '>Website</a>') if person.website else '')
+        + (('<a href=' + person.website + ' target="_blank">Website</a>') if person.website else '')
         + (' | ' if (person.website and person.pubmed) else '')
-        + (('<a href=' + person.pubmed + '>PubMed</a>') if person.pubmed else '')
+        + (('<a href=' + person.pubmed + ' target="_blank">PubMed</a>') if person.pubmed else '')
         + ('<br />' if (
             person.days_to_respond
             or person.requests
