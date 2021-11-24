@@ -39,9 +39,9 @@ NOT_PROVIDED = 'Not provided'
 EDITOR_TYPE_FOR_SENIOR_EDITOR = 'Senior'
 EDITOR_TYPE_FOR_REVIEWING_EDITOR = 'Reviewing'
 
-HEADING_STYLE = """
-font-family:sans-serif; color:black; margin-bottom:5px; font-size:1.02em; font-weight:bold;
-"""
+HEADING_STYLE = (
+    "font-family:sans-serif; color:black; margin-bottom:5px; font-size:1.02em; font-weight:bold;"
+)
 
 RECOMMENDATION_HEADINGS = [
     (
