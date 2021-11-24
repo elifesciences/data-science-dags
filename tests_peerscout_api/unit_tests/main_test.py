@@ -216,24 +216,38 @@ class TestGetRecommendationHtml:
     def test_should_have_recomendation_heading_when_the_recomendation_not_avaliable(
         self
     ):
-        for heading in RECOMMENDATION_HEADINGS:
-            heading = heading.format(editor_type=EDITOR_TYPE)
-            assert heading in get_recommendation_html(
+        result_recommendation_html = get_recommendation_html(
                 author_suggestion_exclude_editor_ids=[],
                 author_suggestion_include_editor_ids=[],
                 recommended_person_ids=[],
-                editor_type=EDITOR_TYPE)
+                editor_type=EDITOR_TYPE
+        )
+        for heading in RECOMMENDATION_HEADINGS:
+            heading = heading.format(editor_type=EDITOR_TYPE)
+            assert heading in result_recommendation_html
 
     def test_should_have_recomendation_heading_when_the_recomendation_avaliable(
         self
     ):
+        result_recommendation_html = get_recommendation_html(
+            author_suggestion_exclude_editor_ids=SUGGESTED_PERSON_IDS_TO_EXC,
+            author_suggestion_include_editor_ids=SUGGESTED_PERSON_IDS_TO_INC,
+            recommended_person_ids=RECOMMENDED_PERSON_IDS,
+            editor_type=EDITOR_TYPE
+        )
         for heading in RECOMMENDATION_HEADINGS:
             heading = heading.format(editor_type=EDITOR_TYPE)
-            assert heading in get_recommendation_html(
-                author_suggestion_exclude_editor_ids=SUGGESTED_PERSON_IDS_TO_EXC,
-                author_suggestion_include_editor_ids=SUGGESTED_PERSON_IDS_TO_INC,
-                recommended_person_ids=RECOMMENDED_PERSON_IDS,
-                editor_type=EDITOR_TYPE)
+            assert heading in result_recommendation_html
+
+    def test_should_not_contain_line_feed_in_recommendation_html(self):
+        result_recommendation_html = get_recommendation_html(
+            author_suggestion_exclude_editor_ids=SUGGESTED_PERSON_IDS_TO_EXC,
+            author_suggestion_include_editor_ids=SUGGESTED_PERSON_IDS_TO_INC,
+            recommended_person_ids=RECOMMENDED_PERSON_IDS,
+            editor_type=EDITOR_TYPE
+        )
+        for heading in RECOMMENDATION_HEADINGS:
+            assert "\n" not in result_recommendation_html
 
 
 class TestGetHtmlTextForRecommendedPerson:
