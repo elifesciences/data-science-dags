@@ -246,7 +246,7 @@ class TestGetRecommendationHtml:
             recommended_person_ids=RECOMMENDED_PERSON_IDS,
             editor_type=EDITOR_TYPE
         )
-        for heading in RECOMMENDATION_HEADINGS:
+        for _ in RECOMMENDATION_HEADINGS:
             assert "\n" not in result_recommendation_html
 
 
