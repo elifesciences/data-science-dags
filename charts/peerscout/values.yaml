@@ -83,3 +83,19 @@ env: {}
 
 volumeMounts: []
 volumes: []    
+
+livenessProbe:
+  httpGet:
+    path: /api/status
+    port: http
+  initialDelaySeconds: 5
+  timeoutSeconds: 30
+  periodSeconds: 30
+
+readinessProbe:
+  httpGet:
+    path: /api/status
+    port: http
+  initialDelaySeconds: 5
+  timeoutSeconds: 30
+  periodSeconds: 10
