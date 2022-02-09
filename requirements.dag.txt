@@ -8,3 +8,5 @@ zope.deprecation==4.4.0
 zict==2.0.0
 zipp==3.4.0
 Werkzeug==0.16.1
+tqdm==4.62.0
+traitlets==5.1.1
