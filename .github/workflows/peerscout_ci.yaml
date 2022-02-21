@@ -21,4 +21,4 @@ jobs:
       - id: validate
         uses: elifesciences/helm-validator-action@master
         with:
-          chartPath: 'charts/peerscout'
+          chartPath: 'charts/peerscout/**'
