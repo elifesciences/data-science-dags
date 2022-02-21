@@ -8,10 +8,10 @@ on:
     tags:
       - v*
     paths:
-      - 'charts/peerscout'
+      - 'charts/peerscout/**'
   pull_request:
     paths:
-      - 'charts/peerscout'
+      - 'charts/peerscout/**'
 
 jobs:
   ci:
@@ -21,4 +21,4 @@ jobs:
       - id: validate
         uses: elifesciences/helm-validator-action@master
         with:
-          chartPath: 'charts/peerscout/**'
+          chartPath: 'charts/peerscout'
