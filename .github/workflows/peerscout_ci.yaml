@@ -1,0 +1,24 @@
+name: Peerscout Chart CI
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+    tags:
+      - v*
+    paths:
+      - 'charts/peerscout'
+  pull_request:
+    paths:
+      - 'charts/peerscout'
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - id: validate
+        uses: elifesciences/helm-validator-action@master
+        with:
+          chartPath: 'charts/peerscout'
