@@ -82,3 +82,8 @@ def to_csv(
     if compression == 'gzip':
         data = gzip.compress(data)
     write_bytes(filepath, data)
+
+
+def dataframe_chunk(seq, size):
+    for pos in range(0, len(seq), size):
+        yield seq.iloc[pos:pos + size]
