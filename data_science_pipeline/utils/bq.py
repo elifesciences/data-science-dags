@@ -193,7 +193,7 @@ def get_bq_write_disposition(if_exists: str) -> WriteDisposition:
     raise ValueError('unsupported if_exists: %s' % if_exists)
 
 
-def iter_json_without_null_from_df(df: pd.DataFrame, batch_size: int = 5000 ) -> Iterable[dict]:
+def iter_json_without_null_from_df(df: pd.DataFrame, batch_size: int = 5000) -> Iterable[dict]:
     for df_batch in dataframe_chunk(df, batch_size):
         json_list = df_batch.to_dict(orient='records')
         LOGGER.info('[df.to_dict] length of json_list: %s', len(json_list))
