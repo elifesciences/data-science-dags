@@ -29,6 +29,7 @@ from data_science_pipeline.utils.bq_schema import (
     get_schemafield_list_from_json_list,
     create_or_extend_table_schema
 )
+from data_science_pipeline.utils.pandas import dataframe_chunk
 
 
 LOGGER = logging.getLogger(__name__)
@@ -192,10 +193,18 @@ def get_bq_write_disposition(if_exists: str) -> WriteDisposition:
     raise ValueError('unsupported if_exists: %s' % if_exists)
 
 
+def iter_json_without_null_from_df(df: pd.DataFrame, batch_size: int = 5000) -> Iterable[dict]:
+    for df_batch in dataframe_chunk(df, batch_size):
+        json_list = df_batch.to_dict(orient='records')
+        LOGGER.info('[df.to_dict] length of json_list: %s', len(json_list))
+        json_list = remove_key_with_null_value(json_list)
+        yield from json_list
+
+
 @contextmanager
 def df_as_jsonl_file_without_null(df: pd.DataFrame, **kwargs) -> ContextManager[str]:
-    json_list = remove_key_with_null_value(df.to_dict(orient='records'))
-    with json_list_as_jsonl_file(json_list, **kwargs) as jsonl_file:
+    json_iterable = iter_json_without_null_from_df(df)
+    with json_list_as_jsonl_file(json_iterable, **kwargs) as jsonl_file:
         yield jsonl_file
 
 
@@ -208,6 +217,7 @@ def to_gbq(
     """Similar to DataFrame.to_gpq but better handles schema detection of nested fields"""
     dataset_name, table_name = destination_table.split('.', maxsplit=1)
     with df_as_jsonl_file_without_null(df, jsonl_file=jsonl_file) as _jsonl_file:
+        LOGGER.info("Loading dataframe %s to BQ table %s ...", df, destination_table)
         load_file_into_bq_with_auto_schema(
             _jsonl_file,
             dataset_name=dataset_name,
