@@ -118,6 +118,7 @@ def load_file_into_bq_with_auto_schema(
         dataset_name, table_name = get_validated_dataset_name_table_name(
             dataset_name, table_name
         )
+        LOGGER.info('creating or extending table %s.%s schema', dataset_name, table_name)
         create_or_extend_table_schema(
             gcp_project=project_id,
             dataset_name=dataset_name,
@@ -125,6 +126,7 @@ def load_file_into_bq_with_auto_schema(
             full_file_location=jsonl_file,
             quoted_values_are_strings=True
         )
+        LOGGER.info('loading the data to the table : %s.%s', dataset_name, table_name)
         load_file_into_bq(
             jsonl_file,
             project_id=project_id,
