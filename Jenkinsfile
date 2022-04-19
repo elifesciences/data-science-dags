@@ -7,6 +7,9 @@ elifePipeline {
         stage 'Checkout', {
             checkout scm
             commit = elifeGitRevision()
+            commitShort = elifeGitRevision().substring(0, 8)
+            branch = sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
+            timestamp = sh(script: 'date --utc +%Y%m%d.%H%M', returnStdout: true).trim()
             git_url = getGitUrl()
         }
 
@@ -36,6 +39,7 @@ elifePipeline {
                 def image = DockerImage.elifesciences(this, 'data-science-dags_peerscout-api', commit)
                 def unstable_image = image.addSuffixAndTag('_unstable', commit)
                 unstable_image.tag('latest').push()
+                unstable_image.tag("${branch}-${commitShort}-${timestamp}").push()
                 unstable_image.push()
             }
             stage 'Build data pipeline image with latest commit', {
