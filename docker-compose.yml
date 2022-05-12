@@ -56,9 +56,7 @@ services:
 
   webserver:
     depends_on:
-      - postgres
-      - dask-worker
-      - dask-scheduler
+      - worker
     environment: *airflow-env
     image: elifesciences/data-science-airflow-dag:${IMAGE_TAG}
     entrypoint: /entrypoint
@@ -67,7 +65,7 @@ services:
   scheduler:
     image: elifesciences/data-science-airflow-dag:${IMAGE_TAG}
     depends_on:
-      - webserver
+      - postgres
     environment: *airflow-env
     entrypoint: /entrypoint
     command: scheduler
@@ -76,10 +74,24 @@ services:
     image: elifesciences/data-science-airflow-dag:${IMAGE_TAG}
     depends_on:
       - scheduler
+      - webserver
     environment: *airflow-env
     command: >
       bash -c "sudo install -D /tmp/credentials.json -m 644 -t  /home/airflow/.config/gcloud
       && ./run_test.sh with-end-to-end"
+    
+  worker:
+    environment: *airflow-env
+    depends_on:
+      - redis
+      - scheduler
+    image: elifesciences/data-science-airflow-dag:${IMAGE_TAG}
+    entrypoint: /entrypoint
+    hostname: worker
+    command: >
+        bash -c "sudo install -D /tmp/credentials.json -m 644 -t /home/airflow/.config/gcloud
+        && sudo install -D /tmp/.aws-credentials -m 644 --no-target-directory /home/airflow/.aws/credentials
+        && airflow worker"
 
   postgres:
     image: postgres:9.6
@@ -92,25 +104,19 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+  redis:
+    image: redis:5.0.5
+    environment:
+        - ALLOW_EMPTY_PASSWORD=yes
 
-  dask-scheduler:
-    environment: *airflow-env
-    image: elifesciences/data-science-airflow-dag:${IMAGE_TAG}
-    hostname: dask-scheduler
-    entrypoint: [ ]
-    command: ["dask-scheduler"]
-
-  dask-worker:
-    environment: *airflow-env
+  flower:
+    image: elifesciences/data-hub-ejp-xml-pipeline-dev
     depends_on:
-      - dask-scheduler
-    image: elifesciences/data-science-airflow-dag:${IMAGE_TAG}
-    hostname: dask-worker
-    entrypoint: []
-    command: >
-      bash -c "sudo install -D /tmp/credentials.json -m 644 -t /home/airflow/.config/gcloud
-      && sudo install -D /tmp/.aws-credentials -m 644 --no-target-directory /home/airflow/.aws/credentials
-      && ./worker.sh tcp://dask-scheduler:8786"
+        - redis
+    environment: *airflow-env
+    ports:
+        - "5555:5555"
+    command: celery flower
 
   peerscout-api:
     build:
