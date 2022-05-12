@@ -51,9 +51,6 @@ COPY --chown=airflow:airflow run_test.sh ./
 
 RUN if [ "${install_dev}" = "y" ]; then chmod +x run_test.sh; fi
 
-COPY --chown=airflow:airflow worker.sh ./
-RUN chmod +x worker.sh
-
 COPY notebooks/example.ipynb ./applications_file_directory/notebooks/example.ipynb
 
 RUN mkdir -p $AIRFLOW_HOME/serve
