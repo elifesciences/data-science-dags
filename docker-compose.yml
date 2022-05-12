@@ -6,10 +6,11 @@ x-airflow-env:
   - LOAD_EX=n
   - AIRFLOW_HOST=webserver
   - AIRFLOW_PORT=8080
-  - AIRFLOW__CORE__EXECUTOR=DaskExecutor
+  - AIRFLOW__CORE__EXECUTOR=CeleryExecutor
+  - AIRFLOW__CELERY__BROKER_URL=redis://redis:6379/1
+  - AIRFLOW__CELERY__RESULT_BACKEND=db+postgresql://airflow:airflow@postgres:5432/airflow
   - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
   - AIRFLOW__CORE__FERNET_KEY='81HqDtbqAywKSOumSha3BhWNOdQ26slT6K0YaZeZyPs='
-  - AIRFLOW__DASK__CLUSTER_ADDRESS=dask-scheduler:8786
   - AIRFLOW__API__AUTH_BACKEND=airflow.api.auth.backend.default
   - DEPLOYMENT_ENV=ci
   - GOOGLE_APPLICATION_CREDENTIALS=/home/airflow/.config/gcloud/credentials.json
@@ -54,9 +55,7 @@ services:
 
   webserver:
     depends_on:
-      - postgres
-      - dask-worker
-      - dask-scheduler
+      - worker
     environment: *airflow-env
     image: elifesciences/data-science-airflow-dag:${IMAGE_TAG}
     entrypoint: /entrypoint
@@ -65,7 +64,7 @@ services:
   scheduler:
     image: elifesciences/data-science-airflow-dag:${IMAGE_TAG}
     depends_on:
-      - webserver
+      - postgres
     environment: *airflow-env
     entrypoint: /entrypoint
     command: scheduler
@@ -74,10 +73,24 @@ services:
     image: elifesciences/data-science-airflow-dag:${IMAGE_TAG}
     depends_on:
       - scheduler
+      - webserver
     environment: *airflow-env
     command: >
       bash -c "sudo install -D /tmp/credentials.json -m 644 -t  /home/airflow/.config/gcloud
       && ./run_test.sh with-end-to-end"
+    
+  worker:
+    environment: *airflow-env
+    depends_on:
+      - redis
+      - scheduler
+    image: elifesciences/data-science-airflow-dag:${IMAGE_TAG}
+    entrypoint: /entrypoint
+    hostname: worker
+    command: >
+        bash -c "sudo install -D /tmp/credentials.json -m 644 -t /home/airflow/.config/gcloud
+        && sudo install -D /tmp/.aws-credentials -m 644 --no-target-directory /home/airflow/.aws/credentials
+        && airflow worker"
 
   postgres:
     image: postgres:9.6
@@ -86,29 +99,23 @@ services:
       - POSTGRES_PASSWORD=airflow
       - POSTGRES_DB=airflow
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U airflow"]
       interval: 5s
       timeout: 5s
       retries: 5
+  redis:
+    image: redis:5.0.5
+    environment:
+        - ALLOW_EMPTY_PASSWORD=yes
 
-  dask-scheduler:
-    environment: *airflow-env
-    image: elifesciences/data-science-airflow-dag:${IMAGE_TAG}
-    hostname: dask-scheduler
-    entrypoint: [ ]
-    command: ["dask-scheduler"]
-
-  dask-worker:
-    environment: *airflow-env
+  flower:
+    image: elifesciences/data-hub-ejp-xml-pipeline-dev
     depends_on:
-      - dask-scheduler
-    image: elifesciences/data-science-airflow-dag:${IMAGE_TAG}
-    hostname: dask-worker
-    entrypoint: []
-    command: >
-      bash -c "sudo install -D /tmp/credentials.json -m 644 -t /home/airflow/.config/gcloud
-      && sudo install -D /tmp/.aws-credentials -m 644 --no-target-directory /home/airflow/.aws/credentials
-      && ./worker.sh tcp://dask-scheduler:8786"
+        - redis
+    environment: *airflow-env
+    ports:
+        - "5555:5555"
+    command: celery flower
 
   peerscout-api:
     build:

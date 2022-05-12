@@ -245,20 +245,12 @@ airflow-scheduler-exec:
 	$(AIRFLOW_DOCKER_COMPOSE) exec scheduler bash
 
 
-airflow-dask-worker-shell:
-	$(AIRFLOW_DOCKER_COMPOSE) run --rm dask-worker bash
-
-
-airflow-dask-worker-exec:
-	$(AIRFLOW_DOCKER_COMPOSE) exec dask-worker bash
-
-
 airflow-logs:
-	$(AIRFLOW_DOCKER_COMPOSE) logs -f scheduler webserver dask-worker
+	$(AIRFLOW_DOCKER_COMPOSE) logs -f scheduler webserver worker
 
 
 airflow-start:
-	$(AIRFLOW_DOCKER_COMPOSE) up -d --scale dask-worker=1 scheduler
+	$(AIRFLOW_DOCKER_COMPOSE) up worker webserver flower
 	$(MAKE) airflow-print-url
 
 
