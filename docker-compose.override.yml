@@ -19,7 +19,7 @@ services:
   scheduler:
     volumes: *airflow-volumes
 
-  dask-worker:
+  worker:
     environment:
       - DEPLOYMENT_ENV=dev
     volumes: *airflow-volumes
