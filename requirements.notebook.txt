@@ -1,5 +1,5 @@
 beautifulsoup4==4.9.3
-bigquery-schema-generator==1.4
+bigquery-schema-generator==1.5
 boto3==1.19.8
 botocore<1.23.0, >=1.22.0
 cattrs==1.7.1
@@ -10,7 +10,7 @@ lxml==4.6.5
 pandas-gbq==0.15.0
 pyarrow==4.0.1
 PyICU==2.7.4
-google-cloud-bigquery>=2.23.2
+google-cloud-bigquery>=2.26.0
 s3path==0.3.2
 scikit-learn==0.24.2
 six==1.16.0
