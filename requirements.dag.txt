@@ -1,4 +1,4 @@
-apache-airflow[crypto,celery,postgres,jdbc,ssh]==1.10.15
+apache-airflow[crypto,celery,postgres,jdbc,ssh]==2.3.0
 papermill==2.3.3
 click==7.1.2
 ansiwrap==0.8.4
