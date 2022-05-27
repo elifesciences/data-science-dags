@@ -58,6 +58,8 @@ services:
     depends_on:
       - worker
     environment: *airflow-env
+    volumes:
+      - ./config/webserver_config.py:/opt/airflow/webserver_config.py
     image: elifesciences/data-science-airflow-dag:${IMAGE_TAG}
     entrypoint: /entrypoint
     command: webserver
