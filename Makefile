@@ -313,7 +313,7 @@ clean:
 	$(DOCKER_COMPOSE) down -v
 
 airflow-initdb:
-	$(DOCKER_COMPOSE) run --rm  webserver initdb
+	$(DOCKER_COMPOSE) run --rm  webserver db init
 
 
 ci-test-exclude-e2e:
