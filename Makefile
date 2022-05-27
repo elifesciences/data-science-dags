@@ -312,6 +312,9 @@ peerscout-api-dev-test: \
 clean:
 	$(DOCKER_COMPOSE) down -v
 
+airflow-db-upgrade:
+	$(DOCKER_COMPOSE) run --rm  webserver db upgrade
+
 airflow-initdb:
 	$(DOCKER_COMPOSE) run --rm  webserver db init
 
