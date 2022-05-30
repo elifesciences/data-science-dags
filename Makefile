@@ -57,6 +57,7 @@ dev-install:
 	$(PIP) install --disable-pip-version-check -r requirements.dev.txt
 	$(PIP) install --disable-pip-version-check -r requirements.jupyter.txt
 	$(PIP) install --disable-pip-version-check -r requirements.notebook.txt
+	$(PIP) install --disable-pip-version-check -r requirements.fbprophet.txt
 	$(PIP) install --disable-pip-version-check -r requirements.dag.txt
 	$(PIP) install --disable-pip-version-check -e . --no-deps
 
@@ -312,8 +313,11 @@ peerscout-api-dev-test: \
 clean:
 	$(DOCKER_COMPOSE) down -v
 
+airflow-db-upgrade:
+	$(DOCKER_COMPOSE) run --rm  webserver db upgrade
+
 airflow-initdb:
-	$(DOCKER_COMPOSE) run --rm  webserver initdb
+	$(DOCKER_COMPOSE) run --rm  webserver db init
 
 
 ci-test-exclude-e2e:

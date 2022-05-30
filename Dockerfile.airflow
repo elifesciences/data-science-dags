@@ -1,4 +1,4 @@
-FROM apache/airflow:1.10.15-python3.7
+FROM apache/airflow:2.3.0-python3.7
 ARG install_dev=n
 
 USER root
@@ -29,7 +29,7 @@ RUN pip install --disable-pip-version-check -r requirements.notebook.txt \
 COPY requirements.fbprophet.txt ./
 RUN pip install --disable-pip-version-check -r requirements.fbprophet.txt
 
-COPY --chown=airflow:airflow requirements.dev.txt ./
+COPY requirements.dev.txt ./
 RUN if [ "${install_dev}" = "y" ]; then \
     pip install --disable-pip-version-check --user -r requirements.dev.txt; \
   fi
@@ -39,17 +39,15 @@ ENV PATH /home/airflow/.local/bin:$PATH
 RUN mkdir $AIRFLOW_HOME/applications_file_directory
 ENV AIRFLOW_APPLICATIONS_DIRECTORY_PATH $AIRFLOW_HOME/applications_file_directory
 
-COPY --chown=airflow:airflow data_science_pipeline ./data_science_pipeline
-COPY --chown=airflow:airflow dags ./dags
-COPY --chown=airflow:airflow setup.py ./setup.py
+COPY data_science_pipeline ./data_science_pipeline
+COPY dags ./dags
+COPY setup.py ./setup.py
 
 RUN pip install --disable-pip-version-check -e . --user --no-dependencies
 
 COPY .pylintrc .flake8 ./
-COPY --chown=airflow:airflow tests ./tests
-COPY --chown=airflow:airflow run_test.sh ./
-
-RUN if [ "${install_dev}" = "y" ]; then chmod +x run_test.sh; fi
+COPY tests ./tests
+COPY run_test.sh ./
 
 COPY notebooks/example.ipynb ./applications_file_directory/notebooks/example.ipynb
 
