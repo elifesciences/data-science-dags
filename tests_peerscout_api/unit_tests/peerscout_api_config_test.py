@@ -1,6 +1,5 @@
 from peerscout_api.peerscout_api_config import PeerscoutApiConfig
 
-
 PROJECT_NAME = 'project_1'
 DATASET_NAME = 'dataset_1'
 TABLE_NAME = 'table_1'
@@ -14,6 +13,7 @@ TARGET_CONFIG = {
 ITEM_CONFIG_DICT = {
     'target': TARGET_CONFIG
 }
+
 
 def get_config_for_item_config_dict(item_dict: dict) -> dict:
     return {'peerscoutApi': [item_dict]}
