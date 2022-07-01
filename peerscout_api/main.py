@@ -1,7 +1,9 @@
+from datetime import datetime, timezone
 import os
 import json
 import logging
 import html
+from tempfile import TemporaryDirectory
 from typing import NamedTuple, Optional
 import jsonschema
 
@@ -9,6 +11,7 @@ from google.cloud.bigquery import Client
 from google.cloud import bigquery
 from flask import Flask, jsonify, request
 from werkzeug.exceptions import BadRequest
+from data_science_pipeline.utils.bq import load_given_json_list_data_from_tempdir_to_bq
 
 from elife_data_hub_utils.keyword_extract.extract_keywords import (
     get_keyword_extractor
@@ -29,6 +32,8 @@ DEFAULT_STATE_PATH_FORMAT = (
     "s3://{env}-elife-data-pipeline/airflow-config/data-science/state"
 )
 REQUEST_JSON_SCHEMA_PATH = os.path.join(os.path.dirname(__file__), 'input-json-schema.json')
+
+TARGET_TABLE_NAME = 'peerscout_api_reviewer_recommendations'
 
 SENIOR_EDITOR_MODEL_NAME = 'senior_editor_model.joblib'
 REVIEWING_EDITOR_MODEL_NAME = 'reviewing_editor_model.joblib'
@@ -85,6 +90,13 @@ class PersonProps(NamedTuple):
     no_of_assigments: Optional[str] = None
     no_of_full_submissions: Optional[str] = None
     decision_time: Optional[str] = None
+
+
+def get_current_timestamp_as_string(
+        time_format: str = "%Y-%m-%dT%H:%M:%SZ"
+):
+    dtobj = datetime.now(timezone.utc)
+    return dtobj.strftime(time_format)
 
 
 def get_deployment_env() -> str:
@@ -356,6 +368,18 @@ def get_response_json(
         }
 
 
+def write_peerscout_api_response_to_bq(recommendation_reponse: dict):
+    PROJECT_NAME = 'elife-data-pipeline'
+    DATASET_NAME = get_deployment_env()
+
+    load_given_json_list_data_from_tempdir_to_bq(
+        project_name=PROJECT_NAME,
+        dataset_name=DATASET_NAME,
+        table_name=TARGET_TABLE_NAME,
+        json_list=[recommendation_reponse],
+    )
+
+
 def create_app():
     app = Flask(__name__)
     keyword_extractor = get_keyword_extractor(get_spacy_language_model_env())
@@ -438,10 +462,14 @@ def create_app():
             editor_type=EDITOR_TYPE_FOR_REVIEWING_EDITOR
         )
 
-        return jsonify(get_response_json(
+        api_json_response = get_response_json(
             senior_editor_recommendation_json=json_response_for_senior_editors,
             reviewing_editor_recommendation_json=json_response_for_reviewing_editors
-        ))
+        )
+
+        write_peerscout_api_response_to_bq(api_json_response)
+
+        return jsonify(api_json_response)
 
     return app
 
