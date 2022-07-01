@@ -371,6 +371,10 @@ def get_response_json(
 def write_peerscout_api_response_to_bq(recommendation_reponse: dict):
     PROJECT_NAME = 'elife-data-pipeline'
     DATASET_NAME = get_deployment_env()
+    provenance = {
+        'provenance':{'imported_timestamp': get_current_timestamp_as_string()}
+    }
+    recommendation_reponse.update(provenance)
 
     load_given_json_list_data_from_tempdir_to_bq(
         project_name=PROJECT_NAME,
