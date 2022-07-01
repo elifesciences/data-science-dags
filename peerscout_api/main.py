@@ -3,7 +3,6 @@ import os
 import json
 import logging
 import html
-from tempfile import TemporaryDirectory
 from typing import NamedTuple, Optional
 import jsonschema
 
