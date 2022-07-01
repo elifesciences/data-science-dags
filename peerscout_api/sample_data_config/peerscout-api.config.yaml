@@ -1,0 +1,6 @@
+peerscoutApi:
+  - dataPipelineId: peerscout-api
+    target:
+      projectName: 'elife-data-pipeline'
+      datasetName: '{ENV}'
+      tableName: peerscout_api_reviewer_recommendations
