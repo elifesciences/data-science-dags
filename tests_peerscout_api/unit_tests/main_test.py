@@ -144,6 +144,12 @@ def _query_bq_for_person_details_mock() -> MagicMock:
         yield mock
 
 
+@pytest.fixture(name='load_given_json_list_data_from_tempdir_to_bq_mock', autouse=True)
+def _load_given_json_list_data_from_tempdir_to_bq_mock() -> MagicMock:
+    with patch.object(target_module, 'load_given_json_list_data_from_tempdir_to_bq') as mock:
+        yield mock
+
+
 @pytest.fixture(name='get_editor_recommendations_for_api_mock', autouse=True)
 def _get_editor_recommendations_for_api_mock() -> MagicMock:
     with patch.object(target_module, 'get_editor_recommendations_for_api') as mock:
