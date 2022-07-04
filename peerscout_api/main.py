@@ -10,11 +10,12 @@ from google.cloud.bigquery import Client
 from google.cloud import bigquery
 from flask import Flask, jsonify, request
 from werkzeug.exceptions import BadRequest
-from data_science_pipeline.utils.bq import load_given_json_list_data_from_tempdir_to_bq
 
 from elife_data_hub_utils.keyword_extract.extract_keywords import (
     get_keyword_extractor
 )
+
+from data_science_pipeline.utils.bq import load_given_json_list_data_from_tempdir_to_bq
 
 from peerscout_api.recommend_editor import (
     load_model,
