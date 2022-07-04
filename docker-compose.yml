@@ -129,6 +129,7 @@ services:
     image: elifesciences/data-science-dags_peerscout-api:${IMAGE_TAG}
     environment:
       - PEERSCOUT_API_URL=http://peerscout-api:8080/api/peerscout
+      - GOOGLE_APPLICATION_CREDENTIALS=/home/airflow/.config/gcloud/credentials.json
 
   peerscout-api-dev:
     build:
@@ -138,6 +139,7 @@ services:
     image: elifesciences/data-science-dags_peerscout-api_dev:${IMAGE_TAG}
     environment: 
       - PEERSCOUT_API_URL=http://peerscout-api:8080/api/peerscout
+      - GOOGLE_APPLICATION_CREDENTIALS=/home/airflow/.config/gcloud/credentials.json
   
   wait-for-it:
     image: willwill/wait-for-it
