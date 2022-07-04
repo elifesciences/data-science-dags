@@ -263,34 +263,3 @@ def run_query_and_save_to_table(  # pylint: disable=too-many-arguments
     if LOGGER.isEnabledFor(logging.DEBUG):
         sample_result = list(islice(result, 3))
         LOGGER.debug("sample_result: %s", sample_result)
-
-
-def load_given_json_list_data_from_tempdir_to_bq(
-    project_name: str,
-    dataset_name: str,
-    table_name: str,
-    json_list: Iterable[Any]
-):
-    with TemporaryDirectory() as tmp_dir:
-        filename = os.path.join(tmp_dir, 'tmp_file.json')
-        write_jsonl_to_file(
-            json_list=json_list,
-            full_temp_file_location=filename,
-        )
-        if os.path.getsize(filename) > 0:
-            create_or_extend_table_schema(
-                gcp_project=project_name,
-                dataset_name=dataset_name,
-                table_name=table_name,
-                full_file_location=filename,
-                quoted_values_are_strings=True
-            )
-            load_file_into_bq(
-                project_id=project_name,
-                dataset_name=dataset_name,
-                table_name=table_name,
-                filename=filename
-            )
-            LOGGER.info('Loaded table: %s', table_name)
-        else:
-            LOGGER.info('No updates found for the table: %s', table_name)

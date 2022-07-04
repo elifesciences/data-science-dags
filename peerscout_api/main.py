@@ -15,7 +15,8 @@ from elife_data_hub_utils.keyword_extract.extract_keywords import (
     get_keyword_extractor
 )
 
-from data_science_pipeline.utils.bq import load_given_json_list_data_from_tempdir_to_bq
+from data_science_pipeline.utils.json import remove_key_with_null_value
+from data_science_pipeline.utils.bq import load_json_list_and_append_to_bq_table_with_auto_schema
 
 from peerscout_api.recommend_editor import (
     load_model,
@@ -371,13 +372,13 @@ def get_response_json(
 def write_peerscout_api_response_to_bq(recommendation_response: dict):
     PROJECT_NAME = 'elife-data-pipeline'
     DATASET_NAME = get_deployment_env()
-    recommendation_response_with_provenance = {
+    recommendation_response_with_provenance = remove_key_with_null_value({
         **recommendation_response,
         'provenance': {'imported_timestamp': get_current_timestamp_as_string()}
-    }
+    })
 
-    load_given_json_list_data_from_tempdir_to_bq(
-        project_name=PROJECT_NAME,
+    load_json_list_and_append_to_bq_table_with_auto_schema(
+        project_id=PROJECT_NAME,
         dataset_name=DATASET_NAME,
         table_name=TARGET_TABLE_NAME,
         json_list=[recommendation_response_with_provenance],
