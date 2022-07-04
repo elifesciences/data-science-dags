@@ -1,10 +1,9 @@
 import logging
 import os
-from tempfile import TemporaryDirectory
 import time
 from contextlib import contextmanager
 from itertools import islice
-from typing import Any, Iterable, List, Tuple, ContextManager
+from typing import  Iterable, List, Tuple, ContextManager
 
 
 import pandas as pd
@@ -23,8 +22,7 @@ from google.cloud.bigquery import (
 from data_science_pipeline.utils.io import open_with_auto_compression
 from data_science_pipeline.utils.json import (
     remove_key_with_null_value,
-    json_list_as_jsonl_file,
-    write_jsonl_to_file
+    json_list_as_jsonl_file
 )
 from data_science_pipeline.utils.bq_schema import (
     generate_schema_from_file,

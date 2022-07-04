@@ -146,7 +146,10 @@ def _query_bq_for_person_details_mock() -> MagicMock:
 
 @pytest.fixture(name='load_json_list_and_append_to_bq_table_with_auto_schema_mock', autouse=True)
 def _load_json_list_and_append_to_bq_table_with_auto_schema_mock() -> MagicMock:
-    with patch.object(target_module, 'load_json_list_and_append_to_bq_table_with_auto_schema') as mock:
+    with patch.object(
+        target_module,
+        'load_json_list_and_append_to_bq_table_with_auto_schema'
+    ) as mock:
         yield mock
 
 
