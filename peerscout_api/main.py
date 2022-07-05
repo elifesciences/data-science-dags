@@ -378,7 +378,7 @@ def write_peerscout_api_response_to_bq(
     recommendation_response_with_provenance = remove_key_with_null_value({
         **recommendation_response,
         'provenance': {
-            **recommendation_request,
+            'recommendation_request': {**recommendation_request},
             'imported_timestamp': get_current_timestamp_as_string()
         }
     })
