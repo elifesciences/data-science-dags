@@ -371,7 +371,8 @@ def get_response_json(
 
 def write_peerscout_api_response_to_bq(
     recommendation_request: dict,
-    recommendation_response: dict):
+    recommendation_response: dict
+):
     PROJECT_NAME = 'elife-data-pipeline'
     DATASET_NAME = get_deployment_env()
     recommendation_response_with_provenance = remove_key_with_null_value({
