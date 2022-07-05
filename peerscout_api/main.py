@@ -369,12 +369,17 @@ def get_response_json(
         }
 
 
-def write_peerscout_api_response_to_bq(recommendation_response: dict):
+def write_peerscout_api_response_to_bq(
+    recommendation_request: dict,
+    recommendation_response: dict):
     PROJECT_NAME = 'elife-data-pipeline'
     DATASET_NAME = get_deployment_env()
     recommendation_response_with_provenance = remove_key_with_null_value({
         **recommendation_response,
-        'provenance': {'imported_timestamp': get_current_timestamp_as_string()}
+        'provenance': {
+            **recommendation_request,
+            'imported_timestamp': get_current_timestamp_as_string()
+        }
     })
 
     load_json_list_and_append_to_bq_table_with_auto_schema(
@@ -472,7 +477,10 @@ def create_app():
             reviewing_editor_recommendation_json=json_response_for_reviewing_editors
         )
 
-        write_peerscout_api_response_to_bq(api_json_response)
+        write_peerscout_api_response_to_bq(
+            recommendation_request=data,
+            recommendation_response=api_json_response
+        )
 
         return jsonify(api_json_response)
 
