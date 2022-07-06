@@ -187,7 +187,6 @@ def _get_ok_json(response):
 class TestGetTargetDatasetEnv:
     def test_should_read_target_dataset_as_ci_for_e2e_test(self):
         assert get_target_dataset_env() == 'ci'
-        # assert get_deployment_env() == 'staging'
 
 
 class TestPeerscoutAPI:
