@@ -18,7 +18,8 @@ from peerscout_api.main import (
     RECOMMENDATION_HEADINGS,
     NO_RECOMMENDATION_HTML,
     EDITOR_TYPE_FOR_REVIEWING_EDITOR,
-    EDITOR_TYPE_FOR_SENIOR_EDITOR
+    EDITOR_TYPE_FOR_SENIOR_EDITOR,
+    get_target_dataset_env
 )
 
 import peerscout_api.main as target_module
@@ -181,6 +182,12 @@ def _test_client() -> FlaskClient:
 def _get_ok_json(response):
     assert response.status_code == 200
     return response.json
+
+
+class TestGetTargetDatasetEnv:
+    def test_should_read_target_dataset_as_ci_for_e2e_test(self):
+        assert get_target_dataset_env() == 'ci'
+        # assert get_deployment_env() == 'staging'
 
 
 class TestPeerscoutAPI:

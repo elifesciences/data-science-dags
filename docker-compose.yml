@@ -128,6 +128,7 @@ services:
       target: runtime
     image: elifesciences/data-science-dags_peerscout-api:${IMAGE_TAG}
     environment:
+      - PEERSCOUT_API_TARGET_DATASET=ci
       - PEERSCOUT_API_URL=http://peerscout-api:8080/api/peerscout
 
   peerscout-api-dev:

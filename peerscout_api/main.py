@@ -26,6 +26,9 @@ from peerscout_api.recommend_editor import (
 DEFAULT_SPACY_LANGUAGE_MODEL_NAME = "en_core_web_sm"
 SPACY_LANGUAGE_MODEL_NAME_ENV_VALUE = "SPACY_LANGUAGE_MODEL_NAME"
 
+PEERSCOUT_API_TARGET_DATASET_ENV_NAME = "PEERSCOUT_API_TARGET_DATASET"
+DEFAULT_PEERSCOUT_API_TARGET_DATASET_VALUE = "ci"
+
 DEPLOYMENT_ENV_ENV_NAME = "DEPLOYMENT_ENV"
 DEFAULT_DEPLOYMENT_ENV_VALUE = "ci"
 DATA_SCIENCE_STATE_PATH_ENV_NAME = "DATA_SCIENCE_STATE_PATH"
@@ -104,6 +107,13 @@ def get_deployment_env() -> str:
     return os.getenv(
         DEPLOYMENT_ENV_ENV_NAME,
         DEFAULT_DEPLOYMENT_ENV_VALUE
+    )
+
+
+def get_target_dataset_env() -> str:
+    return os.getenv(
+        PEERSCOUT_API_TARGET_DATASET_ENV_NAME,
+        DEFAULT_PEERSCOUT_API_TARGET_DATASET_VALUE
     )
 
 
@@ -374,11 +384,7 @@ def write_peerscout_api_response_to_bq(
     recommendation_response: dict
 ):
     PROJECT_NAME = 'elife-data-pipeline'
-    # to use ci as target dataset in test and ci;
-    # DEFAULT_DEPLOYMENT_ENV_VALUE is given as first parameter
-    TARGET_DATASET_NAME = (DEFAULT_DEPLOYMENT_ENV_VALUE or os.getenv(DEPLOYMENT_ENV_ENV_NAME))
-
-    LOGGER.info('TARGET_DATASET_NAME: %s', TARGET_DATASET_NAME)
+    TARGET_DATASET_NAME = get_target_dataset_env()
 
     recommendation_response_with_provenance = remove_key_with_null_value({
         **recommendation_response,
