@@ -374,7 +374,12 @@ def write_peerscout_api_response_to_bq(
     recommendation_response: dict
 ):
     PROJECT_NAME = 'elife-data-pipeline'
-    DATASET_NAME = get_deployment_env()
+    # to use ci as target dataset in test and ci;
+    # DEFAULT_DEPLOYMENT_ENV_VALUE is given as first parameter
+    TARGET_DATASET_NAME = (DEFAULT_DEPLOYMENT_ENV_VALUE or os.getenv(DEPLOYMENT_ENV_ENV_NAME))
+
+    LOGGER.info('TARGET_DATASET_NAME: %s', TARGET_DATASET_NAME)
+
     recommendation_response_with_provenance = remove_key_with_null_value({
         **recommendation_response,
         'provenance': {
@@ -385,7 +390,7 @@ def write_peerscout_api_response_to_bq(
 
     load_json_list_and_append_to_bq_table_with_auto_schema(
         project_id=PROJECT_NAME,
-        dataset_name=DATASET_NAME,
+        dataset_name=TARGET_DATASET_NAME,
         table_name=TARGET_TABLE_NAME,
         json_list=[recommendation_response_with_provenance],
     )
