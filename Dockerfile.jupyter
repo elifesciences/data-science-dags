@@ -1,6 +1,10 @@
-FROM jupyter/minimal-notebook:dc9744740e12
+FROM jupyter/base-notebook:python-3.8.8
 
 USER root
+
+RUN apt-get update \
+  && apt-get install sudo pkg-config libicu-dev gcc g++ -yqq \
+  && rm -rf /var/lib/apt/lists/*
 
 ENV PROJECT_FOLDER=/home/jovyan/data-science-dags
 
