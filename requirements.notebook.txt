@@ -6,7 +6,7 @@ cattrs==1.7.1
 cloudpickle==1.4.1
 ipywidgets==7.6.3
 joblib==1.0.1
-lxml==4.6.5
+lxml==4.9.1
 pandas-gbq==0.15.0
 pyarrow==4.0.1
 PyICU==2.7.4
