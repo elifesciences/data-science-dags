@@ -5,7 +5,6 @@ from contextlib import contextmanager
 from itertools import islice
 from typing import Iterable, List, Tuple, ContextManager
 
-
 import pandas as pd
 
 import google.cloud.exceptions

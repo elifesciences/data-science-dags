@@ -5,5 +5,6 @@ s3path==0.3.2
 scikit-learn==0.24.2
 boto3==1.19.8
 google-cloud-bigquery==2.23.2
+bigquery-schema-generator==1.5
 Werkzeug==2.0.3
 https://github.com/elifesciences/elife-data-hub-utils/archive/refs/tags/v0.0.3.zip#egg=elife_data_hub_utils

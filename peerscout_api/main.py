@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 import os
 import json
 import logging
@@ -14,6 +15,9 @@ from elife_data_hub_utils.keyword_extract.extract_keywords import (
     get_keyword_extractor
 )
 
+from data_science_pipeline.utils.json import remove_key_with_null_value
+from data_science_pipeline.utils.bq import load_json_list_and_append_to_bq_table_with_auto_schema
+
 from peerscout_api.recommend_editor import (
     load_model,
     get_editor_recommendations_for_api
@@ -22,6 +26,9 @@ from peerscout_api.recommend_editor import (
 DEFAULT_SPACY_LANGUAGE_MODEL_NAME = "en_core_web_sm"
 SPACY_LANGUAGE_MODEL_NAME_ENV_VALUE = "SPACY_LANGUAGE_MODEL_NAME"
 
+PEERSCOUT_API_TARGET_DATASET_ENV_NAME = "PEERSCOUT_API_TARGET_DATASET"
+DEFAULT_PEERSCOUT_API_TARGET_DATASET_VALUE = "ci"
+
 DEPLOYMENT_ENV_ENV_NAME = "DEPLOYMENT_ENV"
 DEFAULT_DEPLOYMENT_ENV_VALUE = "ci"
 DATA_SCIENCE_STATE_PATH_ENV_NAME = "DATA_SCIENCE_STATE_PATH"
@@ -29,6 +36,8 @@ DEFAULT_STATE_PATH_FORMAT = (
     "s3://{env}-elife-data-pipeline/airflow-config/data-science/state"
 )
 REQUEST_JSON_SCHEMA_PATH = os.path.join(os.path.dirname(__file__), 'input-json-schema.json')
+
+TARGET_TABLE_NAME = 'peerscout_api_reviewer_recommendations'
 
 SENIOR_EDITOR_MODEL_NAME = 'senior_editor_model.joblib'
 REVIEWING_EDITOR_MODEL_NAME = 'reviewing_editor_model.joblib'
@@ -87,10 +96,24 @@ class PersonProps(NamedTuple):
     decision_time: Optional[str] = None
 
 
+def get_current_timestamp_as_string(
+        time_format: str = "%Y-%m-%dT%H:%M:%SZ"
+):
+    dtobj = datetime.now(timezone.utc)
+    return dtobj.strftime(time_format)
+
+
 def get_deployment_env() -> str:
     return os.getenv(
         DEPLOYMENT_ENV_ENV_NAME,
         DEFAULT_DEPLOYMENT_ENV_VALUE
+    )
+
+
+def get_target_dataset_env() -> str:
+    return os.getenv(
+        PEERSCOUT_API_TARGET_DATASET_ENV_NAME,
+        DEFAULT_PEERSCOUT_API_TARGET_DATASET_VALUE
     )
 
 
@@ -137,12 +160,12 @@ def query_bq_for_person_details(
 def get_person_details_from_bq(
     person_ids: list
 ):
-    PROJECT_NAME = 'elife-data-pipeline'
-    DATASET_NAME = get_deployment_env()
+    project_name = 'elife-data-pipeline'
+    dataset_name = get_deployment_env()
 
     return query_bq_for_person_details(
-        project=PROJECT_NAME,
-        dataset=DATASET_NAME,
+        project=project_name,
+        dataset=dataset_name,
         person_ids=person_ids
     )
 
@@ -356,6 +379,29 @@ def get_response_json(
         }
 
 
+def write_peerscout_api_response_to_bq(
+    recommendation_request: dict,
+    recommendation_response: dict
+):
+    project_name = 'elife-data-pipeline'
+    target_dataset_name = get_target_dataset_env()
+
+    recommendation_response_with_provenance = remove_key_with_null_value({
+        **recommendation_response,
+        'provenance': {
+            'recommendation_request': {**recommendation_request},
+            'imported_timestamp': get_current_timestamp_as_string()
+        }
+    })
+
+    load_json_list_and_append_to_bq_table_with_auto_schema(
+        project_id=project_name,
+        dataset_name=target_dataset_name,
+        table_name=TARGET_TABLE_NAME,
+        json_list=[recommendation_response_with_provenance],
+    )
+
+
 def create_app():
     app = Flask(__name__)
     keyword_extractor = get_keyword_extractor(get_spacy_language_model_env())
@@ -438,10 +484,17 @@ def create_app():
             editor_type=EDITOR_TYPE_FOR_REVIEWING_EDITOR
         )
 
-        return jsonify(get_response_json(
+        api_json_response = get_response_json(
             senior_editor_recommendation_json=json_response_for_senior_editors,
             reviewing_editor_recommendation_json=json_response_for_reviewing_editors
-        ))
+        )
+
+        write_peerscout_api_response_to_bq(
+            recommendation_request=data,
+            recommendation_response=api_json_response
+        )
+
+        return jsonify(api_json_response)
 
     return app
 
