@@ -160,12 +160,12 @@ def query_bq_for_person_details(
 def get_person_details_from_bq(
     person_ids: list
 ):
-    PROJECT_NAME = 'elife-data-pipeline'
-    DATASET_NAME = get_deployment_env()
+    project_name = 'elife-data-pipeline'
+    dataset_name = get_deployment_env()
 
     return query_bq_for_person_details(
-        project=PROJECT_NAME,
-        dataset=DATASET_NAME,
+        project=project_name,
+        dataset=dataset_name,
         person_ids=person_ids
     )
 
@@ -383,8 +383,8 @@ def write_peerscout_api_response_to_bq(
     recommendation_request: dict,
     recommendation_response: dict
 ):
-    PROJECT_NAME = 'elife-data-pipeline'
-    TARGET_DATASET_NAME = get_target_dataset_env()
+    project_name = 'elife-data-pipeline'
+    target_dataset_name = get_target_dataset_env()
 
     recommendation_response_with_provenance = remove_key_with_null_value({
         **recommendation_response,
@@ -395,8 +395,8 @@ def write_peerscout_api_response_to_bq(
     })
 
     load_json_list_and_append_to_bq_table_with_auto_schema(
-        project_id=PROJECT_NAME,
-        dataset_name=TARGET_DATASET_NAME,
+        project_id=project_name,
+        dataset_name=target_dataset_name,
         table_name=TARGET_TABLE_NAME,
         json_list=[recommendation_response_with_provenance],
     )
