@@ -183,12 +183,6 @@ def _get_ok_json(response):
     assert response.status_code == 200
     return response.json
 
-
-class TestGetTargetDatasetEnv:
-    def test_should_read_target_dataset_as_ci_for_e2e_test(self):
-        assert get_target_dataset_env() == 'ci'
-
-
 class TestPeerscoutAPI:
     def test_should_have_access_for_status_page(self, test_client: FlaskClient):
         response = test_client.get('/api/status')
