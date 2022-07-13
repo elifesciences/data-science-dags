@@ -43,8 +43,8 @@ service:
 ingress:
   enabled: false
   annotations:
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "90"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "90"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "180"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "180"
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
