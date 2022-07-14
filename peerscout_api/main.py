@@ -393,6 +393,10 @@ def write_peerscout_api_response_to_bq(
             'imported_timestamp': get_current_timestamp_as_string()
         }
     })
+    LOGGER.info(
+        "API Recommendation JSON for BQ load: %r",
+        recommendation_response_with_provenance
+    )
 
     load_json_list_and_append_to_bq_table_with_auto_schema(
         project_id=project_name,
