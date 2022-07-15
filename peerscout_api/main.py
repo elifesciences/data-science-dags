@@ -5,6 +5,7 @@ import logging
 import html
 from typing import NamedTuple, Optional
 import jsonschema
+from threading import Thread
 
 from google.cloud.bigquery import Client
 from google.cloud import bigquery
@@ -406,6 +407,17 @@ def write_peerscout_api_response_to_bq(
     )
 
 
+def write_peerscout_api_response_to_bq_in_a_thread(
+    recommendation_request: dict,
+    recommendation_response: dict
+):
+    thread = Thread(
+        target=write_peerscout_api_response_to_bq,
+        args=(recommendation_request, recommendation_response)
+    )
+    thread.start()
+
+
 def create_app():
     app = Flask(__name__)
     keyword_extractor = get_keyword_extractor(get_spacy_language_model_env())
@@ -493,7 +505,7 @@ def create_app():
             reviewing_editor_recommendation_json=json_response_for_reviewing_editors
         )
 
-        write_peerscout_api_response_to_bq(
+        write_peerscout_api_response_to_bq_in_a_thread(
             recommendation_request=data,
             recommendation_response=api_json_response
         )

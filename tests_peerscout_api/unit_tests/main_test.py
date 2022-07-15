@@ -160,6 +160,12 @@ def _get_editor_recommendations_for_api_mock() -> MagicMock:
         yield mock
 
 
+@pytest.fixture(name='write_peerscout_api_response_to_bq_in_a_thread_mock')
+def _write_peerscout_api_response_to_bq_in_a_thread_mock() -> MagicMock:
+    with patch.object(target_module, 'write_peerscout_api_response_to_bq_in_a_thread') as mock:
+        yield mock
+
+
 @pytest.fixture(name='get_keyword_extractor_mock', autouse=True)
 def _get_keyword_extractor_mock() -> MagicMock:
     with patch.object(target_module, 'get_keyword_extractor') as mock:
@@ -219,6 +225,17 @@ class TestPeerscoutAPI:
         )
         response = test_client.post('/api/peerscout', json=INPUT_DATA_VALID)
         assert _get_ok_json(response) == get_valid_recommendation_response()
+
+    def test_should_call_write_peerscout_api_response_to_bq_in_a_thread_with_correct_params(
+        self,
+        test_client: FlaskClient,
+        write_peerscout_api_response_to_bq_in_a_thread_mock: MagicMock
+    ):
+        response = test_client.post('/api/peerscout', json=INPUT_DATA_VALID)
+        write_peerscout_api_response_to_bq_in_a_thread_mock.assert_called_with(
+            recommendation_request=INPUT_DATA_VALID,
+            recommendation_response=_get_ok_json(response)
+        )
 
 
 class TestGetRecommendationHtml:
