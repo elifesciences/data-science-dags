@@ -4,8 +4,8 @@ import json
 import logging
 import html
 from typing import NamedTuple, Optional
-import jsonschema
 from threading import Thread
+import jsonschema
 
 from google.cloud.bigquery import Client
 from google.cloud import bigquery
