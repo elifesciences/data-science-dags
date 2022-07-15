@@ -54,11 +54,13 @@ venv-create:
 
 dev-install:
 	$(PIP) install --disable-pip-version-check -r requirements.build.txt
-	$(PIP) install --disable-pip-version-check -r requirements.dev.txt
-	$(PIP) install --disable-pip-version-check -r requirements.jupyter.txt
-	$(PIP) install --disable-pip-version-check -r requirements.notebook.txt
-	$(PIP) install --disable-pip-version-check -r requirements.fbprophet.txt
-	$(PIP) install --disable-pip-version-check -r requirements.dag.txt
+	$(PIP) install --disable-pip-version-check \
+	-r requirements.dev.txt \
+	-r requirements.jupyter.txt \
+	-r requirements.notebook.txt \
+	-r requirements.fbprophet.txt \
+	-r requirements.dag.txt \
+	-r requirements.api.txt
 	$(PIP) install --disable-pip-version-check -e . --no-deps
 
 
