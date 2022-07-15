@@ -9,7 +9,7 @@ joblib==1.0.1
 lxml==4.9.1
 pandas-gbq==0.15.0
 pyarrow==4.0.1
-# PyICU==2.7.4
+PyICU==2.7.4
 google-cloud-bigquery>=2.26.0
 db-dtypes==1.0.1
 s3path==0.3.2
