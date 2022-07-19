@@ -25,6 +25,7 @@ t_last_manuscript_version_abstract_keywords AS (
 )
 
 SELECT version.version_id, manuscript_version_abstract_keywords.extracted_keywords
+, ARRAY( SELECT person_id FROM UNNEST(version.authors)) AS author_person_ids
 FROM `{project}.{dataset}.mv_manuscript_version` AS version
 JOIN t_last_manuscript_version_abstract_keywords AS manuscript_version_abstract_keywords
   ON manuscript_version_abstract_keywords.version_id = version.version_id
