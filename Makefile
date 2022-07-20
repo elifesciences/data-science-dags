@@ -178,7 +178,7 @@ notebook-lint:
 		&& ls -l ./notebooks \
 		&& jupyter nbconvert \
 		--to=script \
-		--output-dir=./temp/converted-notebooks/ \
+		--output-dir=./.temp/converted-notebooks/ \
 		./notebooks/**/*.ipynb \
 		&& pylint ./.temp/converted-notebooks/*.py \
 		--max-line-length=$(NOTEBOOK_MAX_LINE_LENGTH) \
