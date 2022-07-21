@@ -32,6 +32,7 @@ MANUSCRIPT_DF = pd.DataFrame(MANUSCRIPT_DICT)
 
 print(MANUSCRIPT_DF)
 
+
 class TestGetAuthorIdsOfGivenVersionOfPaper:
     def test_should_return_author_ids_for_matching_manuscript_version(self):
         assert get_author_ids_of_given_version_of_paper(
