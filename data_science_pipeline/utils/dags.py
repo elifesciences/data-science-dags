@@ -7,7 +7,7 @@ from tempfile import TemporaryDirectory
 
 import airflow
 from airflow import DAG
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python import PythonOperator
 
 import papermill as pm
 
