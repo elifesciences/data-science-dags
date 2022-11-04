@@ -282,9 +282,9 @@ def pick_person_id_from_bq_result(
     person_ids_to_pick: list
 ) -> list:
     picked_person_details = []
-    for result in bq_person_detail_sql_result:
-        for person_id in person_ids_to_pick:
-            if person_id == result.person_id:
+    for person_id in person_ids_to_pick:
+        for result in bq_person_detail_sql_result:
+            if person_id == result['person_id']:
                 picked_person_details.append(result)
 
     return picked_person_details
