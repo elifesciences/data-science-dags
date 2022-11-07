@@ -282,6 +282,7 @@ def pick_person_id_from_bq_result(
     person_ids_to_pick: list
 ) -> list:
     picked_person_details = []
+    # the complexity will not be an issue as person_ids_to_pick list will contain up to 3 ids
     for person_id in person_ids_to_pick:
         for result in bq_person_detail_sql_result:
             if person_id == result['person_id']:
