@@ -18,7 +18,8 @@ from peerscout_api.main import (
     RECOMMENDATION_HEADINGS,
     NO_RECOMMENDATION_HTML,
     EDITOR_TYPE_FOR_REVIEWING_EDITOR,
-    EDITOR_TYPE_FOR_SENIOR_EDITOR
+    EDITOR_TYPE_FOR_SENIOR_EDITOR,
+    pick_person_id_from_bq_result
 )
 
 import peerscout_api.main as target_module
@@ -94,6 +95,9 @@ DECISION_TIME_HTML = "Decision time: 43 days"
 LINE_BREAK = '<br />'
 SEMI_COLUMN = '; '
 PIPE = ' | '
+
+BQ_RESPONSE_DICT_1 = {'person_id': 'person_id_1'}
+BQ_RESPONSE_DICT_2 = {'person_id': 'person_id_2'}
 
 
 def get_valid_recommendation_response():
@@ -187,6 +191,28 @@ def _test_client() -> FlaskClient:
 def _get_ok_json(response):
     assert response.status_code == 200
     return response.json
+
+
+class TestPickPersonIdFromBqResult:
+    def test_should_return_empty_result_if_passed_list_empty(self):
+        assert not pick_person_id_from_bq_result(
+            bq_person_detail_sql_result=[BQ_RESPONSE_DICT_1, BQ_RESPONSE_DICT_2],
+            person_ids_to_pick=[]
+        )
+
+    def test_should_return_bq_result_for_list_of_one_person_id(self):
+        actual_response = pick_person_id_from_bq_result(
+            bq_person_detail_sql_result=[BQ_RESPONSE_DICT_1, BQ_RESPONSE_DICT_2],
+            person_ids_to_pick=[BQ_RESPONSE_DICT_1['person_id']]
+        )
+        assert actual_response == [BQ_RESPONSE_DICT_1]
+
+    def test_should_preserve_order_of_passed_in_person_ids(self):
+        actual_response = pick_person_id_from_bq_result(
+            bq_person_detail_sql_result=[BQ_RESPONSE_DICT_1, BQ_RESPONSE_DICT_2],
+            person_ids_to_pick=[BQ_RESPONSE_DICT_2['person_id'], BQ_RESPONSE_DICT_1['person_id']]
+        )
+        assert actual_response == [BQ_RESPONSE_DICT_2, BQ_RESPONSE_DICT_1]
 
 
 class TestPeerscoutAPI:
