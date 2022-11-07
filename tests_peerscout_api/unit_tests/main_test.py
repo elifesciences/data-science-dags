@@ -200,7 +200,7 @@ class TestPickPersonIdFromBqResult:
             person_ids_to_pick=[]
         )
 
-    def test_should_return_result_if_passed_one_item_in_list(self):
+    def test_should_return_bq_result_for_list_of_one_person_id(self):
         actual_response = pick_person_id_from_bq_result(
             bq_person_detail_sql_result=[BQ_RESPONSE_DICT_1, BQ_RESPONSE_DICT_2],
             person_ids_to_pick=[BQ_RESPONSE_DICT_1['person_id']]
