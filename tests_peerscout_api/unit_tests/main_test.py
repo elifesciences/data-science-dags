@@ -207,7 +207,7 @@ class TestPickPersonIdFromBqResult:
         )
         assert actual_response == [BQ_RESPONSE_DICT_1]
 
-    def test_should_return_result_order_if_passed_one_item_in_list(self):
+    def test_should_preserve_order_of_passed_in_person_ids(self):
         actual_response = pick_person_id_from_bq_result(
             bq_person_detail_sql_result=[BQ_RESPONSE_DICT_1, BQ_RESPONSE_DICT_2],
             person_ids_to_pick=[BQ_RESPONSE_DICT_2['person_id'], BQ_RESPONSE_DICT_1['person_id']]
