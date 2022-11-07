@@ -98,7 +98,6 @@ PIPE = ' | '
 
 BQ_RESPONSE_DICT_1 = {'person_id': 'person_id_1'}
 BQ_RESPONSE_DICT_2 = {'person_id': 'person_id_2'}
-BQ_RESPONSE_LIST = [BQ_RESPONSE_DICT_1, BQ_RESPONSE_DICT_2]
 
 
 def get_valid_recommendation_response():
@@ -197,20 +196,20 @@ def _get_ok_json(response):
 class TestPickPersonIdFromBqResult:
     def test_should_return_empty_result_if_passed_list_empty(self):
         assert not pick_person_id_from_bq_result(
-            bq_person_detail_sql_result=BQ_RESPONSE_LIST,
+            bq_person_detail_sql_result=[BQ_RESPONSE_DICT_1, BQ_RESPONSE_DICT_2],
             person_ids_to_pick=[]
         )
 
     def test_should_return_result_if_passed_one_item_in_list(self):
         actual_response = pick_person_id_from_bq_result(
-            bq_person_detail_sql_result=BQ_RESPONSE_LIST,
+            bq_person_detail_sql_result=[BQ_RESPONSE_DICT_1, BQ_RESPONSE_DICT_2],
             person_ids_to_pick=[BQ_RESPONSE_DICT_1['person_id']]
         )
         assert actual_response == [BQ_RESPONSE_DICT_1]
 
     def test_should_return_result_order_if_passed_one_item_in_list(self):
         actual_response = pick_person_id_from_bq_result(
-            bq_person_detail_sql_result=BQ_RESPONSE_LIST,
+            bq_person_detail_sql_result=[BQ_RESPONSE_DICT_1, BQ_RESPONSE_DICT_2],
             person_ids_to_pick=[BQ_RESPONSE_DICT_2['person_id'], BQ_RESPONSE_DICT_1['person_id']]
         )
         assert actual_response == [BQ_RESPONSE_DICT_2, BQ_RESPONSE_DICT_1]
