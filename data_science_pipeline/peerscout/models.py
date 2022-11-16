@@ -2,7 +2,7 @@ import logging
 from abc import ABC, abstractmethod
 from collections import Counter, defaultdict
 from itertools import groupby
-from typing import Dict, List, Generic, Optional, Tuple, Union, T, KT
+from typing import Dict, List, Generic, Optional, Tuple, Union, TypeVar
 
 import numpy as np
 import pandas as pd
@@ -11,7 +11,8 @@ from data_science_pipeline.utils.pandas import isnull
 
 
 LOGGER = logging.getLogger(__name__)
-
+T = TypeVar('T')
+KT = TypeVar('KT')
 
 def _to_list(a: list) -> list:
     if isnull(a):
@@ -86,7 +87,7 @@ def get_count_weighted_keywords_list(
 
 def get_weighted_keywords_list_for_vectorizer(
         keywords_list: List[List[str]],
-        vectorizer: Vectorizer = None) -> List[List[Tuple[float, str]]]:
+        vectorizer: Optional[Vectorizer] = None) -> List[List[Tuple[float, str]]]:
     if vectorizer is None:
         return get_count_weighted_keywords_list(keywords_list)
     return get_weighted_keywords_list_for_tf_matrix(
@@ -188,7 +189,7 @@ class WeightedKeywordModel:
             choices: List[T],
             keywords_list: List[List[str]],
             keyword_weights_list: List[List[float]],
-            vectorizer: Vectorizer = None):
+            vectorizer: Optional[Vectorizer] = None):
         assert len(choices) == len(keywords_list), "choices and keywords list must have same length"
         assert len(choices) == len(keyword_weights_list), \
             "choices and keyword_weights_list list must have same length"
@@ -210,9 +211,9 @@ class WeightedKeywordModel:
     @staticmethod
     def from_tf_matrix(
             tf_matrix: np.ndarray,
-            tf_keywords: List[str] = None,
-            vectorizer: Vectorizer = None,
-            choices: list = None,
+            tf_keywords: Optional[List[str]] = None,
+            vectorizer: Optional[Vectorizer] = None,
+            choices: Optional[list] = None,
             **kwargs) -> 'WeightedKeywordModel':
         if choices is None:
             choices = list(range(len(tf_matrix)))

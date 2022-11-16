@@ -2,7 +2,7 @@
 # https://github.com/elifesciences/data-hub-core-airflow-dags/blob/develop/data_pipeline/utils/data_store/bq_data_service.py
 
 import logging
-from typing import List
+from typing import List, Literal
 from google.cloud import bigquery
 from google.cloud.bigquery.schema import SchemaField
 from google.cloud.exceptions import NotFound
@@ -166,7 +166,7 @@ def get_new_merged_schema(
 
 def generate_schema_from_file(
         full_file_location: str,
-        quoted_values_are_strings: str = True
+        quoted_values_are_strings: bool = True
 ):
     with open_with_auto_compression(full_file_location, 'r') as file_reader:
         generator = SchemaGenerator(
@@ -185,7 +185,7 @@ def create_or_extend_table_schema(
         dataset_name,
         table_name,
         full_file_location,
-        quoted_values_are_strings: True
+        quoted_values_are_strings: Literal[True]
 ):
     schema = generate_schema_from_file(
         full_file_location,
