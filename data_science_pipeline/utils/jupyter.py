@@ -10,7 +10,7 @@ def to_markdown_sql(sql: str):
 
 def printmd(s: str):
     try:
-        s = s.decode('unicode_escape')
+        s = s.encode().decode('unicode_escape')
     except AttributeError:
         pass
     display(Markdown(s))
