@@ -4,6 +4,7 @@ import re
 from datetime import timedelta
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import Optional
 
 import airflow
 from airflow import DAG
@@ -186,7 +187,7 @@ def get_default_notebook_task_id(notebook_filename: str) -> str:
 def create_run_notebook_operator(
         notebook_filename: str,
         task_id: str = None,
-        notebook_params: dict = None,
+        notebook_params: Optional[dict] = None,
         **kwargs):
     if not task_id:
         task_id = get_default_notebook_task_id(notebook_filename)
