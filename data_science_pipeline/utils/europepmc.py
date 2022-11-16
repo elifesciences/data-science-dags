@@ -240,7 +240,7 @@ class EuropePMCApi:
     def get_author_pmids(self, *args, **kwargs) -> List[str]:
         return list(self.iter_author_pmids(*args, **kwargs))
 
-    def get_summary_by_page_pmids(self, pmids: List[str]) -> List[dict]:
+    def get_summary_by_page_pmids(self, pmids: List[str]) -> List[str]:
         if len(pmids) > EUROPEPMC_MAX_PAGE_SIZE:
             raise ValueError(
                 'paging not supported, list of pmids must be less than %d'
