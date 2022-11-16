@@ -70,7 +70,7 @@ def load_file_into_bq(
         source_format=SourceFormat.NEWLINE_DELIMITED_JSON,
         write_mode=WriteDisposition.WRITE_APPEND,
         auto_detect_schema=True,
-        schema: List[SchemaField] = None,
+        schema: Optional[List[SchemaField]] = None,
         rows_to_skip=0,
         project_id: Optional[str] = None):
     dataset_name, table_name = get_validated_dataset_name_table_name(
