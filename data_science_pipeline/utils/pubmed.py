@@ -107,7 +107,7 @@ def parse_term_item(term_item: str):
 
 
 def parse_term_query(term_query: str) -> dict:
-    result = {}
+    result: dict = {}
     operator = 'OR'
     for item in re.split(r'(OR|NOT|AND)', term_query):
         item = item.strip()
