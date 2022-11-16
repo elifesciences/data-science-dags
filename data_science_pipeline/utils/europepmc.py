@@ -1,7 +1,7 @@
 import re
 import logging
 from itertools import islice
-from typing import Callable, Iterable, List
+from typing import Callable, Iterable, List, Optional
 
 import requests
 from icu import Transliterator  # pylint: disable=no-name-in-module
@@ -171,7 +171,7 @@ class EuropePMCApi:
     def __init__(
             self,
             session: requests.Session,
-            params: dict = None,
+            params: Optional[dict] = None,
             on_error: callable = None):
         self.session = session
         self.params = params or {}
