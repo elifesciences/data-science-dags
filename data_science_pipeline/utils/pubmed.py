@@ -1,7 +1,7 @@
 import logging
 import re
 from urllib.parse import urlparse, parse_qs, urlencode, urljoin
-from typing import Iterable, List, Optional
+from typing import Iterable, Iterator, List, Optional
 
 import requests
 from bs4 import BeautifulSoup
@@ -197,7 +197,7 @@ class PubmedBibliographyScraper:
         LOGGER.info('retrieved html from: %s (%d chars)', url, len(response_text))
         return response_text
 
-    def iter_pages(self, url: str) -> PubmedBibliographyPage:
+    def iter_pages(self, url: str) -> Iterator[PubmedBibliographyPage]:
         page = PubmedBibliographyPage(self.get_html(url))
         yield page
         previous_url = url
