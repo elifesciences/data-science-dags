@@ -112,7 +112,7 @@ class EuropePMCApiResponsePage:
         return self.json_response.get('request', {}).get('cursorMark')
 
     @property
-    def next_cursor(self) -> str:
+    def next_cursor(self) -> Optional[str]:
         return self.json_response.get('nextCursorMark')
 
     @property
