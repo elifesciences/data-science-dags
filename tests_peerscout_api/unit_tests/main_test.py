@@ -28,7 +28,7 @@ import peerscout_api.main as target_module
 
 LOGGER = logging.getLogger(__name__)
 
-INPUT_DATA_VALID = {
+INPUT_DATA_VALID: dict = {
     "manuscript_id": "12345",
     "tracking_number": "12345_ABC",
     "revision_number": 0,
