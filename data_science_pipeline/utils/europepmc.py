@@ -116,7 +116,7 @@ class EuropePMCApiResponsePage:
         return self.json_response.get('nextCursorMark')
 
     @property
-    def validated_next_cursor(self) -> str:
+    def validated_next_cursor(self) -> Optional[str]:
         next_cursor = self.next_cursor
         if next_cursor == self.current_cursor:
             return None
