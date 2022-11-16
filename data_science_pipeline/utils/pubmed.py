@@ -146,7 +146,7 @@ class PubmedBibliographyNextPageLink:
             return None
         return self.next_page_soup['href']
 
-    def get_href(self, base_url: str) -> str:
+    def get_href(self, base_url: str) -> Optional[str]:
         if not self.next_page_soup:
             return None
         return combined_page_url_href(base_url, self.href)
@@ -157,7 +157,7 @@ class PubmedBibliographyPage:
         self.html_content = html_content
         self.page_soup = BeautifulSoup(html_content, features='lxml')
 
-    def parse_pmid_text(self, pmid_text: str) -> str:
+    def parse_pmid_text(self, pmid_text: str) -> Optional[str]:
         LOGGER.debug('pmid_text: %s', pmid_text)
         m = re.match(r'.*\b(\d+)\b.*', str(pmid_text), re.DOTALL)
         if m:
@@ -179,10 +179,10 @@ class PubmedBibliographyPage:
         )
 
     @property
-    def next_page_href(self) -> bool:
+    def next_page_href(self) -> Optional[str]:
         return self.next_page.href
 
-    def get_next_page_href(self, base_url: str) -> str:
+    def get_next_page_href(self, base_url: str) -> Optional[str]:
         return self.next_page.get_href(base_url)
 
 
