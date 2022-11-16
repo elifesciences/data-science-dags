@@ -3,7 +3,7 @@ import os
 import time
 from contextlib import contextmanager
 from itertools import islice
-from typing import Iterable, List, Optional, Tuple, ContextManager
+from typing import Iterable, Iterator, List, Optional, Tuple, ContextManager
 
 import pandas as pd
 
@@ -203,7 +203,7 @@ def iter_json_without_null_from_df(df: pd.DataFrame, batch_size: int = 5000) -> 
 
 
 @contextmanager
-def df_as_jsonl_file_without_null(df: pd.DataFrame, **kwargs) -> ContextManager[str]:
+def df_as_jsonl_file_without_null(df: pd.DataFrame, **kwargs) -> Iterator[str]:
     json_iterable = iter_json_without_null_from_df(df)
     with json_list_as_jsonl_file(json_iterable, **kwargs) as jsonl_file:
         yield jsonl_file
