@@ -1,6 +1,6 @@
 import os
 import logging
-from typing import List, NamedTuple, Tuple, T
+from typing import List, NamedTuple, Tuple, TypeVar
 import numpy as np
 import pandas as pd
 
@@ -13,6 +13,7 @@ from data_science_pipeline.peerscout.models import (
 )
 
 LOGGER = logging.getLogger(__name__)
+T = TypeVar('T')
 
 
 class PeerScoutModelProps(NamedTuple):
