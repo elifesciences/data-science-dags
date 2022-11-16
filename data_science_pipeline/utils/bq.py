@@ -40,7 +40,7 @@ def with_limit_sql(sql: str, limit: Optional[int] = None) -> str:
     return sql + '\nLIMIT %d' % limit
 
 
-def is_bq_not_found_exception(exception: BaseException) -> bool:
+def is_bq_not_found_exception(exception: Optional[BaseException] = None) -> bool:
     if not exception:
         return False
     return (
@@ -65,14 +65,14 @@ def get_validated_dataset_name_table_name(
 
 def load_file_into_bq(
         filename: str,
-        dataset_name: Optional[str] = None,
-        table_name: Optional[str] = None,
+        project_id: str,
+        dataset_name: str,
+        table_name: str,
         source_format=SourceFormat.NEWLINE_DELIMITED_JSON,
         write_mode=WriteDisposition.WRITE_APPEND,
         auto_detect_schema=True,
         schema: Optional[List[SchemaField]] = None,
-        rows_to_skip=0,
-        project_id: Optional[str] = None):
+        rows_to_skip=0):
     dataset_name, table_name = get_validated_dataset_name_table_name(
         dataset_name, table_name
     )
@@ -108,10 +108,10 @@ def load_file_into_bq(
 
 def load_file_into_bq_with_auto_schema(
         jsonl_file: str,
-        dataset_name: Optional[str] = None,
-        table_name: Optional[str] = None,
+        project_id: str,
+        dataset_name: str,
+        table_name: str,
         write_mode: str = WriteDisposition.WRITE_APPEND,
-        project_id: Optional[str] = None,
         **kwargs):
     if write_mode == WriteDisposition.WRITE_APPEND:
         dataset_name, table_name = get_validated_dataset_name_table_name(
