@@ -172,7 +172,7 @@ class EuropePMCApi:
             self,
             session: requests.Session,
             params: Optional[dict] = None,
-            on_error: callable = None):
+            on_error: Optional[Callable] = None):
         self.session = session
         self.params = params or {}
         self.on_error = on_error
