@@ -1,7 +1,7 @@
 import logging
 import re
 from urllib.parse import urlparse, parse_qs, urlencode, urljoin
-from typing import Iterable, Iterator, List, Optional
+from typing import Any, Iterable, Iterator, List, Optional
 
 import requests
 from bs4 import BeautifulSoup
@@ -42,7 +42,7 @@ def is_ncbi_domain_url(url: str) -> bool:
     return urlparse(url.lower()).hostname.endswith(NCBI_DOMAIN_NAME)
 
 
-def is_ncbi_pubmed_article_url(url: str) -> str:
+def is_ncbi_pubmed_article_url(url: str) -> bool:
     return any(
         url.startswith(prefix)
         for prefix in NCBI_PUBMED_URL_PREFIX_LIST
@@ -167,7 +167,7 @@ class PubmedBibliographyPage:
         return None
 
     @property
-    def pmids(self) -> List[str]:
+    def pmids(self) -> List[Optional[str]]:
         citations_soup = self.page_soup.find('div', class_='citations')
         pmid_soups = citations_soup.find_all(class_='pmid')
         return [self.parse_pmid_text(e.text) for e in pmid_soups]
@@ -208,9 +208,9 @@ class PubmedBibliographyScraper:
             previous_url = next_page_url
             next_page_url = page.get_next_page_href(url)
 
-    def iter_pmids(self, url: str) -> Iterable[str]:
+    def iter_pmids(self, url: str) -> Iterable[Optional[str]]:
         for page in self.iter_pages(url):
             yield from page.pmids
 
-    def get_pmids(self, url: str) -> List[str]:
-        return list(self.iter_pmids(url))
+    def get_pmids(self, url: str) -> List[Any]:
+        return [self.iter_pmids(url)]
