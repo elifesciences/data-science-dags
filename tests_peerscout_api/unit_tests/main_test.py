@@ -1,4 +1,5 @@
 import logging
+from typing import Iterable
 from unittest.mock import patch, MagicMock
 
 from flask.testing import FlaskClient
@@ -143,13 +144,13 @@ def get_valid_no_recommendation_response():
 
 
 @pytest.fixture(name='query_bq_for_person_details_mock', autouse=True)
-def _query_bq_for_person_details_mock() -> MagicMock:
+def _query_bq_for_person_details_mock() -> Iterable[MagicMock]:
     with patch.object(target_module, 'query_bq_for_person_details') as mock:
         yield mock
 
 
 @pytest.fixture(name='load_json_list_and_append_to_bq_table_with_auto_schema_mock', autouse=True)
-def _load_json_list_and_append_to_bq_table_with_auto_schema_mock() -> MagicMock:
+def _load_json_list_and_append_to_bq_table_with_auto_schema_mock() -> Iterable[MagicMock]:
     with patch.object(
         target_module,
         'load_json_list_and_append_to_bq_table_with_auto_schema'
@@ -158,26 +159,26 @@ def _load_json_list_and_append_to_bq_table_with_auto_schema_mock() -> MagicMock:
 
 
 @pytest.fixture(name='get_editor_recommendations_for_api_mock', autouse=True)
-def _get_editor_recommendations_for_api_mock() -> MagicMock:
+def _get_editor_recommendations_for_api_mock() -> Iterable[MagicMock]:
     with patch.object(target_module, 'get_editor_recommendations_for_api') as mock:
         mock.return_value = pd.DataFrame(columns=['person_id', 'name'])
         yield mock
 
 
 @pytest.fixture(name='write_peerscout_api_response_to_bq_in_a_thread_mock')
-def _write_peerscout_api_response_to_bq_in_a_thread_mock() -> MagicMock:
+def _write_peerscout_api_response_to_bq_in_a_thread_mock() -> Iterable[MagicMock]:
     with patch.object(target_module, 'write_peerscout_api_response_to_bq_in_a_thread') as mock:
         yield mock
 
 
 @pytest.fixture(name='get_keyword_extractor_mock', autouse=True)
-def _get_keyword_extractor_mock() -> MagicMock:
+def _get_keyword_extractor_mock() -> Iterable[MagicMock]:
     with patch.object(target_module, 'get_keyword_extractor') as mock:
         yield mock
 
 
 @pytest.fixture(name='load_model_mock', autouse=True)
-def _load_model_mock() -> MagicMock:
+def _load_model_mock() -> Iterable[MagicMock]:
     with patch.object(target_module, 'load_model') as mock:
         yield mock
 
