@@ -75,7 +75,7 @@ def is_ncbi_bibliography_url(url: str) -> bool:
 
 def get_ncbi_search_term(url: str) -> Optional[str]:
     if not is_ncbi_domain_url(url) or is_ncbi_bibliography_url(url):
-        return False
+        return None
     terms = parse_qs(urlparse(url).query).get('term')
     return terms[0] if terms else ''
 
