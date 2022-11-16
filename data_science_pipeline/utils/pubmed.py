@@ -1,7 +1,7 @@
 import logging
 import re
 from urllib.parse import urlparse, parse_qs, urlencode, urljoin
-from typing import Iterable, List
+from typing import Iterable, List, Optional
 
 import requests
 from bs4 import BeautifulSoup
@@ -49,7 +49,7 @@ def is_ncbi_pubmed_article_url(url: str) -> str:
     )
 
 
-def get_ncbi_pubmed_article_id(url: str) -> str:
+def get_ncbi_pubmed_article_id(url: str) -> Optional[str]:
     url = normalize_url(url)
     if not is_ncbi_pubmed_article_url(url):
         return None
@@ -73,7 +73,7 @@ def is_ncbi_bibliography_url(url: str) -> bool:
     )
 
 
-def get_ncbi_search_term(url: str) -> str:
+def get_ncbi_search_term(url: str) -> Optional[str]:
     if not is_ncbi_domain_url(url) or is_ncbi_bibliography_url(url):
         return False
     terms = parse_qs(urlparse(url).query).get('term')
@@ -141,7 +141,7 @@ class PubmedBibliographyNextPageLink:
         self.next_page_soup = next_page_soup
 
     @property
-    def href(self) -> str:
+    def href(self) -> Optional[str]:
         if not self.next_page_soup:
             return None
         return self.next_page_soup['href']
