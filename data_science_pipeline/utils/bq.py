@@ -34,7 +34,7 @@ from data_science_pipeline.utils.pandas import dataframe_chunk
 LOGGER = logging.getLogger(__name__)
 
 
-def with_limit_sql(sql: str, limit: int = None) -> str:
+def with_limit_sql(sql: str, limit: Optional[int] = None) -> str:
     if not limit:
         return sql
     return sql + '\nLIMIT %d' % limit

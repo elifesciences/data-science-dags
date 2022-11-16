@@ -217,7 +217,7 @@ class EuropePMCApi:
     def iter_query_results(
             self,
             *args,
-            limit: int = None,
+            limit: Optional[int] = None,
             **kwargs) -> Iterable[dict]:
         return islice(
             (

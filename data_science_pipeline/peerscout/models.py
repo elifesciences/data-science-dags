@@ -2,7 +2,7 @@ import logging
 from abc import ABC, abstractmethod
 from collections import Counter, defaultdict
 from itertools import groupby
-from typing import Dict, List, Generic, Tuple, Union, T, KT
+from typing import Dict, List, Generic, Optional, Tuple, Union, T, KT
 
 import numpy as np
 import pandas as pd
@@ -123,7 +123,7 @@ class WeightedKeywordModelRankingList(Generic[KT, T]):
             self.choices
         )
 
-    def get_ranked_choices_list(self, limit: int = None) -> List[List[T]]:
+    def get_ranked_choices_list(self, limit: Optional[int] = None) -> List[List[T]]:
         return [
             [
                 self.choices[index]
@@ -136,7 +136,7 @@ class WeightedKeywordModelRankingList(Generic[KT, T]):
     def ranked_choices_list(self) -> List[List[T]]:
         return self.get_ranked_choices_list()
 
-    def get_ranked_scores_list(self, limit: int = None) -> List[List[T]]:
+    def get_ranked_scores_list(self, limit: Optional[int] = None) -> List[List[T]]:
         return [
             [
                 {
@@ -158,7 +158,7 @@ class WeightedKeywordModelRankingList(Generic[KT, T]):
     def ranked_scores_list(self) -> List[List[T]]:
         return self.get_ranked_scores_list()
 
-    def get_matching_keywords_list(self, limit: int = None) -> List[List[Tuple[float, str]]]:
+    def get_matching_keywords_list(self, limit: Optional[int] = None) -> List[List[Tuple[float, str]]]:
         return [
             [
                 matching_keywords_map.get(index, [])[:limit]
@@ -276,7 +276,7 @@ class WeightedKeywordModel:
     def predict(
             self,
             keywords_list: List[List[str]],
-            limit: int = None,
+            limit: Optional[int] = None,
             return_scores: bool = False):
         LOGGER.debug('keywords_list: %s', keywords_list)
         index = _get_index(keywords_list)
