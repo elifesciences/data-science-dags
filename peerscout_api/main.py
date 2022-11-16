@@ -250,8 +250,7 @@ def get_html_text_for_author_suggested_person(
 
 def get_list_of_recommended_person_details_with_html_text(
     result_of_person_details_from_bq
-) -> list:
-
+) -> str:
     person_details = (
         [
             get_html_text_for_recommended_person(person)
@@ -263,8 +262,7 @@ def get_list_of_recommended_person_details_with_html_text(
 
 def get_list_of_author_suggested_person_details_with_html_text(
     result_of_person_details_from_bq
-) -> list:
-
+):
     person_details = (
         [
             get_html_text_for_author_suggested_person(person)
