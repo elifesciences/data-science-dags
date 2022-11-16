@@ -212,8 +212,8 @@ def df_as_jsonl_file_without_null(df: pd.DataFrame, **kwargs) -> Iterator[str]:
 def to_gbq(
         df: pd.DataFrame,
         destination_table: str,
+        project_id: str,
         if_exists: str = 'fail',
-        project_id: Optional[str] = None,
         jsonl_file: Optional[str] = None):
     """Similar to DataFrame.to_gpq but better handles schema detection of nested fields"""
     dataset_name, table_name = destination_table.split('.', maxsplit=1)
