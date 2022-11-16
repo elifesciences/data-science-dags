@@ -1,7 +1,7 @@
 import functools
 import gzip
 from io import StringIO
-from typing import Optional, Any
+from typing import Callable, Optional, Any
 
 import numpy as np
 import pandas as pd
@@ -22,7 +22,7 @@ def isnull(value: Any) -> bool:
     return False
 
 
-def wrap_fn_or_none(fn: callable) -> callable:
+def wrap_fn_or_none(fn: Callable) -> Callable:
     @functools.wraps(fn)
     def wrapper(*args):
         for arg in args:
@@ -34,7 +34,7 @@ def wrap_fn_or_none(fn: callable) -> callable:
 
 def apply_skip_null(
         ser: pd.Series,
-        func: callable,
+        func: Callable,
         *args,
         **kwargs) -> pd.Series:
     return ser.apply(wrap_fn_or_none(func), *args, **kwargs)
