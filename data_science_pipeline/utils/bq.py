@@ -3,7 +3,7 @@ import os
 import time
 from contextlib import contextmanager
 from itertools import islice
-from typing import Iterable, List, Tuple, ContextManager
+from typing import Iterable, List, Optional, Tuple, ContextManager
 
 import pandas as pd
 
@@ -65,14 +65,14 @@ def get_validated_dataset_name_table_name(
 
 def load_file_into_bq(
         filename: str,
-        dataset_name: str = None,
-        table_name: str = None,
+        dataset_name: Optional[str] = None,
+        table_name: Optional[str] = None,
         source_format=SourceFormat.NEWLINE_DELIMITED_JSON,
         write_mode=WriteDisposition.WRITE_APPEND,
         auto_detect_schema=True,
         schema: List[SchemaField] = None,
         rows_to_skip=0,
-        project_id: str = None):
+        project_id: Optional[str] = None):
     dataset_name, table_name = get_validated_dataset_name_table_name(
         dataset_name, table_name
     )
@@ -108,10 +108,10 @@ def load_file_into_bq(
 
 def load_file_into_bq_with_auto_schema(
         jsonl_file: str,
-        dataset_name: str = None,
-        table_name: str = None,
+        dataset_name: Optional[str] = None,
+        table_name: Optional[str] = None,
         write_mode: str = WriteDisposition.WRITE_APPEND,
-        project_id: str = None,
+        project_id: Optional[str] = None,
         **kwargs):
     if write_mode == WriteDisposition.WRITE_APPEND:
         dataset_name, table_name = get_validated_dataset_name_table_name(
@@ -213,8 +213,8 @@ def to_gbq(
         df: pd.DataFrame,
         destination_table: str,
         if_exists: str = 'fail',
-        project_id: str = None,
-        jsonl_file: str = None):
+        project_id: Optional[str] = None,
+        jsonl_file: Optional[str] = None):
     """Similar to DataFrame.to_gpq but better handles schema detection of nested fields"""
     dataset_name, table_name = destination_table.split('.', maxsplit=1)
     with df_as_jsonl_file_without_null(df, jsonl_file=jsonl_file) as _jsonl_file:

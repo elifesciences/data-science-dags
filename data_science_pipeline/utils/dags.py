@@ -186,7 +186,7 @@ def get_default_notebook_task_id(notebook_filename: str) -> str:
 
 def create_run_notebook_operator(
         notebook_filename: str,
-        task_id: str = None,
+        task_id: Optional[str] = None,
         notebook_params: Optional[dict] = None,
         **kwargs):
     if not task_id:

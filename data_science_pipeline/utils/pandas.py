@@ -1,6 +1,7 @@
 import functools
 import gzip
 from io import StringIO
+from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -48,7 +49,7 @@ def get_filepath_csv_separator(filepath: str):
 
 def read_csv(
         filepath: str,
-        sep: str = None,
+        sep: Optional[str] = None,
         compression: str = 'infer',
         encoding: str = 'utf-8',
         **kwargs) -> pd.DataFrame:
@@ -65,7 +66,7 @@ def read_csv(
 def to_csv(
         df: pd.DataFrame,
         filepath: str,
-        sep: str = None,
+        sep: Optional[str] = None,
         index: bool = False,
         compression: str = 'infer',
         encoding: str = 'utf-8',

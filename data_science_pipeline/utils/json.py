@@ -2,7 +2,7 @@ import json
 import os
 from contextlib import contextmanager
 from tempfile import TemporaryDirectory
-from typing import ContextManager, Iterable
+from typing import ContextManager, Iterable, Optional
 
 import pandas as pd
 import numpy as np
@@ -81,7 +81,7 @@ def write_jsonl_to_file(
 def json_list_as_jsonl_file(
         json_list: Iterable[dict],
         gzip_enabled: bool = True,
-        jsonl_file: str = None) -> ContextManager[str]:
+        jsonl_file: Optional[str] = None) -> ContextManager[str]:
     if jsonl_file:
         write_jsonl_to_file(json_list, jsonl_file)
         yield jsonl_file
