@@ -194,7 +194,7 @@ class WeightedKeywordModel:
         assert len(choices) == len(keyword_weights_list), \
             "choices and keyword_weights_list list must have same length"
         self.choices = list(choices)
-        self.choice_indices_by_keyword_map = {}
+        self.choice_indices_by_keyword_map: dict = {}
         LOGGER.debug('keywords_list: %s', keywords_list)
         for choice_index, keywords in enumerate(keywords_list):
             for keyword in _to_list(keywords):
