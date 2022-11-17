@@ -105,7 +105,7 @@ class EuropePMCApiResponsePage:
 
     @property
     def total_count(self) -> int:
-        return int(self.json_response.get('hitCount'))
+        return int(self.json_response['hitCount'])
 
     @property
     def current_cursor(self) -> str:
