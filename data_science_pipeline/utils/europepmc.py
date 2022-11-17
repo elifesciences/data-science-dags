@@ -1,7 +1,7 @@
 import re
 import logging
 from itertools import islice
-from typing import Callable, Iterable, List, Optional
+from typing import Any, Callable, Iterable, List, Optional, TypeGuard, cast
 
 import requests
 from icu import Transliterator  # pylint: disable=no-name-in-module
@@ -227,9 +227,9 @@ class EuropePMCApi:
             ), limit
         )
 
-    def iter_author_pmids(self, author_names: List[str], **kwargs) -> List[str]:
+    def iter_author_pmids(self, author_names: List[str], **kwargs) -> Iterable[str]:
         return filter(
-            bool,
+            bool,  # type: ignore
             (item.get('pmid') for item in self.iter_query_results(
                 get_europepmc_author_query_string(author_names),
                 result_type='idlist',
