@@ -2,7 +2,7 @@ import logging
 from abc import ABC, abstractmethod
 from collections import Counter, defaultdict
 from itertools import groupby
-from typing import Dict, List, Generic, Optional, Tuple, Union, TypeVar
+from typing import Any, Dict, List, Generic, Optional, Tuple, Union, TypeVar
 
 import numpy as np
 import pandas as pd
@@ -137,7 +137,7 @@ class WeightedKeywordModelRankingList(Generic[KT, T]):
     def ranked_choices_list(self) -> List[List[T]]:
         return self.get_ranked_choices_list()
 
-    def get_ranked_scores_list(self, limit: Optional[int] = None) -> List[List[T]]:
+    def get_ranked_scores_list(self, limit: Optional[int] = None) -> List[List[Dict[str, Any]]]:
         return [
             [
                 {
@@ -156,7 +156,7 @@ class WeightedKeywordModelRankingList(Generic[KT, T]):
         ]
 
     @property
-    def ranked_scores_list(self) -> List[List[T]]:
+    def ranked_scores_list(self) -> List[List[Dict[str, List[List[Tuple[float, str]]]]]]:
         return self.get_ranked_scores_list()
 
     def get_matching_keywords_list(self, limit: Optional[int] = None) -> List[List[List[List[Tuple[float, str]]]]]:
