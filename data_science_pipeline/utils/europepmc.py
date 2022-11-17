@@ -1,7 +1,7 @@
 import re
 import logging
 from itertools import islice
-from typing import Any, Callable, Iterable, List, Optional, TypeGuard, cast
+from typing import Callable, Iterable, List, Optional
 
 import requests
 from icu import Transliterator  # pylint: disable=no-name-in-module
