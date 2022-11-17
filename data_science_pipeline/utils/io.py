@@ -42,11 +42,11 @@ def load_object_from(path: str) -> Any:
     return joblib.load(BytesIO(read_bytes(path)))
 
 
-def is_gzip_path(path: str) -> bool:
+def is_gzip_path(path: Path) -> bool:
     return str(path).endswith('.gz')
 
 
-def open_with_auto_compression(path: str, mode: str) -> Any[IO]:
+def open_with_auto_compression(path: Path, mode: str) -> Any[IO]:
     if is_gzip_path(path):
         if mode == 'r':
             mode = 'rt'
