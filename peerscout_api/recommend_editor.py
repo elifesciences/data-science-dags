@@ -1,7 +1,6 @@
 import os
 import logging
 from typing import List, NamedTuple, Tuple, TypeVar
-import numpy as np
 import pandas as pd
 
 from scipy.sparse import csc_matrix

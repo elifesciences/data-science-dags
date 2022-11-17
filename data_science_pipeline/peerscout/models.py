@@ -15,6 +15,7 @@ LOGGER = logging.getLogger(__name__)
 T = TypeVar('T')
 KT = TypeVar('KT')
 
+
 def _to_list(a: list) -> list:
     if isnull(a):
         return []
@@ -33,7 +34,7 @@ def _sorted_matching_keywords_map_list(
     return [
         {
             key: sorted(
-                matching_keywords,  #type: ignore
+                matching_keywords,  # type: ignore
                 key=lambda score_keyword: (-score_keyword[0], score_keyword[1])
             )
             for key, matching_keywords in matching_keywords_map.items()
@@ -160,8 +161,10 @@ class WeightedKeywordModelRankingList(Generic[KT, T]):
     def ranked_scores_list(self) -> List[List[Dict[str, List[List[Tuple[float, str]]]]]]:
         return self.get_ranked_scores_list()
 
-    def get_matching_keywords_list(self, limit: Optional[int] = None) -> List[List[List[List[Tuple[float, str]]]]]:
-        return [ # List[Dict[KT, List[Tuple[float, str]]]]
+    def get_matching_keywords_list(
+        self, limit: Optional[int] = None
+    ) -> List[List[List[List[Tuple[float, str]]]]]:
+        return [
             [
                 matching_keywords_map.get(index, [])[:limit]
                 for index in range(len(self.choices))
@@ -175,7 +178,7 @@ class WeightedKeywordModelRankingList(Generic[KT, T]):
 
     @property
     def proba_matrix(self) -> List[List[float]]:
-        return np.asmatrix([  #type: ignore
+        return np.asmatrix([  # type: ignore
             [
                 score_map.get(index, 0.0)
                 for index in range(len(self.choices))

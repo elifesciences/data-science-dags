@@ -4,7 +4,7 @@ from pathlib import Path
 import time
 from contextlib import contextmanager
 from itertools import islice
-from typing import Iterable, Iterator, List, Optional, Tuple, ContextManager, cast
+from typing import Iterable, Iterator, List, Optional, Tuple, cast
 
 import pandas as pd
 

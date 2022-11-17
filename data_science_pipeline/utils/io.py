@@ -1,7 +1,7 @@
 import gzip
 from io import BytesIO
 from pathlib import Path
-from typing import Any, ContextManager, IO
+from typing import Any, IO
 
 import joblib
 
