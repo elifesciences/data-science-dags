@@ -70,7 +70,7 @@ def get_recommended_editors_with_probability(
         proba_matrix: List[List[float]],
         editors_matching_keywords_list: List[List[List[Tuple[float, str]]]],
         indices: List[T],
-        threshold: float = 0.5) -> List[List[Tuple[float, T]]]:
+        threshold: float = 0.5) -> List[List[Tuple[float, T, float, List[Tuple[float, str]]]]]:
     return [
         sorted([
             (
