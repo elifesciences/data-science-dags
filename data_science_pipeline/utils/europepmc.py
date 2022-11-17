@@ -211,7 +211,7 @@ class EuropePMCApi:
             *args,
             **kwargs) -> EuropePMCApiResponsePageIterator:
         return EuropePMCApiResponsePageIterator(
-            lambda cursor: self.query_page(*args, cursor=cursor, **kwargs)
+            lambda cursor: self.query_page(*args, cursor=cursor, **kwargs)  # type: ignore
         )
 
     def iter_query_results(
