@@ -183,7 +183,7 @@ class EuropePMCApi:
             result_type: str,
             output_format: str = 'json',
             cursor: str = EUROPEPMC_START_CURSOR,
-            page_size: int = EUROPEPMC_MAX_PAGE_SIZE) -> EuropePMCApiResponsePage:
+            page_size: int = EUROPEPMC_MAX_PAGE_SIZE) -> Optional[EuropePMCApiResponsePage]:
         LOGGER.debug('query: %s', query)
         data = {
             **self.params,
@@ -246,10 +246,14 @@ class EuropePMCApi:
                 'paging not supported, list of pmids must be less than %d'
                 % EUROPEPMC_MAX_PAGE_SIZE
             )
-        result = get_manuscript_summary_from_json_response(self.query_page(
+        query_page = self.query_page(
             get_europepmc_pmid_query_string(pmids),
             result_type='core'
-        ).json_response)
+        )
+        if query_page:
+            result = get_manuscript_summary_from_json_response(query_page.json_response)
+        else:
+            result = []
         if not result:
             LOGGER.warning('no results for %s', pmids)
         return result
