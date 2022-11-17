@@ -1,9 +1,10 @@
 import logging
 import os
+from pathlib import Path
 import time
 from contextlib import contextmanager
 from itertools import islice
-from typing import Iterable, Iterator, List, Optional, Tuple, ContextManager
+from typing import Iterable, Iterator, List, Optional, Tuple, ContextManager, cast
 
 import pandas as pd
 
@@ -90,7 +91,7 @@ def load_file_into_bq(
     if source_format is SourceFormat.CSV:
         job_config.skip_leading_rows = rows_to_skip
     LOGGER.info('loading from %s', filename)
-    with open_with_auto_compression(filename, "rb") as source_file:
+    with open_with_auto_compression(cast(Path, filename), "rb") as source_file:
         job = client.load_table_from_file(
             source_file, destination=table_ref, job_config=job_config
         )
@@ -169,7 +170,7 @@ def load_file_and_append_to_bq_table_with_auto_schema(*args, **kwargs):
 
 def load_json_list_into_bq_with_auto_schema(json_list: Iterable[dict], **kwargs):
     with json_list_as_jsonl_file(json_list) as jsonl_file:
-        load_file_into_bq_with_auto_schema(jsonl_file, **kwargs)
+        load_file_into_bq_with_auto_schema(str(jsonl_file), **kwargs)
 
 
 def load_json_list_and_replace_bq_table_with_auto_schema(*args, **kwargs):
@@ -206,7 +207,7 @@ def iter_json_without_null_from_df(df: pd.DataFrame, batch_size: int = 5000) -> 
 def df_as_jsonl_file_without_null(df: pd.DataFrame, **kwargs) -> Iterator[str]:
     json_iterable = iter_json_without_null_from_df(df)
     with json_list_as_jsonl_file(json_iterable, **kwargs) as jsonl_file:
-        yield jsonl_file
+        yield str(jsonl_file)
 
 
 def to_gbq(
