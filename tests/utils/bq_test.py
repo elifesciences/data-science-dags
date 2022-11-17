@@ -11,8 +11,7 @@ from data_science_pipeline.utils.bq import (
 
 
 class TestDfAsJsonlFileWithoutNull:
-    def test_should_remove_null_value(self, temp_dir: Path):
-        jsonl_file = temp_dir / 'data.jsonl'
+    def test_should_remove_null_value(self):
         df = pd.DataFrame([{'key1': 'value1', 'key2': None}])
         with df_as_jsonl_file_without_null(df, gzip_enabled=False) as jsonl_file:
             result = [
@@ -21,8 +20,7 @@ class TestDfAsJsonlFileWithoutNull:
             ]
         assert result == [{'key1': 'value1'}]
 
-    def test_should_remove_np_nan_value(self, temp_dir: Path):
-        jsonl_file = temp_dir / 'data.jsonl'
+    def test_should_remove_np_nan_value(self):
         df = pd.DataFrame([{'key1': 'value1', 'key2': np.nan}])
         with df_as_jsonl_file_without_null(df, gzip_enabled=False) as jsonl_file:
             result = [
@@ -31,8 +29,7 @@ class TestDfAsJsonlFileWithoutNull:
             ]
         assert result == [{'key1': 'value1'}]
 
-    def test_should_remove_null_value_from_nested_field(self, temp_dir: Path):
-        jsonl_file = temp_dir / 'data.jsonl'
+    def test_should_remove_null_value_from_nested_field(self):
         df = pd.DataFrame([{'parent': {'key1': 'value1', 'key2': None}}])
         with df_as_jsonl_file_without_null(df, gzip_enabled=False) as jsonl_file:
             result = [
@@ -41,8 +38,7 @@ class TestDfAsJsonlFileWithoutNull:
             ]
         assert result == [{'parent': {'key1': 'value1'}}]
 
-    def test_should_not_fail_with_list_values_field(self, temp_dir: Path):
-        jsonl_file = temp_dir / 'data.jsonl'
+    def test_should_not_fail_with_list_values_field(self):
         df = pd.DataFrame([{'key1': ['value1', 'value2'], 'key2': None}])
         with df_as_jsonl_file_without_null(df, gzip_enabled=False) as jsonl_file:
             result = [
