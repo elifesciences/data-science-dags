@@ -39,7 +39,9 @@ def resolve_url(url: str) -> str:
 
 
 def is_ncbi_domain_url(url: str) -> bool:
-    return urlparse(url.lower()).hostname.endswith(NCBI_DOMAIN_NAME)
+    hostname = urlparse(url.lower()).hostname
+    assert hostname is not None
+    return hostname.endswith(NCBI_DOMAIN_NAME)
 
 
 def is_ncbi_pubmed_article_url(url: str) -> bool:
