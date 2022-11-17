@@ -2,7 +2,8 @@
 # https://github.com/elifesciences/data-hub-core-airflow-dags/blob/develop/data_pipeline/utils/data_store/bq_data_service.py
 
 import logging
-from typing import List, Literal
+from pathlib import Path
+from typing import List, Literal, cast
 from google.cloud import bigquery
 from google.cloud.bigquery.schema import SchemaField
 from google.cloud.exceptions import NotFound
@@ -141,8 +142,8 @@ def get_new_merged_schema(
     fields_to_recurse = [
         obj_key
         for obj_key in set_intersection
-        if existing_schema_dict.get(obj_key).get("fields") and
-        isinstance(existing_schema_dict.get(obj_key).get("fields"), list)
+        if existing_schema_dict[obj_key].get("fields") and
+        isinstance(existing_schema_dict[obj_key].get("fields"), list)
     ]
     new_schema.extend(
         [
@@ -152,10 +153,10 @@ def get_new_merged_schema(
         ]
     )
     for field_to_recurse in fields_to_recurse:
-        field = existing_schema_dict.get(field_to_recurse).copy()
+        field = existing_schema_dict[field_to_recurse].copy()
         field["fields"] = get_new_merged_schema(
-            existing_schema_dict.get(field_to_recurse).get("fields", []),
-            update_schema_dict.get(field_to_recurse).get("fields", []),
+            existing_schema_dict[field_to_recurse].get("fields", []),
+            update_schema_dict[field_to_recurse].get("fields", []),
         )
         new_schema.append(
             field
@@ -168,7 +169,7 @@ def generate_schema_from_file(
         full_file_location: str,
         quoted_values_are_strings: bool = True
 ):
-    with open_with_auto_compression(full_file_location, 'r') as file_reader:
+    with open_with_auto_compression(cast(Path, full_file_location), 'r') as file_reader:
         generator = SchemaGenerator(
             input_format="json",
             quoted_values_are_strings=quoted_values_are_strings
