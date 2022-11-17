@@ -46,7 +46,7 @@ def is_gzip_path(path: str) -> bool:
     return str(path).endswith('.gz')
 
 
-def open_with_auto_compression(path: str, mode: str) -> ContextManager[IO]:
+def open_with_auto_compression(path: str, mode: str) -> Any[IO]:
     if is_gzip_path(path):
         if mode == 'r':
             mode = 'rt'
