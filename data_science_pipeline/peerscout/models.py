@@ -253,7 +253,7 @@ class WeightedKeywordModel:
         for keyword_weight, keyword in weighted_keywords:
             for choice_index in self.choice_indices_by_keyword_map.get(keyword, []):
                 keyword_score = (
-                    self.keyword_weights_by_choice_and_keyword_map.choice_index.keyword
+                    self.keyword_weights_by_choice_and_keyword_map[choice_index][keyword]
                     * keyword_weight
                 )
                 choice_matching_keywords[choice_index].append(
