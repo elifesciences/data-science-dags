@@ -80,7 +80,7 @@ def get_pmids_from_json_response(json_response: dict) -> List[str]:
     ]
 
 
-def get_manuscript_summary_from_json_response(json_response: dict) -> List[str]:
+def get_manuscript_summary_from_json_response(json_response: dict) -> List[dict]:
     if not json_response:
         return []
     return [
@@ -240,7 +240,7 @@ class EuropePMCApi:
     def get_author_pmids(self, *args, **kwargs) -> List[str]:
         return list(self.iter_author_pmids(*args, **kwargs))
 
-    def get_summary_by_page_pmids(self, pmids: List[str]) -> List[str]:
+    def get_summary_by_page_pmids(self, pmids: List[str]) -> List[dict]:
         if len(pmids) > EUROPEPMC_MAX_PAGE_SIZE:
             raise ValueError(
                 'paging not supported, list of pmids must be less than %d'
