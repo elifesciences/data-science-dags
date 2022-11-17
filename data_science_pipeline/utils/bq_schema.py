@@ -121,11 +121,11 @@ def get_new_merged_schema(
 ):
     new_schema = []
     existing_schema_dict = {
-        schema_object.get("name").lower(): schema_object
+        schema_object["name"].lower(): schema_object
         for schema_object in existing_schema
     }
     update_schema_dict = {
-        schema_object.get("name").lower(): schema_object
+        schema_object["name"].lower(): schema_object
         for schema_object in update_schema
     }
     merged_dict = {
