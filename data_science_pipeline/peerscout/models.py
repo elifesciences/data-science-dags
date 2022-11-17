@@ -174,7 +174,7 @@ class WeightedKeywordModelRankingList(Generic[KT, T]):
 
     @property
     def proba_matrix(self) -> List[List[float]]:
-        return np.asmatrix([
+        return np.asmatrix([  #type: ignore
             [
                 score_map.get(index, 0.0)
                 for index in range(len(self.choices))
