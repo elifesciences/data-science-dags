@@ -99,7 +99,7 @@ def get_weighted_keywords_list_for_vectorizer(
 class WeightedKeywordModelRankingList(Generic[KT, T]):
     def __init__(
             self,
-            matching_keywords_map_list: List[Dict[KT, List[Tuple[float, str]]]],
+            matching_keywords_map_list: List[Dict[int, List[Tuple[float, str]]]],
             choices: List[T]):
         self.matching_keywords_map_list = _sorted_matching_keywords_map_list(
             matching_keywords_map_list
