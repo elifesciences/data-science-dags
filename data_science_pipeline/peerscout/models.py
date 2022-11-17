@@ -33,7 +33,7 @@ def _sorted_matching_keywords_map_list(
     return [
         {
             key: sorted(
-                matching_keywords,
+                matching_keywords,  #type: ignore
                 key=lambda score_keyword: (-score_keyword[0], score_keyword[1])
             )
             for key, matching_keywords in matching_keywords_map.items()
