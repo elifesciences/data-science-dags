@@ -4,6 +4,7 @@ from typing import List, NamedTuple, Tuple, TypeVar
 import numpy as np
 import pandas as pd
 
+from scipy.sparse import csc_matrix
 from sklearn.metrics.pairwise import cosine_similarity
 
 from data_science_pipeline.utils.io import load_object_from
@@ -20,7 +21,7 @@ class PeerScoutModelProps(NamedTuple):
     editor_names: List[str]
     editor_person_ids: List[str]
     editor_tf_idf_vectorizer: Vectorizer
-    editor_tf_idf: np.ndarray
+    editor_tf_idf: csc_matrix
 
     def get_editor_person_id_by_name_map(self):
         editor_names = self.editor_names
@@ -44,7 +45,7 @@ def load_model(model_path: str, model_name: str) -> PeerScoutModelProps:
 
 def get_weighted_keyword_valid_model(model: PeerScoutModelProps):
     weighted_keyword_valid_model = WeightedKeywordModel.from_tf_matrix(
-        model.editor_tf_idf.todense(),
+        tf_matrix=model.editor_tf_idf.todense(),
         vectorizer=model.editor_tf_idf_vectorizer,
         choices=model.editor_names
     )
