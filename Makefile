@@ -168,6 +168,9 @@ pylint:
 	$(DEV_RUN) pylint data_science_pipeline peerscout_api dags tests setup.py
 
 
+mypy:
+	$(DEV_RUN) mypy data_science_pipeline peerscout_api dags tests setup.py
+
 flake8:
 	$(DEV_RUN) flake8 data_science_pipeline peerscout_api dags tests setup.py
 
@@ -225,7 +228,7 @@ watch:
 lint: flake8 pylint notebook-lint
 
 
-test: lint pytest
+test: lint pytest mypy
 
 
 airflow-build:
