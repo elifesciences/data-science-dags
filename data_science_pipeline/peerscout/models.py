@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Generic, Optional, Tuple, Union, TypeVar
 
 import numpy as np
 import pandas as pd
+from scipy.sparse import csc_matrix
 
 from data_science_pipeline.utils.pandas import isnull
 
@@ -45,7 +46,7 @@ class Vectorizer(ABC):
     """Vectorizer for typing, e.g. sklearn's TfidfVectorizer"""
 
     @abstractmethod
-    def transform(self, raw_documents: List[List[str]]) -> np.ndarray:
+    def transform(self, raw_documents: List[List[str]]) -> csc_matrix:
         pass
 
     @abstractmethod
