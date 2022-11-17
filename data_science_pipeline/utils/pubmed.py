@@ -57,10 +57,13 @@ def get_ncbi_pubmed_article_id(url: str) -> Optional[str]:
 
 
 def get_ncbi_pubmed_article_ids(urls: List[str]) -> List[str]:
-    return list(filter(bool, [
-        get_ncbi_pubmed_article_id(url)
-        for url in urls
-    ]))
+    return list(filter(
+        bool,  # type: ignore
+        [
+            get_ncbi_pubmed_article_id(url)
+            for url in urls
+        ]
+    ))
 
 
 def is_ncbi_bibliography_url(url: str) -> bool:
