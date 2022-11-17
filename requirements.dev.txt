@@ -6,3 +6,4 @@ pytest-watch==4.2.0
 requests==2.26.0
 mypy==0.990
 types-requests
+types-PyYAML
