@@ -30,7 +30,7 @@ def _get_index(a: Union[list, pd.Series]):
 
 def _sorted_matching_keywords_map_list(
         matching_keywords_map_list: List[Dict[KT, List[Tuple[float, str]]]]
-        ) -> List[Dict[KT, List[List[Tuple[float, str]]]]]:
+        ) -> List[Dict[KT, List[Tuple[float, str]]]]:
     return [
         {
             key: sorted(
@@ -166,7 +166,7 @@ class WeightedKeywordModelRankingList(Generic[KT, T]):
 
     def get_matching_keywords_list(
         self, limit: Optional[int] = None
-    ) -> List[List[List[List[Tuple[float, str]]]]]:
+    ) -> List[List[List[Tuple[float, str]]]]:
         return [
             [
                 matching_keywords_map.get(index, [])[:limit]
@@ -176,7 +176,7 @@ class WeightedKeywordModelRankingList(Generic[KT, T]):
         ]
 
     @property
-    def matching_keywords_list(self) -> List[List[List[List[Tuple[float, str]]]]]:
+    def matching_keywords_list(self) -> List[List[List[Tuple[float, str]]]]:
         return self.get_matching_keywords_list()
 
     @property
