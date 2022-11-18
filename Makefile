@@ -83,6 +83,7 @@ dev-notebook-lint:
 	$(PYTHON) -m pylint .temp/converted-notebooks/*.py \
 		--max-line-length=$(NOTEBOOK_MAX_LINE_LENGTH) \
 		--disable=$(NOTEBOOK_PYLINT_EXCLUSIONS)
+	$(PYTHON) -m mypy .temp/converted-notebooks/*.py
 
 
 dev-notebook-nbstripout:
@@ -188,6 +189,7 @@ notebook-lint:
 		&& pylint ./.temp/converted-notebooks/*.py \
 		--max-line-length=$(NOTEBOOK_MAX_LINE_LENGTH) \
 		--disable=$(NOTEBOOK_PYLINT_EXCLUSIONS) \
+		&& mypy ./.temp/converted-notebooks/*.py \
 	'
 
 
@@ -225,10 +227,10 @@ watch:
 	@$(MAKE) ARGS="$(ARGS) $(NOT_SLOW_PYTEST_ARGS)" .watch
 
 
-lint: flake8 pylint notebook-lint
+lint: flake8 pylint mypy notebook-lint
 
 
-test: lint pytest mypy
+test: lint pytest
 
 
 airflow-build:
