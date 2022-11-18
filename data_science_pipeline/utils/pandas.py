@@ -1,6 +1,7 @@
 import functools
 import gzip
 from io import StringIO
+from typing import Callable, Optional, Any
 
 import numpy as np
 import pandas as pd
@@ -12,7 +13,7 @@ from data_science_pipeline.utils.io import (
 )
 
 
-def isnull(value: any) -> bool:
+def isnull(value: Any) -> bool:
     # Note: this handles the following exception just using pd.isnull:
     #  ValueError: The truth value of an array with more than one element
     #     is ambiguous.
@@ -21,7 +22,7 @@ def isnull(value: any) -> bool:
     return False
 
 
-def wrap_fn_or_none(fn: callable) -> callable:
+def wrap_fn_or_none(fn: Callable) -> Callable:
     @functools.wraps(fn)
     def wrapper(*args):
         for arg in args:
@@ -33,7 +34,7 @@ def wrap_fn_or_none(fn: callable) -> callable:
 
 def apply_skip_null(
         ser: pd.Series,
-        func: callable,
+        func: Callable,
         *args,
         **kwargs) -> pd.Series:
     return ser.apply(wrap_fn_or_none(func), *args, **kwargs)
@@ -48,7 +49,7 @@ def get_filepath_csv_separator(filepath: str):
 
 def read_csv(
         filepath: str,
-        sep: str = None,
+        sep: Optional[str] = None,
         compression: str = 'infer',
         encoding: str = 'utf-8',
         **kwargs) -> pd.DataFrame:
@@ -65,7 +66,7 @@ def read_csv(
 def to_csv(
         df: pd.DataFrame,
         filepath: str,
-        sep: str = None,
+        sep: Optional[str] = None,
         index: bool = False,
         compression: str = 'infer',
         encoding: str = 'utf-8',

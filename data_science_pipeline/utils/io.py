@@ -1,7 +1,7 @@
 import gzip
 from io import BytesIO
 from pathlib import Path
-from typing import Any, ContextManager, IO
+from typing import Any
 
 import joblib
 
@@ -42,11 +42,11 @@ def load_object_from(path: str) -> Any:
     return joblib.load(BytesIO(read_bytes(path)))
 
 
-def is_gzip_path(path: str) -> bool:
+def is_gzip_path(path: Path) -> bool:
     return str(path).endswith('.gz')
 
 
-def open_with_auto_compression(path: str, mode: str) -> ContextManager[IO]:
+def open_with_auto_compression(path: Path, mode: str) -> Any:
     if is_gzip_path(path):
         if mode == 'r':
             mode = 'rt'

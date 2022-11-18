@@ -1,8 +1,9 @@
 import json
 import os
 from contextlib import contextmanager
+from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import ContextManager, Iterable
+from typing import Iterable, Iterator, Optional, cast
 
 import pandas as pd
 import numpy as np
@@ -66,7 +67,7 @@ def remove_key_with_null_value(record):
 
 def write_jsonl_to_file(
         json_list: Iterable[dict],
-        full_temp_file_location: str,
+        full_temp_file_location: Path,
         write_mode: str = 'w'):
     with open_with_auto_compression(full_temp_file_location, write_mode) as write_file:
         for record in json_list:
@@ -81,14 +82,14 @@ def write_jsonl_to_file(
 def json_list_as_jsonl_file(
         json_list: Iterable[dict],
         gzip_enabled: bool = True,
-        jsonl_file: str = None) -> ContextManager[str]:
+        jsonl_file: Optional[Path] = None) -> Iterator[Path]:
     if jsonl_file:
         write_jsonl_to_file(json_list, jsonl_file)
         yield jsonl_file
         return
     with TemporaryDirectory() as temp_dir:
-        jsonl_file = os.path.join(temp_dir, 'data.jsonl')
+        jsonl_file = cast(Path, os.path.join(temp_dir, 'data.jsonl'))
         if gzip_enabled:
-            jsonl_file += '.gz'
+            jsonl_file = cast(Path, str(jsonl_file) + '.gz')
         write_jsonl_to_file(json_list, jsonl_file)
         yield jsonl_file

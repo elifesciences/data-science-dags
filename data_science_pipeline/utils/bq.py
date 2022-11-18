@@ -1,9 +1,10 @@
 import logging
 import os
+from pathlib import Path
 import time
 from contextlib import contextmanager
 from itertools import islice
-from typing import Iterable, List, Tuple, ContextManager
+from typing import Iterable, Iterator, List, Optional, Tuple, cast
 
 import pandas as pd
 
@@ -34,13 +35,13 @@ from data_science_pipeline.utils.pandas import dataframe_chunk
 LOGGER = logging.getLogger(__name__)
 
 
-def with_limit_sql(sql: str, limit: int = None) -> str:
+def with_limit_sql(sql: str, limit: Optional[int] = None) -> str:
     if not limit:
         return sql
     return sql + '\nLIMIT %d' % limit
 
 
-def is_bq_not_found_exception(exception: BaseException) -> bool:
+def is_bq_not_found_exception(exception: Optional[BaseException] = None) -> bool:
     if not exception:
         return False
     return (
@@ -64,15 +65,15 @@ def get_validated_dataset_name_table_name(
 
 
 def load_file_into_bq(
-        filename: str,
-        dataset_name: str = None,
-        table_name: str = None,
+        filename: Path,
+        project_id: str,
+        dataset_name: str,
+        table_name: str,
         source_format=SourceFormat.NEWLINE_DELIMITED_JSON,
         write_mode=WriteDisposition.WRITE_APPEND,
         auto_detect_schema=True,
-        schema: List[SchemaField] = None,
-        rows_to_skip=0,
-        project_id: str = None):
+        schema: Optional[List[SchemaField]] = None,
+        rows_to_skip=0):
     dataset_name, table_name = get_validated_dataset_name_table_name(
         dataset_name, table_name
     )
@@ -90,7 +91,7 @@ def load_file_into_bq(
     if source_format is SourceFormat.CSV:
         job_config.skip_leading_rows = rows_to_skip
     LOGGER.info('loading from %s', filename)
-    with open_with_auto_compression(filename, "rb") as source_file:
+    with open_with_auto_compression(cast(Path, filename), "rb") as source_file:
         job = client.load_table_from_file(
             source_file, destination=table_ref, job_config=job_config
         )
@@ -107,11 +108,11 @@ def load_file_into_bq(
 
 
 def load_file_into_bq_with_auto_schema(
-        jsonl_file: str,
-        dataset_name: str = None,
-        table_name: str = None,
+        jsonl_file: Path,
+        project_id: str,
+        dataset_name: str,
+        table_name: str,
         write_mode: str = WriteDisposition.WRITE_APPEND,
-        project_id: str = None,
         **kwargs):
     if write_mode == WriteDisposition.WRITE_APPEND:
         dataset_name, table_name = get_validated_dataset_name_table_name(
@@ -122,7 +123,7 @@ def load_file_into_bq_with_auto_schema(
             gcp_project=project_id,
             dataset_name=dataset_name,
             table_name=table_name,
-            full_file_location=jsonl_file,
+            full_file_location=str(jsonl_file),
             quoted_values_are_strings=True
         )
         LOGGER.info('loading the data to the table : %s.%s', dataset_name, table_name)
@@ -203,7 +204,7 @@ def iter_json_without_null_from_df(df: pd.DataFrame, batch_size: int = 5000) -> 
 
 
 @contextmanager
-def df_as_jsonl_file_without_null(df: pd.DataFrame, **kwargs) -> ContextManager[str]:
+def df_as_jsonl_file_without_null(df: pd.DataFrame, **kwargs) -> Iterator[Path]:
     json_iterable = iter_json_without_null_from_df(df)
     with json_list_as_jsonl_file(json_iterable, **kwargs) as jsonl_file:
         yield jsonl_file
@@ -212,9 +213,9 @@ def df_as_jsonl_file_without_null(df: pd.DataFrame, **kwargs) -> ContextManager[
 def to_gbq(
         df: pd.DataFrame,
         destination_table: str,
+        project_id: str,
         if_exists: str = 'fail',
-        project_id: str = None,
-        jsonl_file: str = None):
+        jsonl_file: Optional[str] = None):
     """Similar to DataFrame.to_gpq but better handles schema detection of nested fields"""
     dataset_name, table_name = destination_table.split('.', maxsplit=1)
     with df_as_jsonl_file_without_null(df, jsonl_file=jsonl_file) as _jsonl_file:

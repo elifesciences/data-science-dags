@@ -105,9 +105,10 @@ class TestRemoveKeyWithNullValue:
 class TestWriteJsonlToFile:
     def test_should_be_able_to_write_numpy_array(self, temp_dir: Path):
         temp_file = temp_dir / 'file.json'
-        write_jsonl_to_file([{
-            'key1': np.asarray([1, 2, 3])
-        }], temp_file)
+        write_jsonl_to_file(
+            json_list=[{'key1': np.asarray([1, 2, 3])}],
+            full_temp_file_location=temp_file
+        )
         assert json.loads(temp_file.read_text()) == {
             'key1': [1, 2, 3]
         }

@@ -1,7 +1,7 @@
 import logging
 import re
 from urllib.parse import urlparse, parse_qs, urlencode, urljoin
-from typing import Iterable, List
+from typing import Any, Iterable, Iterator, List, Optional
 
 import requests
 from bs4 import BeautifulSoup
@@ -39,17 +39,19 @@ def resolve_url(url: str) -> str:
 
 
 def is_ncbi_domain_url(url: str) -> bool:
-    return urlparse(url.lower()).hostname.endswith(NCBI_DOMAIN_NAME)
+    hostname = urlparse(url.lower()).hostname
+    assert hostname is not None
+    return hostname.endswith(NCBI_DOMAIN_NAME)
 
 
-def is_ncbi_pubmed_article_url(url: str) -> str:
+def is_ncbi_pubmed_article_url(url: str) -> bool:
     return any(
         url.startswith(prefix)
         for prefix in NCBI_PUBMED_URL_PREFIX_LIST
     )
 
 
-def get_ncbi_pubmed_article_id(url: str) -> str:
+def get_ncbi_pubmed_article_id(url: str) -> Optional[str]:
     url = normalize_url(url)
     if not is_ncbi_pubmed_article_url(url):
         return None
@@ -57,10 +59,13 @@ def get_ncbi_pubmed_article_id(url: str) -> str:
 
 
 def get_ncbi_pubmed_article_ids(urls: List[str]) -> List[str]:
-    return list(filter(bool, [
-        get_ncbi_pubmed_article_id(url)
-        for url in urls
-    ]))
+    return list(filter(
+        bool,  # type: ignore
+        [
+            get_ncbi_pubmed_article_id(url)
+            for url in urls
+        ]
+    ))
 
 
 def is_ncbi_bibliography_url(url: str) -> bool:
@@ -73,9 +78,9 @@ def is_ncbi_bibliography_url(url: str) -> bool:
     )
 
 
-def get_ncbi_search_term(url: str) -> str:
+def get_ncbi_search_term(url: str) -> Optional[str]:
     if not is_ncbi_domain_url(url) or is_ncbi_bibliography_url(url):
-        return False
+        return None
     terms = parse_qs(urlparse(url).query).get('term')
     return terms[0] if terms else ''
 
@@ -107,7 +112,7 @@ def parse_term_item(term_item: str):
 
 
 def parse_term_query(term_query: str) -> dict:
-    result = {}
+    result: dict = {}
     operator = 'OR'
     for item in re.split(r'(OR|NOT|AND)', term_query):
         item = item.strip()
@@ -141,12 +146,12 @@ class PubmedBibliographyNextPageLink:
         self.next_page_soup = next_page_soup
 
     @property
-    def href(self) -> str:
+    def href(self) -> Optional[str]:
         if not self.next_page_soup:
             return None
         return self.next_page_soup['href']
 
-    def get_href(self, base_url: str) -> str:
+    def get_href(self, base_url: str) -> Optional[str]:
         if not self.next_page_soup:
             return None
         return combined_page_url_href(base_url, self.href)
@@ -157,7 +162,7 @@ class PubmedBibliographyPage:
         self.html_content = html_content
         self.page_soup = BeautifulSoup(html_content, features='lxml')
 
-    def parse_pmid_text(self, pmid_text: str) -> str:
+    def parse_pmid_text(self, pmid_text: str) -> Optional[str]:
         LOGGER.debug('pmid_text: %s', pmid_text)
         m = re.match(r'.*\b(\d+)\b.*', str(pmid_text), re.DOTALL)
         if m:
@@ -167,7 +172,7 @@ class PubmedBibliographyPage:
         return None
 
     @property
-    def pmids(self) -> List[str]:
+    def pmids(self) -> List[Optional[str]]:
         citations_soup = self.page_soup.find('div', class_='citations')
         pmid_soups = citations_soup.find_all(class_='pmid')
         return [self.parse_pmid_text(e.text) for e in pmid_soups]
@@ -179,10 +184,10 @@ class PubmedBibliographyPage:
         )
 
     @property
-    def next_page_href(self) -> bool:
+    def next_page_href(self) -> Optional[str]:
         return self.next_page.href
 
-    def get_next_page_href(self, base_url: str) -> str:
+    def get_next_page_href(self, base_url: str) -> Optional[str]:
         return self.next_page.get_href(base_url)
 
 
@@ -197,7 +202,7 @@ class PubmedBibliographyScraper:
         LOGGER.info('retrieved html from: %s (%d chars)', url, len(response_text))
         return response_text
 
-    def iter_pages(self, url: str) -> PubmedBibliographyPage:
+    def iter_pages(self, url: str) -> Iterator[PubmedBibliographyPage]:
         page = PubmedBibliographyPage(self.get_html(url))
         yield page
         previous_url = url
@@ -208,9 +213,9 @@ class PubmedBibliographyScraper:
             previous_url = next_page_url
             next_page_url = page.get_next_page_href(url)
 
-    def iter_pmids(self, url: str) -> Iterable[str]:
+    def iter_pmids(self, url: str) -> Iterable[Optional[str]]:
         for page in self.iter_pages(url):
             yield from page.pmids
 
-    def get_pmids(self, url: str) -> List[str]:
-        return list(self.iter_pmids(url))
+    def get_pmids(self, url: str) -> List[Any]:
+        return [self.iter_pmids(url)]

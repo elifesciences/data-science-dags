@@ -2,15 +2,18 @@ import logging
 from abc import ABC, abstractmethod
 from collections import Counter, defaultdict
 from itertools import groupby
-from typing import Dict, List, Generic, Tuple, Union, T, KT
+from typing import Any, Dict, List, Generic, Optional, Tuple, Union, TypeVar, cast
 
 import numpy as np
 import pandas as pd
+from scipy.sparse import csc_matrix
 
 from data_science_pipeline.utils.pandas import isnull
 
 
 LOGGER = logging.getLogger(__name__)
+T = TypeVar('T')
+KT = TypeVar('KT')
 
 
 def _to_list(a: list) -> list:
@@ -31,8 +34,8 @@ def _sorted_matching_keywords_map_list(
     return [
         {
             key: sorted(
-                matching_keywords,
-                key=lambda score_keyword: (-score_keyword[0], score_keyword[1])
+                matching_keywords,  # type: ignore
+                key=lambda score_keyword: (-cast(float, score_keyword[0]), score_keyword[1])
             )
             for key, matching_keywords in matching_keywords_map.items()
         }
@@ -44,7 +47,7 @@ class Vectorizer(ABC):
     """Vectorizer for typing, e.g. sklearn's TfidfVectorizer"""
 
     @abstractmethod
-    def transform(self, raw_documents: List[List[str]]) -> np.ndarray:
+    def transform(self, raw_documents: List[List[str]]) -> csc_matrix:
         pass
 
     @abstractmethod
@@ -86,7 +89,7 @@ def get_count_weighted_keywords_list(
 
 def get_weighted_keywords_list_for_vectorizer(
         keywords_list: List[List[str]],
-        vectorizer: Vectorizer = None) -> List[List[Tuple[float, str]]]:
+        vectorizer: Optional[Vectorizer] = None) -> List[List[Tuple[float, str]]]:
     if vectorizer is None:
         return get_count_weighted_keywords_list(keywords_list)
     return get_weighted_keywords_list_for_tf_matrix(
@@ -98,14 +101,17 @@ def get_weighted_keywords_list_for_vectorizer(
 class WeightedKeywordModelRankingList(Generic[KT, T]):
     def __init__(
             self,
-            matching_keywords_map_list: List[Dict[KT, List[Tuple[float, str]]]],
+            matching_keywords_map_list: List[Dict[int, List[Tuple[float, str]]]],
             choices: List[T]):
         self.matching_keywords_map_list = _sorted_matching_keywords_map_list(
             matching_keywords_map_list
         )
         self.score_map_list = [
             {
-                key: sum(score for score, _ in matching_keywords)
+                key: sum(
+                    score  # type: ignore
+                    for score, _ in matching_keywords
+                )
                 for key, matching_keywords in matching_keywords_map.items()
             }
             for matching_keywords_map in self.matching_keywords_map_list
@@ -123,7 +129,7 @@ class WeightedKeywordModelRankingList(Generic[KT, T]):
             self.choices
         )
 
-    def get_ranked_choices_list(self, limit: int = None) -> List[List[T]]:
+    def get_ranked_choices_list(self, limit: Optional[int] = None) -> List[List[T]]:
         return [
             [
                 self.choices[index]
@@ -136,7 +142,7 @@ class WeightedKeywordModelRankingList(Generic[KT, T]):
     def ranked_choices_list(self) -> List[List[T]]:
         return self.get_ranked_choices_list()
 
-    def get_ranked_scores_list(self, limit: int = None) -> List[List[T]]:
+    def get_ranked_scores_list(self, limit: Optional[int] = None) -> List[List[Dict[str, Any]]]:
         return [
             [
                 {
@@ -155,10 +161,12 @@ class WeightedKeywordModelRankingList(Generic[KT, T]):
         ]
 
     @property
-    def ranked_scores_list(self) -> List[List[T]]:
+    def ranked_scores_list(self) -> List[List[Dict[str, List[List[Tuple[float, str]]]]]]:
         return self.get_ranked_scores_list()
 
-    def get_matching_keywords_list(self, limit: int = None) -> List[List[Tuple[float, str]]]:
+    def get_matching_keywords_list(
+        self, limit: Optional[int] = None
+    ) -> List[List[List[Tuple[float, str]]]]:
         return [
             [
                 matching_keywords_map.get(index, [])[:limit]
@@ -168,12 +176,12 @@ class WeightedKeywordModelRankingList(Generic[KT, T]):
         ]
 
     @property
-    def matching_keywords_list(self) -> List[List[Tuple[float, str]]]:
+    def matching_keywords_list(self) -> List[List[List[Tuple[float, str]]]]:
         return self.get_matching_keywords_list()
 
     @property
     def proba_matrix(self) -> List[List[float]]:
-        return np.asmatrix([
+        return np.asmatrix([  # type: ignore
             [
                 score_map.get(index, 0.0)
                 for index in range(len(self.choices))
@@ -188,12 +196,12 @@ class WeightedKeywordModel:
             choices: List[T],
             keywords_list: List[List[str]],
             keyword_weights_list: List[List[float]],
-            vectorizer: Vectorizer = None):
+            vectorizer: Optional[Vectorizer] = None):
         assert len(choices) == len(keywords_list), "choices and keywords list must have same length"
         assert len(choices) == len(keyword_weights_list), \
             "choices and keyword_weights_list list must have same length"
         self.choices = list(choices)
-        self.choice_indices_by_keyword_map = {}
+        self.choice_indices_by_keyword_map: dict = {}
         LOGGER.debug('keywords_list: %s', keywords_list)
         for choice_index, keywords in enumerate(keywords_list):
             for keyword in _to_list(keywords):
@@ -210,9 +218,9 @@ class WeightedKeywordModel:
     @staticmethod
     def from_tf_matrix(
             tf_matrix: np.ndarray,
-            tf_keywords: List[str] = None,
-            vectorizer: Vectorizer = None,
-            choices: list = None,
+            tf_keywords: Optional[List[str]] = None,
+            vectorizer: Optional[Vectorizer] = None,
+            choices: Optional[list] = None,
             **kwargs) -> 'WeightedKeywordModel':
         if choices is None:
             choices = list(range(len(tf_matrix)))
@@ -248,9 +256,7 @@ class WeightedKeywordModel:
         for keyword_weight, keyword in weighted_keywords:
             for choice_index in self.choice_indices_by_keyword_map.get(keyword, []):
                 keyword_score = (
-                    self.keyword_weights_by_choice_and_keyword_map
-                    .get(choice_index)
-                    .get(keyword)
+                    self.keyword_weights_by_choice_and_keyword_map[choice_index][keyword]
                     * keyword_weight
                 )
                 choice_matching_keywords[choice_index].append(
@@ -276,7 +282,7 @@ class WeightedKeywordModel:
     def predict(
             self,
             keywords_list: List[List[str]],
-            limit: int = None,
+            limit: Optional[int] = None,
             return_scores: bool = False):
         LOGGER.debug('keywords_list: %s', keywords_list)
         index = _get_index(keywords_list)

@@ -72,6 +72,8 @@ dev-flake8:
 dev-pylint:
 	$(PYTHON) -m pylint data_science_pipeline peerscout_api dags tests tests_peerscout_api setup.py
 
+dev-mypy:
+	$(PYTHON) -m mypy data_science_pipeline peerscout_api dags tests tests_peerscout_api setup.py
 
 dev-notebook-lint:
 	$(VENV)/bin/jupyter nbconvert \
@@ -81,6 +83,7 @@ dev-notebook-lint:
 	$(PYTHON) -m pylint .temp/converted-notebooks/*.py \
 		--max-line-length=$(NOTEBOOK_MAX_LINE_LENGTH) \
 		--disable=$(NOTEBOOK_PYLINT_EXCLUSIONS)
+	$(PYTHON) -m mypy .temp/converted-notebooks/*.py
 
 
 dev-notebook-nbstripout:
@@ -166,6 +169,9 @@ pylint:
 	$(DEV_RUN) pylint data_science_pipeline peerscout_api dags tests setup.py
 
 
+mypy:
+	$(DEV_RUN) mypy data_science_pipeline peerscout_api dags tests setup.py
+
 flake8:
 	$(DEV_RUN) flake8 data_science_pipeline peerscout_api dags tests setup.py
 
@@ -183,6 +189,7 @@ notebook-lint:
 		&& pylint ./.temp/converted-notebooks/*.py \
 		--max-line-length=$(NOTEBOOK_MAX_LINE_LENGTH) \
 		--disable=$(NOTEBOOK_PYLINT_EXCLUSIONS) \
+		&& mypy ./.temp/converted-notebooks/*.py \
 	'
 
 
@@ -220,7 +227,7 @@ watch:
 	@$(MAKE) ARGS="$(ARGS) $(NOT_SLOW_PYTEST_ARGS)" .watch
 
 
-lint: flake8 pylint notebook-lint
+lint: flake8 pylint mypy notebook-lint
 
 
 test: lint pytest
@@ -297,8 +304,11 @@ peerscout-api-dev-flake8:
 peerscout-api-dev-pylint:
 	$(PEERSCOUT_API_DEV_DOCKER_PYTHON) -m pylint tests_peerscout_api peerscout_api
 
+peerscout-api-dev-mypy:
+	$(PEERSCOUT_API_DEV_DOCKER_PYTHON) -m mypy tests_peerscout_api peerscout_api
+
 peerscout-api-dev-lint: \
-	peerscout-api-dev-flake8 peerscout-api-dev-pylint
+	peerscout-api-dev-flake8 peerscout-api-dev-pylint peerscout-api-dev-mypy
 
 peerscout-api-dev-pytest:
 	$(PEERSCOUT_API_DEV_DOCKER_PYTHON) -m pytest ./tests_peerscout_api/unit_tests -v

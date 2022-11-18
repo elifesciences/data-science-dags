@@ -1,7 +1,7 @@
 import re
 import logging
 from itertools import islice
-from typing import Callable, Iterable, List
+from typing import Callable, Iterable, List, Optional
 
 import requests
 from icu import Transliterator  # pylint: disable=no-name-in-module
@@ -80,7 +80,7 @@ def get_pmids_from_json_response(json_response: dict) -> List[str]:
     ]
 
 
-def get_manuscript_summary_from_json_response(json_response: dict) -> List[str]:
+def get_manuscript_summary_from_json_response(json_response: dict) -> List[dict]:
     if not json_response:
         return []
     return [
@@ -105,18 +105,18 @@ class EuropePMCApiResponsePage:
 
     @property
     def total_count(self) -> int:
-        return int(self.json_response.get('hitCount'))
+        return int(self.json_response['hitCount'])
 
     @property
     def current_cursor(self) -> str:
         return self.json_response.get('request', {}).get('cursorMark')
 
     @property
-    def next_cursor(self) -> str:
+    def next_cursor(self) -> Optional[str]:
         return self.json_response.get('nextCursorMark')
 
     @property
-    def validated_next_cursor(self) -> str:
+    def validated_next_cursor(self) -> Optional[str]:
         next_cursor = self.next_cursor
         if next_cursor == self.current_cursor:
             return None
@@ -171,8 +171,8 @@ class EuropePMCApi:
     def __init__(
             self,
             session: requests.Session,
-            params: dict = None,
-            on_error: callable = None):
+            params: Optional[dict] = None,
+            on_error: Optional[Callable] = None):
         self.session = session
         self.params = params or {}
         self.on_error = on_error
@@ -183,7 +183,7 @@ class EuropePMCApi:
             result_type: str,
             output_format: str = 'json',
             cursor: str = EUROPEPMC_START_CURSOR,
-            page_size: int = EUROPEPMC_MAX_PAGE_SIZE) -> EuropePMCApiResponsePage:
+            page_size: int = EUROPEPMC_MAX_PAGE_SIZE) -> Optional[EuropePMCApiResponsePage]:
         LOGGER.debug('query: %s', query)
         data = {
             **self.params,
@@ -211,13 +211,13 @@ class EuropePMCApi:
             *args,
             **kwargs) -> EuropePMCApiResponsePageIterator:
         return EuropePMCApiResponsePageIterator(
-            lambda cursor: self.query_page(*args, cursor=cursor, **kwargs)
+            lambda cursor: self.query_page(*args, cursor=cursor, **kwargs)  # type: ignore
         )
 
     def iter_query_results(
             self,
             *args,
-            limit: int = None,
+            limit: Optional[int] = None,
             **kwargs) -> Iterable[dict]:
         return islice(
             (
@@ -227,9 +227,9 @@ class EuropePMCApi:
             ), limit
         )
 
-    def iter_author_pmids(self, author_names: List[str], **kwargs) -> List[str]:
+    def iter_author_pmids(self, author_names: List[str], **kwargs) -> Iterable[str]:
         return filter(
-            bool,
+            bool,  # type: ignore
             (item.get('pmid') for item in self.iter_query_results(
                 get_europepmc_author_query_string(author_names),
                 result_type='idlist',
@@ -246,10 +246,14 @@ class EuropePMCApi:
                 'paging not supported, list of pmids must be less than %d'
                 % EUROPEPMC_MAX_PAGE_SIZE
             )
-        result = get_manuscript_summary_from_json_response(self.query_page(
+        query_page = self.query_page(
             get_europepmc_pmid_query_string(pmids),
             result_type='core'
-        ).json_response)
+        )
+        if query_page:
+            result = get_manuscript_summary_from_json_response(query_page.json_response)
+        else:
+            result = []
         if not result:
             LOGGER.warning('no results for %s', pmids)
         return result

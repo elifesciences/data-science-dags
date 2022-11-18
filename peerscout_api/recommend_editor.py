@@ -1,9 +1,9 @@
 import os
 import logging
-from typing import List, NamedTuple, Tuple, T
-import numpy as np
+from typing import List, NamedTuple, Tuple, TypeVar
 import pandas as pd
 
+from scipy.sparse import csc_matrix
 from sklearn.metrics.pairwise import cosine_similarity
 
 from data_science_pipeline.utils.io import load_object_from
@@ -13,13 +13,14 @@ from data_science_pipeline.peerscout.models import (
 )
 
 LOGGER = logging.getLogger(__name__)
+T = TypeVar('T')
 
 
 class PeerScoutModelProps(NamedTuple):
     editor_names: List[str]
     editor_person_ids: List[str]
     editor_tf_idf_vectorizer: Vectorizer
-    editor_tf_idf: np.ndarray
+    editor_tf_idf: csc_matrix
 
     def get_editor_person_id_by_name_map(self):
         editor_names = self.editor_names
@@ -43,7 +44,7 @@ def load_model(model_path: str, model_name: str) -> PeerScoutModelProps:
 
 def get_weighted_keyword_valid_model(model: PeerScoutModelProps):
     weighted_keyword_valid_model = WeightedKeywordModel.from_tf_matrix(
-        model.editor_tf_idf.todense(),
+        tf_matrix=model.editor_tf_idf.todense(),
         vectorizer=model.editor_tf_idf_vectorizer,
         choices=model.editor_names
     )
@@ -67,9 +68,9 @@ def get_manuscript_matching_keywords_list(model: PeerScoutModelProps, extracted_
 
 def get_recommended_editors_with_probability(
         proba_matrix: List[List[float]],
-        editors_matching_keywords_list: List[List[Tuple[float, str]]],
+        editors_matching_keywords_list: List[List[List[Tuple[float, str]]]],
         indices: List[T],
-        threshold: float = 0.5) -> List[List[Tuple[float, T]]]:
+        threshold: float = 0.5) -> List[List[Tuple[float, T, float, List[Tuple[float, str]]]]]:
     return [
         sorted([
             (

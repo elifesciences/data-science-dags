@@ -7,11 +7,11 @@ import pandas as pd
 LOGGER = logging.getLogger(__name__)
 
 
-def to_date_isoformat(d: datetime) -> datetime:
+def to_date_isoformat(d: datetime) -> str:
     return d.date().isoformat()
 
 
-def to_timestamp_isoformat(dt: datetime) -> datetime:
+def to_timestamp_isoformat(dt: datetime) -> str:
     return dt.strftime('%Y-%m-%dT00:00:00Z')
 
 

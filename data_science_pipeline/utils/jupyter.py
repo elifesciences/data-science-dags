@@ -1,3 +1,4 @@
+from typing import Optional
 import pandas as pd
 
 from IPython.display import display, Markdown
@@ -9,7 +10,7 @@ def to_markdown_sql(sql: str):
 
 def printmd(s: str):
     try:
-        s = s.decode('unicode_escape')
+        s = s.encode().decode('unicode_escape')
     except AttributeError:
         pass
     display(Markdown(s))
@@ -17,7 +18,7 @@ def printmd(s: str):
 
 def read_big_query(
         query: str,
-        project_id: str = None,
+        project_id: Optional[str] = None,
         show_query: bool = True,
         **kwargs) -> pd.DataFrame:
     if show_query:

@@ -44,7 +44,7 @@ RUN if [ "${install_dev}" = "y" ]; then \
 COPY data_science_pipeline ./data_science_pipeline
 
 # tests
-COPY .pylintrc ./
+COPY .pylintrc mypy.ini ./
 
 WORKDIR ${PROJECT_FOLDER}/notebooks
 

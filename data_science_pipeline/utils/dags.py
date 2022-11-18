@@ -4,6 +4,7 @@ import re
 from datetime import timedelta
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import Optional
 
 import airflow
 from airflow import DAG
@@ -130,7 +131,7 @@ def get_default_notebook_params() -> dict:
 
 def get_combined_notebook_params(
         default_notebook_params: dict,
-        override_notebook_params: dict = None) -> dict:
+        override_notebook_params: Optional[dict] = None) -> dict:
     return {
         **default_notebook_params,
         **(override_notebook_params or {})
@@ -151,7 +152,7 @@ def get_notebook_path(notebook_filename: str) -> str:
 
 def run_notebook(
         notebook_filename: str,
-        notebook_params: dict = None,
+        notebook_params: Optional[dict] = None,
 ):
     notebook_path = get_notebook_path(notebook_filename)
     notebook_params = get_combined_notebook_params(
@@ -185,8 +186,8 @@ def get_default_notebook_task_id(notebook_filename: str) -> str:
 
 def create_run_notebook_operator(
         notebook_filename: str,
-        task_id: str = None,
-        notebook_params: dict = None,
+        task_id: Optional[str] = None,
+        notebook_params: Optional[dict] = None,
         **kwargs):
     if not task_id:
         task_id = get_default_notebook_task_id(notebook_filename)

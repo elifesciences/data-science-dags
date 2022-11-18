@@ -45,7 +45,7 @@ COPY setup.py ./setup.py
 
 RUN pip install --disable-pip-version-check -e . --user --no-dependencies
 
-COPY .pylintrc .flake8 ./
+COPY .pylintrc .flake8 mypy.ini ./
 COPY tests ./tests
 COPY run_test.sh ./
 
