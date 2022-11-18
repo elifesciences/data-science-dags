@@ -2,7 +2,7 @@ import logging
 from abc import ABC, abstractmethod
 from collections import Counter, defaultdict
 from itertools import groupby
-from typing import Any, Dict, List, Generic, Optional, Tuple, Union, TypeVar
+from typing import Any, Dict, List, Generic, Optional, Tuple, Union, TypeVar, cast
 
 import numpy as np
 import pandas as pd
@@ -35,7 +35,7 @@ def _sorted_matching_keywords_map_list(
         {
             key: sorted(
                 matching_keywords,  # type: ignore
-                key=lambda score_keyword: (-score_keyword[0], score_keyword[1])
+                key=lambda score_keyword: (-cast(float, score_keyword[0]), score_keyword[1])
             )
             for key, matching_keywords in matching_keywords_map.items()
         }
