@@ -65,7 +65,7 @@ def get_validated_dataset_name_table_name(
 
 
 def load_file_into_bq(
-        filename: str,
+        filename: Path,
         project_id: str,
         dataset_name: str,
         table_name: str,
@@ -108,7 +108,7 @@ def load_file_into_bq(
 
 
 def load_file_into_bq_with_auto_schema(
-        jsonl_file: str,
+        jsonl_file: Path,
         project_id: str,
         dataset_name: str,
         table_name: str,
@@ -123,7 +123,7 @@ def load_file_into_bq_with_auto_schema(
             gcp_project=project_id,
             dataset_name=dataset_name,
             table_name=table_name,
-            full_file_location=jsonl_file,
+            full_file_location=str(jsonl_file),
             quoted_values_are_strings=True
         )
         LOGGER.info('loading the data to the table : %s.%s', dataset_name, table_name)
@@ -170,7 +170,7 @@ def load_file_and_append_to_bq_table_with_auto_schema(*args, **kwargs):
 
 def load_json_list_into_bq_with_auto_schema(json_list: Iterable[dict], **kwargs):
     with json_list_as_jsonl_file(json_list) as jsonl_file:
-        load_file_into_bq_with_auto_schema(str(jsonl_file), **kwargs)
+        load_file_into_bq_with_auto_schema(jsonl_file, **kwargs)
 
 
 def load_json_list_and_replace_bq_table_with_auto_schema(*args, **kwargs):
@@ -204,10 +204,10 @@ def iter_json_without_null_from_df(df: pd.DataFrame, batch_size: int = 5000) -> 
 
 
 @contextmanager
-def df_as_jsonl_file_without_null(df: pd.DataFrame, **kwargs) -> Iterator[str]:
+def df_as_jsonl_file_without_null(df: pd.DataFrame, **kwargs) -> Iterator[Path]:
     json_iterable = iter_json_without_null_from_df(df)
     with json_list_as_jsonl_file(json_iterable, **kwargs) as jsonl_file:
-        yield str(jsonl_file)
+        yield jsonl_file
 
 
 def to_gbq(

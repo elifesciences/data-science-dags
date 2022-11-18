@@ -166,7 +166,7 @@ def get_new_merged_schema(
 
 
 def generate_schema_from_file(
-        full_file_location: str,
+        full_file_location: Path,
         quoted_values_are_strings: bool = True
 ):
     with open_with_auto_compression(cast(Path, full_file_location), 'r') as file_reader:
