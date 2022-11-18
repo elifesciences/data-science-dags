@@ -304,8 +304,11 @@ peerscout-api-dev-flake8:
 peerscout-api-dev-pylint:
 	$(PEERSCOUT_API_DEV_DOCKER_PYTHON) -m pylint tests_peerscout_api peerscout_api
 
+peerscout-api-dev-mypy:
+	$(PEERSCOUT_API_DEV_DOCKER_PYTHON) -m mypy tests_peerscout_api peerscout_api
+
 peerscout-api-dev-lint: \
-	peerscout-api-dev-flake8 peerscout-api-dev-pylint
+	peerscout-api-dev-flake8 peerscout-api-dev-pylint peerscout-api-dev-mypy
 
 peerscout-api-dev-pytest:
 	$(PEERSCOUT_API_DEV_DOCKER_PYTHON) -m pytest ./tests_peerscout_api/unit_tests -v

@@ -33,5 +33,5 @@ RUN pip install --disable-pip-version-check -r requirements.dev.txt
 COPY peerscout_api ./peerscout_api
 COPY data_science_pipeline ./data_science_pipeline
 
-COPY .pylintrc .flake8 ./
+COPY .pylintrc .flake8 mypy.ini ./
 COPY tests_peerscout_api ./tests_peerscout_api
