@@ -108,7 +108,10 @@ class WeightedKeywordModelRankingList(Generic[KT, T]):
         )
         self.score_map_list = [
             {
-                key: sum(score for score, _ in matching_keywords)
+                key: sum(
+                    score  # type: ignore
+                    for score, _ in matching_keywords
+                )
                 for key, matching_keywords in matching_keywords_map.items()
             }
             for matching_keywords_map in self.matching_keywords_map_list
