@@ -139,7 +139,7 @@ def query_bq_for_person_details(
 
     client = Client(project=project)
 
-    with open(QUERY_PATH) as f:
+    with open(QUERY_PATH, encoding='utf-8') as f:
         sql_file = f.read()
 
     sql = (
@@ -425,7 +425,7 @@ def create_app():
     senior_editor_model_dict = load_model(MODEL_PATH, SENIOR_EDITOR_MODEL_NAME)
     reviewing_editor_model_dict = load_model(MODEL_PATH, REVIEWING_EDITOR_MODEL_NAME)
 
-    with open(REQUEST_JSON_SCHEMA_PATH) as f:
+    with open(REQUEST_JSON_SCHEMA_PATH, encoding='utf-8') as f:
         json_schema = json.load(f)
 
     @app.route('/', methods=['GET'])

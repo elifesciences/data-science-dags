@@ -5,7 +5,7 @@ from setuptools import (
     setup
 )
 
-with open(os.path.join('requirements.notebook.txt'), 'r') as f:
+with open(os.path.join('requirements.notebook.txt'), 'r', encoding='utf-8') as f:
     REQUIRED_PACKAGES = f.readlines()
 
 packages = [x for x in find_packages()
