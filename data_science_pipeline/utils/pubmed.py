@@ -33,7 +33,7 @@ def normalize_url(url: str) -> str:
 
 def resolve_url(url: str) -> str:
     # Follow redirect to resolve URL, without requesting the target URL
-    response = requests.head(url, allow_redirects=False)
+    response = requests.head(url, allow_redirects=False, timeout=10)
     # Don't raise for status, we will just keep the passed in url
     return response.headers.get('Location') or url
 

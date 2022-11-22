@@ -196,7 +196,8 @@ class EuropePMCApi:
         try:
             response = requests.post(
                 'https://www.ebi.ac.uk/europepmc/webservices/rest/searchPOST',
-                data=data
+                data=data,
+                timeout=10
             )
             response.raise_for_status()
             return EuropePMCApiResponsePage(response.json())
