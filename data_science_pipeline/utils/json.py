@@ -74,7 +74,7 @@ def write_jsonl_to_file(
             try:
                 write_file.write(json.dumps(get_recursive_json_compatible_value(record)))
             except TypeError as exc:
-                raise TypeError('failed to convert %r due to %r' % (record, exc)) from exc
+                raise TypeError(f'failed to convert {record} due to {exc}') from exc
             write_file.write("\n")
 
 
