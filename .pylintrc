@@ -10,7 +10,8 @@ disable=
     too-many-public-methods,
     no-else-return,
     duplicate-code,
-    fixme
+    fixme,
+    unspecified-encoding
 
 [TYPECHECK]
 ignored-classes=
