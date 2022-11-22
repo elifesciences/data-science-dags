@@ -11,7 +11,8 @@ disable=
     no-else-return,
     duplicate-code,
     fixme,
-    unspecified-encoding
+    unspecified-encoding,
+    consider-using-f-string
 
 [TYPECHECK]
 ignored-classes=
