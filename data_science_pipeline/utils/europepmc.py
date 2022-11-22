@@ -146,10 +146,9 @@ class EuropePMCApiResponsePageIterator:
             if not response_page:
                 return
             if response_page.current_cursor != current_cursor:
+                page_cursor = response_page.current_cursor
                 raise AssertionError(
-                    'expected current page cursor %s, but was: %s' % (
-                        current_cursor, response_page.current_cursor
-                    )
+                    f'expected current page cursor {current_cursor}, but was: {page_cursor}'
                 )
             assert response_page.current_cursor == current_cursor
             yield response_page
@@ -244,8 +243,7 @@ class EuropePMCApi:
     def get_summary_by_page_pmids(self, pmids: List[str]) -> List[dict]:
         if len(pmids) > EUROPEPMC_MAX_PAGE_SIZE:
             raise ValueError(
-                'paging not supported, list of pmids must be less than %d'
-                % EUROPEPMC_MAX_PAGE_SIZE
+                f'paging not supported, list of pmids must be less than {EUROPEPMC_MAX_PAGE_SIZE}'
             )
         query_page = self.query_page(
             get_europepmc_pmid_query_string(pmids),
