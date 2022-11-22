@@ -7,7 +7,7 @@ from py._path.local import LocalPath
 
 @pytest.fixture(scope='session', autouse=True)
 def setup_logging():
-    for name in {'tests', 'data_science_pipeline'}:
+    for name in ('tests', 'data_science_pipeline'):
         logging.getLogger(name).setLevel('DEBUG')
 
 
