@@ -19,7 +19,7 @@ def write_bytes(path: str, data: bytes):
 
 
 def write_text(path: str, text: str):
-    get_path(path).write_text(text)
+    get_path(path).write_text(text, encoding='utf-8')
 
 
 def read_bytes(path: str) -> bytes:
@@ -27,7 +27,7 @@ def read_bytes(path: str) -> bytes:
 
 
 def read_text(path: str) -> str:
-    return get_path(path).read_text()
+    return get_path(path).read_text(encoding='utf-8')
 
 
 def serialize_object_to(value: Any, path: str):
@@ -53,4 +53,4 @@ def open_with_auto_compression(path: Path, mode: str) -> Any:
         if mode == 'w':
             mode = 'wt'
         return gzip.open(path, mode)
-    return open(path, mode)
+    return open(path, mode, encoding='utf-8')

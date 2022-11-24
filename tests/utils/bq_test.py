@@ -16,7 +16,7 @@ class TestDfAsJsonlFileWithoutNull:
         with df_as_jsonl_file_without_null(df, gzip_enabled=False) as jsonl_file:
             result = [
                 json.loads(line)
-                for line in Path(jsonl_file).read_text().splitlines()
+                for line in Path(jsonl_file).read_text(encoding='utf-8').splitlines()
             ]
         assert result == [{'key1': 'value1'}]
 
@@ -25,7 +25,7 @@ class TestDfAsJsonlFileWithoutNull:
         with df_as_jsonl_file_without_null(df, gzip_enabled=False) as jsonl_file:
             result = [
                 json.loads(line)
-                for line in Path(jsonl_file).read_text().splitlines()
+                for line in Path(jsonl_file).read_text(encoding='utf-8').splitlines()
             ]
         assert result == [{'key1': 'value1'}]
 
@@ -34,7 +34,7 @@ class TestDfAsJsonlFileWithoutNull:
         with df_as_jsonl_file_without_null(df, gzip_enabled=False) as jsonl_file:
             result = [
                 json.loads(line)
-                for line in Path(jsonl_file).read_text().splitlines()
+                for line in Path(jsonl_file).read_text(encoding='utf-8').splitlines()
             ]
         assert result == [{'parent': {'key1': 'value1'}}]
 
@@ -43,7 +43,7 @@ class TestDfAsJsonlFileWithoutNull:
         with df_as_jsonl_file_without_null(df, gzip_enabled=False) as jsonl_file:
             result = [
                 json.loads(line)
-                for line in Path(jsonl_file).read_text().splitlines()
+                for line in Path(jsonl_file).read_text(encoding='utf-8').splitlines()
             ]
         assert result == [{'key1': ['value1', 'value2']}]
 
