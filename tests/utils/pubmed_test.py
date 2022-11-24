@@ -221,8 +221,8 @@ class TestPubmedBibliographyPage:
     def test_should_find_pubmed_ids(self):
         html_content = '\n'.join([
             '<html><body><div class="citations other">',
-            '<div><span class="pmid">PubMed PMID: %s<span></div>' % PMID_1,
-            '<div><span class="pmid">PubMed PMID:\n%s<span></div>' % PMID_2,
+            f'<div><span class="pmid">PubMed PMID: {PMID_1}<span></div>',
+            f'<div><span class="pmid">PubMed PMID:\n{PMID_2}<span></div>',
             '</div></body></html>'
         ])
         page = PubmedBibliographyPage(html_content)

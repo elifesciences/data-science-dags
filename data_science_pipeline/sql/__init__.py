@@ -7,4 +7,4 @@ SQL_PATH = Path(SQL_DIR)
 
 
 def get_sql(filename: str) -> str:
-    return SQL_PATH.joinpath(filename).read_text()
+    return SQL_PATH.joinpath(filename).read_text(encoding='utf-8')

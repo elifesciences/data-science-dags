@@ -16,11 +16,14 @@ def get_api_url_env() -> str:
 
 
 def test_get_response_json():
-    with open('./peerscout_api/example-data/peerscout-api-request1.json') as request_json:
+    with open(
+        './peerscout_api/example-data/peerscout-api-request1.json',
+        encoding='utf-8'
+    ) as request_json:
         headers = {'Content-Type': 'application/json'}
         url = get_api_url_env()
         LOGGER.info('api url : %s', url)
-        resp = requests.post(url, data=request_json, headers=headers)
+        resp = requests.post(url, data=request_json, headers=headers, timeout=10)
         LOGGER.info('request: %s', resp.request)
         assert resp.status_code == 200
         LOGGER.info('reponse: %s', resp)

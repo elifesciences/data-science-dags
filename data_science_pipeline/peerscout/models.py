@@ -123,11 +123,7 @@ class WeightedKeywordModelRankingList(Generic[KT, T]):
         self.choices = choices
 
     def __repr__(self):
-        return '%s(%r, choices=%r)' % (
-            type(self).__name__,
-            self.matching_keywords_map_list,
-            self.choices
-        )
+        return f'{type(self).__name__}({self.matching_keywords_map_list}, choices={self.choices})'
 
     def get_ranked_choices_list(self, limit: Optional[int] = None) -> List[List[T]]:
         return [

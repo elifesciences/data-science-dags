@@ -38,7 +38,7 @@ LOGGER = logging.getLogger(__name__)
 def with_limit_sql(sql: str, limit: Optional[int] = None) -> str:
     if not limit:
         return sql
-    return sql + '\nLIMIT %d' % limit
+    return sql + f'\nLIMIT {limit}'
 
 
 def is_bq_not_found_exception(exception: Optional[BaseException] = None) -> bool:
@@ -192,7 +192,7 @@ def get_bq_write_disposition(if_exists: str) -> WriteDisposition:
         return WriteDisposition.WRITE_APPEND
     if if_exists == 'fail':
         return WriteDisposition.WRITE_EMPTY
-    raise ValueError('unsupported if_exists: %s' % if_exists)
+    raise ValueError(f'unsupported if_exists: {if_exists}')
 
 
 def iter_json_without_null_from_df(df: pd.DataFrame, batch_size: int = 5000) -> Iterable[dict]:

@@ -9,9 +9,9 @@ disable=
     too-many-instance-attributes,
     too-many-public-methods,
     no-else-return,
-    no-self-use,
     duplicate-code,
-    fixme
+    fixme,
+    consider-using-f-string
 
 [TYPECHECK]
 ignored-classes=

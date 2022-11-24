@@ -4,7 +4,7 @@
 import logging
 from pathlib import Path
 from typing import List, Literal, cast
-import google.cloud.bigquery as bigquery
+from google.cloud import bigquery
 from google.cloud.bigquery.schema import SchemaField
 from google.cloud.exceptions import NotFound
 from bigquery_schema_generator.generate_schema import SchemaGenerator
