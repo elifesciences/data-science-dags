@@ -16,7 +16,7 @@ SELECT
   CONCAT('pmid:', paper_extracted_keywords.pmid) AS publication_id,
   paper_extracted_keywords.pmid,
   paper_summary.doi,
-  REGEXP_EXTRACT(LOWER(paper_summary.doi), r'10.7554/elife.([\d]{{5}})') AS manuscript_id,
+  REGEXP_EXTRACT(LOWER(paper_summary.doi), r'10.7554/elife.([0-9]{5,6})') AS manuscript_id,
   paper_summary.firstPublicationDate AS publication_date,
   paper_extracted_keywords.extracted_keywords AS abstract_keywords
 FROM t_paper_extracted_keywords AS paper_extracted_keywords
