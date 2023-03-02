@@ -26,6 +26,6 @@ SELECT
 FROM `{project}.{dataset}.mv_Editorial_All_Manuscript_Version` AS Version
 LEFT JOIN t_related_person_id AS related_person_id
   ON related_person_id.version_Id = Version.Version_ID
-LEFT JOIN `elife-data-pipeline.prod.mv_Editorial_Person` AS Related_Person
+LEFT JOIN `{project}.{dataset}.mv_Editorial_Person` AS Related_Person
   ON Related_Person.Person_ID = related_person_id.person_id
 ORDER BY Manuscript_ID, Version_ID, relationship_type, person_id
