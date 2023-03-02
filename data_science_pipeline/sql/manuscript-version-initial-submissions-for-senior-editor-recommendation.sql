@@ -29,7 +29,7 @@ SELECT version.version_id, manuscript_version_abstract_keywords.extracted_keywor
 FROM `{project}.{dataset}.mv_manuscript_version` AS version
 JOIN t_last_manuscript_version_abstract_keywords AS manuscript_version_abstract_keywords
   ON manuscript_version_abstract_keywords.version_id = version.version_id
-WHERE version.overall_stage = 'Initial Submission'
+WHERE (version.overall_stage = 'Initial Submission' OR version.source_site_id = 'rp_site')
   AND (
     ARRAY_LENGTH(version.senior_editors) = 0
     OR TIMESTAMP_DIFF(

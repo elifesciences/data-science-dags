@@ -6,7 +6,7 @@ WITH t_initial_submission_version_id_including_null AS (
 
   SELECT version_id
   FROM `{project}.{dataset}.mv_manuscript_version` AS manuscript_version
-  WHERE manuscript_version.overall_stage = 'Initial Submission'
+  WHERE (manuscript_version.overall_stage = 'Initial Submission' OR manuscript_version.source_site_id = 'rp_site')
   AND TIMESTAMP_DIFF(CURRENT_TIMESTAMP(), manuscript_version.stages[SAFE_OFFSET(0)].stage_timestamp, DAY) <= 90
   AND (
     TIMESTAMP_DIFF(CURRENT_TIMESTAMP(), manuscript_version.stages[SAFE_OFFSET(0)].stage_timestamp, DAY) <= 30
