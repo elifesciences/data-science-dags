@@ -1,4 +1,4 @@
-apache-airflow[crypto,celery,postgres,jdbc,ssh]==2.4.2
+apache-airflow[crypto,celery,postgres,jdbc,ssh]==2.6.3
 apache-airflow-providers-amazon==7.2.1
 papermill==2.3.3
 click>=7.1.2
@@ -10,5 +10,5 @@ Werkzeug>=1.0.1
 tqdm==4.62.0
 traitlets==5.1.1
 toolz==0.11.1
-Flask-AppBuilder==4.1.4
+Flask-AppBuilder==4.3.1
 black==21.8b0
