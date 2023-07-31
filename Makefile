@@ -113,14 +113,6 @@ dev-watch:
 dev-test: dev-lint dev-pytest
 
 
-dev-jupyter-configure:
-	$(VENV)/bin/jupyter nbextension enable --py widgetsnbextension
-
-
-dev-jupyter-start: .require-jupyter-vars dev-jupyter-configure
-	$(VENV)/bin/jupyter lab -y --port=$(DATA_SCIENCE_DAGS_JUPYTER_PORT)
-
-
 dev-run-sample-notebook:
 	$(PYTHON) -m papermill.cli \
 		./notebooks/example.ipynb \
