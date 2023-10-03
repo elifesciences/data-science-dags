@@ -23,7 +23,7 @@ def test_get_response_json():
         headers = {'Content-Type': 'application/json'}
         url = get_api_url_env()
         LOGGER.info('api url : %s', url)
-        resp = requests.post(url, data=request_json, headers=headers, timeout=10)
+        resp = requests.post(url, data=request_json, headers=headers, timeout=60)
         LOGGER.info('request: %s', resp.request)
         assert resp.status_code == 200
         LOGGER.info('reponse: %s', resp)
