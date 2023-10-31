@@ -17,7 +17,7 @@ SELECT
   CONCAT('pmid:', pmid) AS publication_id,
   pmid,
   doi,
-  REGEXP_EXTRACT(LOWER(paper_summary.doi), r'10.7554/elife.([0-9]{5,6})') AS manuscript_id,
+  REGEXP_EXTRACT(LOWER(paper_summary.doi), r'10.7554/elife.([0-9]{{5,6}})') AS manuscript_id,
   paper_summary.firstPublicationDate AS publication_date,
   (pmid IN UNNEST(editor_pubmed_links.relevant_pubmed_ids)) AS is_relevant_pubmed_id,
   (pmid IN UNNEST(editor_pubmed_ids.pubmed_ids)) AS is_search_pubmed_id
