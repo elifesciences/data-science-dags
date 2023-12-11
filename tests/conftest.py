@@ -1,5 +1,7 @@
 import logging
 from pathlib import Path
+from typing import Iterable
+from unittest.mock import patch
 
 import pytest
 from py._path.local import LocalPath
@@ -15,3 +17,10 @@ def setup_logging():
 def temp_dir(tmpdir: LocalPath):
     # convert to standard Path
     return Path(str(tmpdir))
+
+
+@pytest.fixture()
+def mock_env() -> Iterable[dict]:
+    env_dict: dict = {}
+    with patch('os.environ', env_dict):
+        yield env_dict
