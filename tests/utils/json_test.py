@@ -63,6 +63,12 @@ class TestRemoveKeyWithNullValue:
             'other': 'value'
         }) == {'key1': False, 'other': 'value'}
 
+    def test_should_remove_empty_list_from_dict(self):
+        assert remove_key_with_null_value({
+            'key1': [],
+            'other': 'value'
+        }) == {'other': 'value'}
+
     def test_should_remove_np_nan_from_dict(self):
         assert remove_key_with_null_value({
             'key1': np.nan,
