@@ -1,6 +1,7 @@
 apache-airflow[crypto,celery,postgres,jdbc,ssh]==2.7.1
 apache-airflow-providers-amazon==7.2.1
 papermill==2.3.3
+pendulum==2.1.2
 click>=7.1.2
 ansiwrap==0.8.4
 zope.deprecation==4.4.0
