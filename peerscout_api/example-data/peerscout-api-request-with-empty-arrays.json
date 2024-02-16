@@ -1,0 +1,19 @@
+{
+    "manuscript_id":"12345",
+    "tracking_number":"12345_ABC",
+    "revision_number":0,
+    "abstract":"<p>Lorem ipsum dolor sit amet, <i>consectetur adipiscing elit</i>, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+    "title":"<b>Lorem Ipsum</b>",
+    "assigned_deputy_editors_id": [
+    ],
+    "author_suggestion":{
+      "include_reviewing_editors_id":[
+      ],
+      "exclude_reviewing_editors_id":[
+      ],
+      "include_senior_editors_id":[
+      ],
+      "exclude_senior_editors_id":[
+      ]
+    } 
+  }
