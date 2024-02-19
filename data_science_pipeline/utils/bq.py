@@ -54,6 +54,27 @@ def get_client(project_id: str) -> Client:
     return Client(project=project_id)
 
 
+def get_improved_bad_request_exception(
+    job: bigquery.job.LoadJob
+) -> google.cloud.exceptions.BadRequest:
+    errors = job.errors
+    result = google.cloud.exceptions.BadRequest(
+        '; '.join([error['message'] for error in errors]),
+        errors=errors
+    )
+    setattr(result, '_job', job)
+    return result
+
+
+def wait_for_load_job(
+    job: bigquery.job.LoadJob
+):
+    try:
+        job.result()
+    except google.cloud.exceptions.BadRequest as exc:
+        raise get_improved_bad_request_exception(job) from exc
+
+
 def get_validated_dataset_name_table_name(
         dataset_name: str,
         table_name: str) -> Tuple[str, str]:
@@ -96,8 +117,7 @@ def load_file_into_bq(
             source_file, destination=table_ref, job_config=job_config
         )
 
-        # Waits for table cloud_data_store to complete
-        job.result()
+        wait_for_load_job(job)
         LOGGER.info('File size is : %s', os.path.getsize(filename))
         LOGGER.info(
             "Loaded %s rows into %s:%s.",
