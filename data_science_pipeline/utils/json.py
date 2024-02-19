@@ -37,6 +37,11 @@ def get_recursive_json_compatible_value(value):
 
 
 def is_empty_value(value) -> bool:
+    try:
+        if not len(value):  # pylint: disable=use-implicit-booleaness-not-len
+            return True
+    except TypeError:
+        pass
     return (
         (value is None or np.isscalar(value))
         and (
