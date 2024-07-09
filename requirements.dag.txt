@@ -6,7 +6,7 @@ click>=7.1.2
 ansiwrap==0.8.4
 zope.deprecation==4.4.0
 zict==2.0.0
-zipp==3.4.0
+zipp==3.19.1
 Werkzeug>=1.0.1
 tqdm==4.66.3
 traitlets==5.1.1
