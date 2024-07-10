@@ -1,7 +1,17 @@
+# Prerequisites
+
+To prepare the environment on Mac before downloading the Python packages, you might need to install the following:
+
+`brew install pkg-config icu4c`
+
+Then, add this to the PATH in the file `~/.zshrc` using the command below:
+
+`export PATH="/usr/local/opt/icu4c/bin:$PATH"`
+
+
 # Data Science DAGs
 
 # PeerScout API
-
 
 To test the api
 
