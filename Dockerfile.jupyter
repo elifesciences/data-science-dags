@@ -50,9 +50,12 @@ WORKDIR ${PROJECT_FOLDER}/notebooks
 
 USER root
 
-RUN ls -l /home/jovyan/.config/ \
-    && chown jovyan:users /home/jovyan/.config/matplotlib \
-    && chown jovyan:users /home/jovyan/.cache/matplotlib
+RUN mkdir -p /home/jovyan/.config/matplotlib /home/jovyan/.cache/matplotlib \
+    && chown jovyan:users /home/jovyan/.config/matplotlib /home/jovyan/.cache/matplotlib
+
+RUN ls -l /home/jovyan/.config/
 
 ENV CHOWN_HOME=yes
 ENV CHOWN_HOME_OPTS=-R
+
+USER jovyan
