@@ -9,4 +9,4 @@ warnings.filterwarnings(
 
 # suppressing: `Importing plotly failed. Interactive plots will not work.`
 # see https://github.com/facebook/prophet/pull/1332
-logging.getLogger('fbprophet.plot').setLevel(logging.CRITICAL)
+logging.getLogger('prophet.plot').setLevel(logging.CRITICAL)

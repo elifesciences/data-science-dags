@@ -25,8 +25,8 @@ RUN pip install --disable-pip-version-check -r requirements.jupyter.txt
 COPY requirements.notebook.txt ./
 RUN pip install --disable-pip-version-check -r requirements.notebook.txt
 
-COPY requirements.fbprophet.txt ./
-RUN pip install --disable-pip-version-check -r requirements.fbprophet.txt
+COPY requirements.prophet.txt ./
+RUN pip install --disable-pip-version-check -r requirements.prophet.txt
 
 COPY requirements.dev.txt ./
 RUN if [ "${install_dev}" = "y" ]; then \

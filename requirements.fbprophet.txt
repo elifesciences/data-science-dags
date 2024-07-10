@@ -1,1 +1,1 @@
-fbprophet==0.7.1
+prophet==1.1.5
