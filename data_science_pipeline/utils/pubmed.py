@@ -40,7 +40,8 @@ def resolve_url(url: str) -> str:
 
 def is_ncbi_domain_url(url: str) -> bool:
     hostname = urlparse(url.lower()).hostname
-    assert hostname is not None
+    if not hostname:
+        raise AssertionError(f'hostname is missing for the url: {url}')
     return hostname.endswith(NCBI_DOMAIN_NAME)
 
 

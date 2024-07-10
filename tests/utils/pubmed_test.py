@@ -1,3 +1,5 @@
+import pytest
+
 from data_science_pipeline.utils.pubmed import (
     normalize_url,
     is_ncbi_domain_url,
@@ -42,6 +44,10 @@ class TestIsNcbiDomainUrl:
 
     def test_should_return_false_for_tinyurl(self):
         assert not is_ncbi_domain_url('https://tinyurl.com/path')
+
+    def test_should_raise_assertion_error_if_hostname_is_none(self):
+        with pytest.raises(AssertionError):
+            is_ncbi_domain_url('')
 
 
 class TestGetNcbiPubmedArticleId:
