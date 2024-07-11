@@ -23,8 +23,8 @@ COPY requirements.notebook.txt ./
 RUN pip install --disable-pip-version-check -r requirements.notebook.txt \
   && jupyter nbextension enable --py widgetsnbextension
 
-COPY requirements.fbprophet.txt ./
-RUN pip install --disable-pip-version-check -r requirements.fbprophet.txt
+COPY requirements.prophet.txt ./
+RUN pip install --disable-pip-version-check -r requirements.prophet.txt
 
 COPY requirements.jupyter.ext.txt ./
 RUN pip install --disable-pip-version-check -r requirements.jupyter.ext.txt \
@@ -50,9 +50,12 @@ WORKDIR ${PROJECT_FOLDER}/notebooks
 
 USER root
 
-RUN ls -l /home/jovyan/.config/ \
-    && chown jovyan:users /home/jovyan/.config/matplotlib \
-    && chown jovyan:users /home/jovyan/.cache/matplotlib
+RUN mkdir -p /home/jovyan/.config/matplotlib /home/jovyan/.cache/matplotlib \
+    && chown jovyan:users /home/jovyan/.config/matplotlib /home/jovyan/.cache/matplotlib
+
+RUN ls -l /home/jovyan/.config/
 
 ENV CHOWN_HOME=yes
 ENV CHOWN_HOME_OPTS=-R
+
+USER jovyan
