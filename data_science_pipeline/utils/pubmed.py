@@ -219,4 +219,4 @@ class PubmedBibliographyScraper:
             yield from page.pmids
 
     def get_pmids(self, url: str) -> List[Any]:
-        return [self.iter_pmids(url)]
+        return list(self.iter_pmids(url))
