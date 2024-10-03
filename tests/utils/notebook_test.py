@@ -1,7 +1,7 @@
 import os
 from unittest.mock import patch
 
-from data_science_pipeline.utils.dags import (
+from data_science_pipeline.utils.notebook import (
     get_default_state_path
 )
 
