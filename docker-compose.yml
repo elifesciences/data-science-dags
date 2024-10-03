@@ -39,7 +39,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.airflow
-    image: elifesciences/data-science-airflow-dag:${IMAGE_TAG}
+    image: ${IMAGE_REPO}:${IMAGE_TAG}
     command: /bin/sh -c exit 0
     entrypoint: []
 
@@ -51,7 +51,7 @@ services:
       dockerfile: Dockerfile.airflow
       args:
         install_dev: y
-    image:  elifesciences/data-science-airflow-dag-dev:${IMAGE_TAG}
+    image:  ${IMAGE_REPO}-dev:${IMAGE_TAG}
     command: /bin/sh -c exit 0
     entrypoint: []
 
@@ -61,12 +61,12 @@ services:
     environment: *airflow-env
     volumes:
       - ./config/webserver_config.py:/opt/airflow/webserver_config.py
-    image: elifesciences/data-science-airflow-dag:${IMAGE_TAG}
+    image: ${IMAGE_REPO}:${IMAGE_TAG}
     entrypoint: /entrypoint
     command: webserver
 
   scheduler:
-    image: elifesciences/data-science-airflow-dag:${IMAGE_TAG}
+    image: ${IMAGE_REPO}:${IMAGE_TAG}
     depends_on:
       - postgres
     environment: *airflow-env
@@ -74,7 +74,7 @@ services:
     command: scheduler
 
   test-client:
-    image: elifesciences/data-science-airflow-dag:${IMAGE_TAG}
+    image: e${IMAGE_REPO}:${IMAGE_TAG}
     depends_on:
       - scheduler
       - webserver
@@ -88,7 +88,7 @@ services:
     depends_on:
       - redis
       - scheduler
-    image: elifesciences/data-science-airflow-dag:${IMAGE_TAG}
+    image: ${IMAGE_REPO}:${IMAGE_TAG}
     entrypoint: /entrypoint
     hostname: worker
     command: >
