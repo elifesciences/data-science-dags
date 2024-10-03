@@ -322,6 +322,10 @@ airflow-initdb:
 	$(DOCKER_COMPOSE) run --rm  webserver db init
 
 
+ci-build-main-image:
+	$(MAKE) DOCKER_COMPOSE="$(DOCKER_COMPOSE_CI)" \
+		build
+
 ci-test-exclude-e2e:
 	$(DOCKER_COMPOSE) run --rm airflow-dev ./run_test.sh
 
@@ -341,3 +345,8 @@ ci-build-and-test:
 
 ci-clean:
 	$(DOCKER_COMPOSE_CI) down -v
+
+
+retag-push-image:
+	docker tag  $(EXISTING_IMAGE_REPO):$(EXISTING_IMAGE_TAG) $(IMAGE_REPO):$(IMAGE_TAG)
+	docker push  $(IMAGE_REPO):$(IMAGE_TAG)

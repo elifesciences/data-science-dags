@@ -1,7 +1,12 @@
 elifePipeline {
     node('containers-jenkins-plugin') {
-        def commit
+        def image_repo = 'elifesciences/data-science-dags'
         def jenkins_image_building_ci_pipeline = 'process/process-data-hub-airflow-image-update-repo-list'
+
+        def commit
+        def commitShort
+        def branch
+        def timestamp
         def git_url
 
         stage 'Checkout', {
@@ -31,11 +36,20 @@ elifePipeline {
             }
         }
 
+        stage 'Build main image', {
+            sh "make IMAGE_REPO=${image_repo} IMAGE_TAG=${commit} ci-build-main-image"
+        }
+
         elifeMainlineOnly {
-            stage 'Merge to master', {
-                elifeGitMoveToBranch commit, 'master'
+            def dev_image_repo = image_repo + '_unstable'
+
+            stage 'Push image', {
+                sh "make EXISTING_IMAGE_TAG=${commit} EXISTING_IMAGE_REPO=${image_repo} IMAGE_TAG=${commit} IMAGE_REPO=${dev_image_repo} retag-push-image"
+                sh "make EXISTING_IMAGE_TAG=${commit} EXISTING_IMAGE_REPO=${image_repo} IMAGE_TAG=${branch}-${commitShort}-${timestamp} IMAGE_REPO=${dev_image_repo} retag-push-image"
+                sh "make EXISTING_IMAGE_TAG=${commit} EXISTING_IMAGE_REPO=${image_repo} IMAGE_TAG=latest IMAGE_REPO=${dev_image_repo} retag-push-image"
             }
-            stage 'Push unstable image', {
+
+            stage 'Push unstable image for PeerScout API', {
                 def image = DockerImage.elifesciences(this, 'data-science-dags_peerscout-api', commit)
                 def unstable_image = image.addSuffixAndTag('_unstable', commit)
                 unstable_image.tag('latest').push()
@@ -45,12 +59,20 @@ elifePipeline {
             stage 'Build data pipeline image with latest commit', {
                 triggerImageBuild(jenkins_image_building_ci_pipeline, git_url, commit)
             }
+            stage 'Merge to master', {
+                elifeGitMoveToBranch commit, 'master'
+            }
         }
 
         elifeTagOnly { tagName ->
             def candidateVersion = tagName - "v"
 
             stage 'Push release image', {
+                sh "make EXISTING_IMAGE_TAG=${commit} EXISTING_IMAGE_REPO=${image_repo} IMAGE_TAG=latest IMAGE_REPO=${image_repo} retag-push-image"
+                sh "make EXISTING_IMAGE_TAG=${commit} EXISTING_IMAGE_REPO=${image_repo} IMAGE_TAG=${candidateVersion} IMAGE_REPO=${image_repo} retag-push-image"
+            }
+
+            stage 'Push release image for PeerScout API', {
                 def image = DockerImage.elifesciences(this, 'data-science-dags_peerscout-api', commit)
                 image.tag('latest').push()
                 image.tag(candidateVersion).push()
