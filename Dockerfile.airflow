@@ -49,6 +49,8 @@ COPY .pylintrc .flake8 mypy.ini ./
 COPY tests ./tests
 COPY run_test.sh ./
 
+COPY notebooks/example.ipynb ./applications_file_directory/notebooks/example.ipynb
+
 RUN mkdir -p $AIRFLOW_HOME/serve
 RUN ln -s $AIRFLOW_HOME/logs $AIRFLOW_HOME/serve/log
 
