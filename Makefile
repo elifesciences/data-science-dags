@@ -113,13 +113,6 @@ dev-watch:
 dev-test: dev-lint dev-pytest
 
 
-dev-run-sample-notebook:
-	$(PYTHON) -m papermill.cli \
-		./notebooks/example.ipynb \
-		/tmp/example-output.ipynb \
-		-p output_dataset $(OUTPUT_DATASET)
-
-
 jupyter-build:
 	chmod a+w .
 	@if [ "$(NO_BUILD)" != "y" ]; then \
