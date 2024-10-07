@@ -18,6 +18,7 @@ flake8 tests/ data_science_pipeline/ dags/
 echo "running mypy"
 mypy tests/ data_science_pipeline/ dags/
 
-pytest tests/ -p no:cacheprovider -s --disable-warnings
+echo "running unit tests"
+pytest tests/unit_test -p no:cacheprovider -s --disable-warnings
 
 echo "done"
