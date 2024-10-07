@@ -41,6 +41,7 @@ ARGS =
 
 .PHONY: build
 
+PYTEST_WATCH_MODULES = tests/unit_test
 
 venv-clean:
 	@if [ -d "$(VENV)" ]; then \
@@ -99,18 +100,18 @@ dev-nbstripout-install:
 	$(VENV)/bin/nbstripout --install
 
 
-dev-lint: dev-flake8 dev-pylint dev-notebook-lint
+dev-lint: dev-flake8 dev-pylint dev-mypy dev-notebook-lint
 
 
-dev-pytest:
-	$(PYTHON) -m pytest -p no:cacheprovider $(ARGS)
+dev-unittest:
+	$(PYTHON) -m pytest -p no:cacheprovider $(ARGS) tests/unit_test
 
 
 dev-watch:
-	$(PYTHON) -m pytest_watch -- -p no:cacheprovider -p no:warnings $(ARGS)
+	$(PYTHON) -m pytest_watch -- -p no:cacheprovider $(ARGS) $(PYTEST_WATCH_MODULES)
 
 
-dev-test: dev-lint dev-pytest
+dev-test: dev-lint dev-unittest
 
 
 dev-run-sample-notebook:
@@ -199,16 +200,16 @@ notebook-nbstripout-check:
 	'
 
 
-pytest:
-	$(DEV_RUN) pytest -p no:cacheprovider $(ARGS)
+unittest:
+	$(DEV_RUN) pytest -p no:cacheprovider $(ARGS) tests/unit_test
 
 
-pytest-not-slow:
-	@$(MAKE) ARGS="$(ARGS) $(NOT_SLOW_PYTEST_ARGS)" pytest
+unittest-not-slow:
+	@$(MAKE) ARGS="$(ARGS) $(NOT_SLOW_PYTEST_ARGS)" unittest
 
 
 .watch:
-	$(DEV_RUN) pytest-watch -- -p no:cacheprovider -p no:warnings $(ARGS)
+	$(DEV_RUN) pytest-watch -- -p no:cacheprovider $(ARGS) $(PYTEST_WATCH_MODULES)
 
 
 watch-slow:
@@ -222,7 +223,7 @@ watch:
 lint: flake8 pylint mypy notebook-lint
 
 
-test: lint pytest
+test: lint unittest
 
 
 airflow-build:
