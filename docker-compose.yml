@@ -74,15 +74,13 @@ services:
     command: scheduler
 
   test-client:
-    image: e${IMAGE_REPO}:${IMAGE_TAG}
-    depends_on:
-      - scheduler
-      - webserver
+    image: ${IMAGE_REPO}-dev:${IMAGE_TAG}
     environment: *airflow-env
     command: >
       bash -c "sudo install -D /tmp/credentials.json -m 644 -t  /home/airflow/.config/gcloud
+      && sudo install -D /tmp/.aws-credentials -m 644 --no-target-directory /home/airflow/.aws/credentials
       && ./run_test.sh with-end-to-end"
-    
+
   worker:
     environment: *airflow-env
     depends_on:
