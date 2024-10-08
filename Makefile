@@ -323,6 +323,12 @@ airflow-initdb:
 	$(DOCKER_COMPOSE) run --rm  webserver db init
 
 
+end2end-test:
+	$(MAKE) clean
+	$(DOCKER_COMPOSE) run --rm  test-client
+	$(MAKE) clean
+
+
 ci-build-main-image:
 	$(MAKE) DOCKER_COMPOSE="$(DOCKER_COMPOSE_CI)" \
 		build

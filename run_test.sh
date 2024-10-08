@@ -21,4 +21,7 @@ mypy tests/ data_science_pipeline/ dags/
 echo "running unit tests"
 pytest tests/unit_test -p no:cacheprovider -s --disable-warnings
 
+echo "running end to end tests"
+python -m pytest tests/end2end_test/ -p no:cacheprovider --log-cli-level=INFO
+
 echo "done"
