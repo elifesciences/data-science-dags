@@ -325,7 +325,7 @@ airflow-initdb:
 
 end2end-test:
 	$(MAKE) clean
-	$(DOCKER_COMPOSE) run --rm  test-client
+	$(DOCKER_COMPOSE) run --rm  test-client ./run_test.sh with-end-to-end
 	$(MAKE) clean
 
 
@@ -344,7 +344,7 @@ ci-build-and-test:
 		jupyter-build \
 		peerscout-api-build \
 		notebook-lint \
-		ci-test-exclude-e2e \
+		end2end-test \
 		peerscout-api-dev-build \
 		peerscout-api-dev-test \
 		peerscout-api-start-and-end2end-test
