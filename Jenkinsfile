@@ -56,9 +56,7 @@ elifePipeline {
                 unstable_image.tag("${branch}-${commitShort}-${timestamp}").push()
                 unstable_image.push()
             }
-            stage 'Build data pipeline image with latest commit', {
-                triggerImageBuild(jenkins_image_building_ci_pipeline, git_url, commit)
-            }
+
             stage 'Merge to master', {
                 elifeGitMoveToBranch commit, 'master'
             }
