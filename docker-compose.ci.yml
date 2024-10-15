@@ -1,5 +1,11 @@
 version: '3.4'
 
+
+x-airflow-volumes:
+  &airflow-volumes
+    - ./credentials.json:/tmp/credentials.json
+    - ~/.aws/credentials:/tmp/.aws-credentials
+
 services:
   peerscout-api:
     environment:
@@ -9,3 +15,6 @@ services:
     volumes: 
       - ~/.aws/credentials:/root/.aws/credentials
       - ./credentials.json:/root/credentials.json
+
+  test-client:
+    volumes: *airflow-volumes

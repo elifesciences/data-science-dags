@@ -8,6 +8,7 @@ x-airflow-volumes:
     - ./notebooks:/opt/airflow/applications_file_directory/notebooks
     - ./dags:/opt/airflow/dags
     - ./data_science_pipeline:/opt/airflow/data_science_pipeline
+    - ./tests:/opt/airflow/tests
 
 
 services:
