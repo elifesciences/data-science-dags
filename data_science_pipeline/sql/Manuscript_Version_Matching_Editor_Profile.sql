@@ -5,7 +5,7 @@ WITH t_initial_submission_version_id_including_null AS (
   UNION ALL
 
   SELECT version_id
-  FROM `{project}.{dataset}.mv_manuscript_version` AS manuscript_version
+  FROM `{project}.{source_dataset}.mv_manuscript_version` AS manuscript_version
   WHERE (manuscript_version.overall_stage = 'Initial Submission' OR manuscript_version.source_site_id = 'rp_site')
   AND TIMESTAMP_DIFF(CURRENT_TIMESTAMP(), manuscript_version.stages[SAFE_OFFSET(0)].stage_timestamp, DAY) <= 90
   AND (
@@ -50,11 +50,11 @@ t_recommendations AS (
       ORDER BY stage_timestamp DESC
       LIMIT 1
     ) AS Senior_Editor_Assigned_Timestamp
-  FROM `{project}.{dataset}.mv_Editorial_Editor_Profile` AS Editor
+  FROM `{project}.{source_dataset}.mv_Editorial_Editor_Profile` AS Editor
   CROSS JOIN t_initial_submission_version_id_including_null AS version_ids
-  LEFT JOIN `{project}.{dataset}.mv_manuscript_version` AS manuscript_version
+  LEFT JOIN `{project}.{source_dataset}.mv_manuscript_version` AS manuscript_version
     ON manuscript_version.version_id = version_ids.version_id
-  LEFT JOIN `{project}.{dataset}.data_science_editor_recommendation` AS editor_recommendation
+  LEFT JOIN `{project}.{output_dataset}.data_science_editor_recommendation` AS editor_recommendation
     ON editor_recommendation.person_id = Editor.Person_ID
     AND editor_recommendation.version_id = version_ids.version_id
   WHERE Editor.Role_Name = 'Senior Editor'
