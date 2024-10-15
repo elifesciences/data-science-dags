@@ -3,7 +3,7 @@ import argparse
 from typing import Optional
 from data_science_pipeline.utils.notebook import run_notebook
 
-logging.basicConfig(level=logging.INFO)
+
 LOGGER = logging.getLogger(__name__)
 
 
