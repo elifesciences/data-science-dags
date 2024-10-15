@@ -325,7 +325,7 @@ airflow-initdb:
 
 end2end-test:
 	$(MAKE) clean
-	$(DOCKER_COMPOSE) run --rm  test-client ./run_test.sh with-end-to-end
+	$(DOCKER_COMPOSE) run --rm  test-client
 	$(MAKE) clean
 
 
