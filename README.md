@@ -8,10 +8,58 @@ Then, add this to the PATH in the file `~/.zshrc` using the command below:
 
 `export PATH="/usr/local/opt/icu4c/bin:$PATH"`
 
+## Running Pipelines via Docker
 
-# Data Science DAGs
+To run pipelines via docker, the non-dev image need to be built first via:
 
-# PeerScout API
+```bash
+make airflow-build
+```
+
+Some environment variables can be set to be able to run the pipelines with real data:
+
+```bash
+DATA_SCIENCE_SOURCE_DATASET=my_dev
+DATA_SCIENCE_OUTPUT_DATASET=my_dev
+```
+
+### PeerScout Build Reviewing Editor Profiles via Docker
+
+```bash
+make data-hub-pipelines-run-peerscout-build-reviewing-editor-profiles
+```
+
+This may take several minutes to run.
+
+### PeerScout Build Senior Editor Profiles via Docker
+
+```bash
+make data-hub-pipelines-run-peerscout-build-senior-editor-profiles
+```
+
+This may take several minutes to run.
+
+### PeerScout Get Editor Pubmed Papers via Docker
+
+```bash
+make data-hub-pipelines-run-peerscout-get-editor-pubmed-papers MAX_MANUSCRIPTS=10
+```
+
+This may take several minutes to run.
+
+### PeerScout Recommend Reviewing Editors via Docker
+
+```bash
+make data-hub-pipelines-run-peerscout-recommend-reviewing-editors MAX_MANUSCRIPTS=10
+```
+
+### PeerScout Recommend Senior Editors via Docker
+
+```bash
+make data-hub-pipelines-run-peerscout-recommend-senior-editors MAX_MANUSCRIPTS=10
+```
+
+## PeerScout API
 
 To test the api
 

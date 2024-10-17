@@ -36,6 +36,9 @@ NOTEBOOK_PYLINT_EXCLUSIONS = pointless-statement,expression-not-assigned,trailin
 
 OUTPUT_DATASET = data_science
 
+MAX_MANUSCRIPTS = 10
+MAX_EDITORS = 10
+
 ARGS =
 
 
@@ -257,6 +260,35 @@ airflow-start:
 
 airflow-stop:
 	$(AIRFLOW_DOCKER_COMPOSE) down
+
+
+data-hub-pipelines-run-peerscout-build-reviewing-editor-profiles:
+	$(DOCKER_COMPOSE) run --rm data-hub-pipelines \
+		python -m data_science_pipeline.cli.peerscout_build_reviewing_editor_profiles
+
+
+data-hub-pipelines-run-peerscout-build-senior-editor-profiles:
+	$(DOCKER_COMPOSE) run --rm data-hub-pipelines \
+		python -m data_science_pipeline.cli.peerscout_build_senior_editor_profiles
+
+
+data-hub-pipelines-run-peerscout-get-editor-pubmed-papers:
+	$(DOCKER_COMPOSE) run --rm data-hub-pipelines \
+		python -m data_science_pipeline.cli.peerscout_get_editor_pubmed_papers \
+			--max-editors=$(MAX_EDITORS) \
+			--max-manuscripts=$(MAX_MANUSCRIPTS)
+
+
+data-hub-pipelines-run-peerscout-recommend-reviewing-editors:
+	$(DOCKER_COMPOSE) run --rm data-hub-pipelines \
+		python -m data_science_pipeline.cli.peerscout_recommend_reviewing_editors \
+			--max-manuscripts=$(MAX_MANUSCRIPTS)
+
+
+data-hub-pipelines-run-peerscout-recommend-senior-editors:
+	$(DOCKER_COMPOSE) run --rm data-hub-pipelines \
+		python -m data_science_pipeline.cli.peerscout_recommend_senior_editors \
+			--max-manuscripts=$(MAX_MANUSCRIPTS)
 
 
 wait-for-peerscout-api:
