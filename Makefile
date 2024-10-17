@@ -37,6 +37,7 @@ NOTEBOOK_PYLINT_EXCLUSIONS = pointless-statement,expression-not-assigned,trailin
 OUTPUT_DATASET = data_science
 
 MAX_MANUSCRIPTS = 10
+MAX_EDITORS = 10
 
 ARGS =
 
@@ -274,6 +275,7 @@ data-hub-pipelines-run-peerscout-build-senior-editor-profiles:
 data-hub-pipelines-run-peerscout-get-editor-pubmed-papers:
 	$(DOCKER_COMPOSE) run --rm data-hub-pipelines \
 		python -m data_science_pipeline.cli.peerscout_get_editor_pubmed_papers \
+			--max-editors=$(MAX_EDITORS) \
 			--max-manuscripts=$(MAX_MANUSCRIPTS)
 
 
