@@ -266,6 +266,12 @@ data-hub-pipelines-run-peerscout-build-reviewing-editor-profiles:
 		python -m data_science_pipeline.cli.peerscout_build_reviewing_editor_profiles
 
 
+data-hub-pipelines-run-peerscout-recommend-reviewing-editors:
+	$(DOCKER_COMPOSE) run --rm data-hub-pipelines \
+		python -m data_science_pipeline.cli.peerscout_recommend_reviewing_editors \
+			--max-manuscripts=$(MAX_MANUSCRIPTS)
+
+
 data-hub-pipelines-run-peerscout-recommend-senior-editors:
 	$(DOCKER_COMPOSE) run --rm data-hub-pipelines \
 		python -m data_science_pipeline.cli.peerscout_recommend_senior_editors \

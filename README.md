@@ -31,6 +31,12 @@ make data-hub-pipelines-run-peerscout-build-reviewing-editor-profiles
 
 This may take several minutes to run.
 
+### PeerScout Recommend Reviewing Editors via Docker
+
+```bash
+make data-hub-pipelines-run-peerscout-recommend-reviewing-editors MAX_MANUSCRIPTS=10
+```
+
 ### PeerScout Recommend Senior Editors via Docker
 
 ```bash
