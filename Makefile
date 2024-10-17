@@ -273,7 +273,8 @@ data-hub-pipelines-run-peerscout-build-senior-editor-profiles:
 
 data-hub-pipelines-run-peerscout-get-editor-pubmed-papers:
 	$(DOCKER_COMPOSE) run --rm data-hub-pipelines \
-		python -m data_science_pipeline.cli.peerscout_get_editor_pubmed_papers
+		python -m data_science_pipeline.cli.peerscout_get_editor_pubmed_papers \
+			--max-manuscripts=$(MAX_MANUSCRIPTS)
 
 
 data-hub-pipelines-run-peerscout-recommend-reviewing-editors:

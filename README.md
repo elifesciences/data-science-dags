@@ -42,7 +42,7 @@ This may take several minutes to run.
 ### PeerScout Get Editor Pubmed Papers via Docker
 
 ```bash
-make data-hub-pipelines-run-peerscout-get-editor-pubmed-papers
+make data-hub-pipelines-run-peerscout-get-editor-pubmed-papers MAX_MANUSCRIPTS=10
 ```
 
 This may take several minutes to run.
