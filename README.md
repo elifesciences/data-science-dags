@@ -8,10 +8,9 @@ Then, add this to the PATH in the file `~/.zshrc` using the command below:
 
 `export PATH="/usr/local/opt/icu4c/bin:$PATH"`
 
+## Data Science DAGs
 
-# Data Science DAGs
-
-# PeerScout API
+## PeerScout API
 
 To test the api
 
