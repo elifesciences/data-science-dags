@@ -22,10 +22,14 @@ def run(max_manuscripts: Optional[int] = None):
     LOGGER.info('ETL process completed successfully.')
 
 
-def main(argv: Optional[Sequence[str]] = None):
+def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument('--max-manuscripts', type=int, required=False)
-    args = parser.parse_args(argv)
+    return parser.parse_args(argv)
+
+
+def main(argv: Optional[Sequence[str]] = None):
+    args = parse_args(argv)
     run(max_manuscripts=args.max_manuscripts)
 
 
