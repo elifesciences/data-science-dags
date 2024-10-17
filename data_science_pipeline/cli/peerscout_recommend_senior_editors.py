@@ -1,6 +1,6 @@
 import logging
 import argparse
-from typing import Optional
+from typing import Optional, Sequence
 from data_science_pipeline.utils.notebook import run_notebook
 
 
@@ -22,7 +22,7 @@ def run(max_manuscripts: Optional[int] = None):
     LOGGER.info('ETL process completed successfully.')
 
 
-def main(argv=None):
+def main(argv: Optional[Sequence[str]] = None):
     parser = argparse.ArgumentParser()
     parser.add_argument('--max-manuscripts', type=int, required=False)
     args = parser.parse_args(argv)
