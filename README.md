@@ -39,6 +39,14 @@ make data-hub-pipelines-run-peerscout-build-senior-editor-profiles
 
 This may take several minutes to run.
 
+### PeerScout Get Editor Pubmed Papers via Docker
+
+```bash
+make data-hub-pipelines-run-peerscout-get-editor-pubmed-papers
+```
+
+This may take several minutes to run.
+
 ### PeerScout Recommend Reviewing Editors via Docker
 
 ```bash
