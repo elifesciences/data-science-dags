@@ -54,22 +54,6 @@ services:
       image:  ${IMAGE_REPO}:${IMAGE_TAG}
       environment: *pipeline-env
 
-  postgres:
-    image: postgres:15
-    environment:
-      - POSTGRES_USER=airflow
-      - POSTGRES_PASSWORD=airflow
-      - POSTGRES_DB=airflow
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U airflow"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-  redis:
-    image: redis:5.0.5
-    environment:
-        - ALLOW_EMPTY_PASSWORD=yes
-
   peerscout-api:
     build:
       context: .
