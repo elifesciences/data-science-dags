@@ -39,7 +39,6 @@ ENV AIRFLOW_APPLICATIONS_DIRECTORY_PATH $AIRFLOW_HOME
 
 COPY data_science_pipeline ./data_science_pipeline
 COPY notebooks ./notebooks
-COPY dags ./dags
 COPY setup.py ./setup.py
 
 RUN pip install --disable-pip-version-check -e . --user --no-dependencies

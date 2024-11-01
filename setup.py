@@ -9,7 +9,7 @@ with open(os.path.join('requirements.notebook.txt'), 'r', encoding='utf-8') as f
     REQUIRED_PACKAGES = f.readlines()
 
 packages = [x for x in find_packages()
-            if x not in {'dags', 'tests'}]
+            if x not in {'tests'}]
 
 setup(
     name='data_science_notebook_dags',

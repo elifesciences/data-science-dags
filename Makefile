@@ -70,14 +70,14 @@ dev-venv: venv-create dev-install
 
 
 dev-flake8:
-	$(PYTHON) -m flake8 data_science_pipeline peerscout_api dags tests tests_peerscout_api setup.py
+	$(PYTHON) -m flake8 data_science_pipeline peerscout_api tests tests_peerscout_api setup.py
 
 
 dev-pylint:
-	$(PYTHON) -m pylint data_science_pipeline peerscout_api dags tests tests_peerscout_api setup.py
+	$(PYTHON) -m pylint data_science_pipeline peerscout_api tests tests_peerscout_api setup.py
 
 dev-mypy:
-	$(PYTHON) -m mypy data_science_pipeline peerscout_api dags tests tests_peerscout_api setup.py
+	$(PYTHON) -m mypy data_science_pipeline peerscout_api tests tests_peerscout_api setup.py
 
 dev-notebook-lint:
 	$(VENV)/bin/jupyter nbconvert \
@@ -162,14 +162,14 @@ jupyter-stop:
 
 
 pylint:
-	$(DEV_RUN) pylint data_science_pipeline peerscout_api dags tests setup.py
+	$(DEV_RUN) pylint data_science_pipeline peerscout_api tests setup.py
 
 
 mypy:
-	$(DEV_RUN) mypy data_science_pipeline peerscout_api dags tests setup.py
+	$(DEV_RUN) mypy data_science_pipeline peerscout_api tests setup.py
 
 flake8:
-	$(DEV_RUN) flake8 data_science_pipeline peerscout_api dags tests setup.py
+	$(DEV_RUN) flake8 data_science_pipeline peerscout_api tests setup.py
 
 
 notebook-lint:

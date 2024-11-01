@@ -10,13 +10,13 @@ export PYTHONOPTIMIZE=
 
 echo "running pylint"
 PYLINTHOME=/tmp/datahub-dags-pylint \
- pylint tests/ data_science_pipeline/ dags/
+ pylint tests/ data_science_pipeline/
 
 echo "running flake8"
-flake8 tests/ data_science_pipeline/ dags/
+flake8 tests/ data_science_pipeline/
 
 echo "running mypy"
-mypy tests/ data_science_pipeline/ dags/
+mypy tests/ data_science_pipeline/
 
 echo "running unit tests"
 pytest tests/unit_test -p no:cacheprovider -s --disable-warnings

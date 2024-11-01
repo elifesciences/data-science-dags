@@ -6,7 +6,6 @@ x-airflow-volumes:
     - ~/.config/gcloud/application_default_credentials.json:/tmp/credentials.json
     - ~/.aws/credentials:/tmp/.aws-credentials
     - ./notebooks:/opt/airflow/applications_file_directory/notebooks
-    - ./dags:/opt/airflow/dags
     - ./data_science_pipeline:/opt/airflow/data_science_pipeline
     - ./tests:/opt/airflow/tests
 
