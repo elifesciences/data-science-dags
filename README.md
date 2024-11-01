@@ -13,7 +13,7 @@ Then, add this to the PATH in the file `~/.zshrc` using the command below:
 To run pipelines via docker, the non-dev image need to be built first via:
 
 ```bash
-make airflow-build
+make build
 ```
 
 Some environment variables can be set to be able to run the pipelines with real data:
