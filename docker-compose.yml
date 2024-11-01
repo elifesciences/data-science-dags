@@ -3,9 +3,8 @@ version: '3.4'
 
 x-pipeline-env:
   &pipeline-env
-  - LOAD_EX=n
   - DEPLOYMENT_ENV=ci
-  - GOOGLE_APPLICATION_CREDENTIALS=/home/airflow/.config/gcloud/credentials.json
+  - GOOGLE_APPLICATION_CREDENTIALS=/root/.config/gcloud/credentials.json
   - DATA_SCIENCE_SOURCE_DATASET=${DATA_SCIENCE_SOURCE_DATASET}
   - DATA_SCIENCE_OUTPUT_DATASET=${DATA_SCIENCE_OUTPUT_DATASET}
   - DATA_SCIENCE_STATE_PATH=${DATA_SCIENCE_STATE_PATH}
@@ -49,9 +48,7 @@ services:
     image: ${IMAGE_REPO}-dev:${IMAGE_TAG}
     environment: *pipeline-env
     command: >
-      bash -c "sudo install -D /tmp/credentials.json -m 644 -t  /home/airflow/.config/gcloud
-      && sudo install -D /tmp/.aws-credentials -m 644 --no-target-directory /home/airflow/.aws/credentials
-      && ./run_test.sh with-end-to-end"
+      bash -c "./run_test.sh with-end-to-end"
 
   data-hub-pipelines:
       image:  ${IMAGE_REPO}:${IMAGE_TAG}
