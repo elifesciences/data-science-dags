@@ -10,12 +10,9 @@ USER_ID = $(shell id -u)
 GROUP_ID = $(shell id -g)
 
 DATA_SCIENCE_DAGS_PROJECTS_HOME = $(shell dirname $(shell pwd))
-DATA_SCIENCE_DAGS_AIRFLOW_PORT = $(shell bash -c 'source .env && echo $$DATA_SCIENCE_DAGS_AIRFLOW_PORT')
 DATA_SCIENCE_DAGS_JUPYTER_PORT = $(shell bash -c 'source .env && echo $$DATA_SCIENCE_DAGS_JUPYTER_PORT')
 DATA_SCIENCE_DAGS_PEERSCOUT_API_PORT = $(shell bash -c 'source .env && echo $$DATA_SCIENCE_DAGS_PEERSCOUT_API_PORT')
 
-AIRFLOW_DOCKER_COMPOSE = DATA_SCIENCE_DAGS_AIRFLOW_PORT="$(DATA_SCIENCE_DAGS_AIRFLOW_PORT)" \
-	$(DOCKER_COMPOSE)
 JUPYTER_DOCKER_COMPOSE = USER_ID="$(USER_ID)" GROUP_ID="$(GROUP_ID)" \
 	DATA_SCIENCE_DAGS_JUPYTER_PORT="$(DATA_SCIENCE_DAGS_JUPYTER_PORT)" \
 	DATA_SCIENCE_DAGS_PROJECTS_HOME="$(DATA_SCIENCE_DAGS_PROJECTS_HOME)" \
@@ -28,7 +25,7 @@ PEERSCOUT_API_DOCKER_COMPOSE = DATA_SCIENCE_DAGS_PEERSCOUT_API_PORT="$(DATA_SCIE
 PEERSCOUT_API_DEV_DOCKER_PYTHON = $(PEERSCOUT_API_DOCKER_COMPOSE) run --rm peerscout-api-dev python
 
 PROJECT_FOLDER = /home/jovyan/data-science-dags
-DEV_RUN = $(JUPYTER_DOCKER_COMPOSE) run --rm airflow-dev
+DEV_RUN = $(JUPYTER_DOCKER_COMPOSE) run --rm data-science-pipelines-dev
 
 # Cells starts scrolling horizontally after 116 characters
 NOTEBOOK_MAX_LINE_LENGTH = 116
@@ -229,37 +226,14 @@ lint: flake8 pylint mypy notebook-lint
 test: lint unittest
 
 
-airflow-build:
-	$(AIRFLOW_DOCKER_COMPOSE) build airflow-image
+build:
+	$(DOCKER_COMPOSE) build data-science-pipelines
 
+build-dev:
+	$(DOCKER_COMPOSE) build data-science-pipelines-dev
 
-airflow-dev-build:
-	$(AIRFLOW_DOCKER_COMPOSE) build airflow-dev
-
-
-airflow-dev-shell:
-	$(AIRFLOW_DOCKER_COMPOSE) run --rm airflow-dev bash
-
-
-airflow-print-url:
-	@echo "airflow url: http://localhost:$(DATA_SCIENCE_DAGS_AIRFLOW_PORT)"
-
-
-airflow-scheduler-exec:
-	$(AIRFLOW_DOCKER_COMPOSE) exec scheduler bash
-
-
-airflow-logs:
-	$(AIRFLOW_DOCKER_COMPOSE) logs -f scheduler webserver worker
-
-
-airflow-start:
-	$(AIRFLOW_DOCKER_COMPOSE) up worker webserver
-	$(MAKE) airflow-print-url
-
-
-airflow-stop:
-	$(AIRFLOW_DOCKER_COMPOSE) down
+shell-dev:
+	$(DOCKER_COMPOSE) run --rm data-science-pipelines-dev bash
 
 
 data-hub-pipelines-run-peerscout-build-reviewing-editor-profiles:
@@ -348,12 +322,6 @@ peerscout-api-dev-test: \
 clean:
 	$(DOCKER_COMPOSE) down -v
 
-airflow-db-migrate:
-	$(DOCKER_COMPOSE) run --rm  webserver db migrate
-
-airflow-initdb:
-	$(DOCKER_COMPOSE) run --rm  webserver db init
-
 
 end2end-test:
 	$(MAKE) clean
@@ -366,13 +334,13 @@ ci-build-main-image:
 		build
 
 ci-test-exclude-e2e:
-	$(DOCKER_COMPOSE) run --rm airflow-dev ./run_test.sh
+	$(DOCKER_COMPOSE) run --rm data-science-pipelines ./run_test.sh
 
 
 ci-build-and-test:
 	$(MAKE) DOCKER_COMPOSE="$(DOCKER_COMPOSE_CI)" \
-		airflow-build \
-		airflow-dev-build \
+		build \
+		build-dev \
 		jupyter-build \
 		peerscout-api-build \
 		notebook-lint \
