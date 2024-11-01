@@ -1,8 +1,8 @@
 version: '3.4'
 
 
-x-airflow-volumes:
-  &airflow-volumes
+x-pipeline-volumes:
+  &pipeline-volumes
     - ./credentials.json:/tmp/credentials.json
     - ~/.aws/credentials:/tmp/.aws-credentials
 
@@ -17,4 +17,4 @@ services:
       - ./credentials.json:/root/credentials.json
 
   test-client:
-    volumes: *airflow-volumes
+    volumes: *pipeline-volumes
