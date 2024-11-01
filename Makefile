@@ -59,7 +59,6 @@ dev-install:
 	$(PIP) install --disable-pip-version-check -r requirements.jupyter.txt
 	$(PIP) install --disable-pip-version-check -r requirements.notebook.txt
 	$(PIP) install --disable-pip-version-check -r requirements.prophet.txt
-	$(PIP) install --disable-pip-version-check -r requirements.dag.txt
 	$(PIP) install --disable-pip-version-check -e . --no-deps
 
 

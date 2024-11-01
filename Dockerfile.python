@@ -10,9 +10,6 @@ WORKDIR /data_science_pipeline
 COPY requirements.build.txt ./
 RUN pip install --disable-pip-version-check -r requirements.build.txt
 
-COPY requirements.dag.txt ./
-RUN pip install --disable-pip-version-check -r requirements.dag.txt
-
 COPY requirements.jupyter.txt ./
 RUN pip install --disable-pip-version-check -r requirements.jupyter.txt
 
