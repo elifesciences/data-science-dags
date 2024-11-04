@@ -28,8 +28,6 @@ RUN if [ "${install_dev}" = "y" ]; then \
     pip install --disable-pip-version-check --user -r requirements.dev.txt; \
   fi
 
-# ENV NOTEBOOKS_PATH=/notebooks
-
 COPY data_science_pipeline ./data_science_pipeline
 COPY notebooks ./notebooks
 COPY setup.py ./setup.py
