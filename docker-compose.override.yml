@@ -19,7 +19,6 @@ services:
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=/root/.config/gcloud/credentials.json
       - AWS_SHARED_CREDENTIALS_FILE=/root/.aws/credentials
-    user: 0:0
 
   jupyter:
     environment:
