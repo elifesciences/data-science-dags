@@ -27,7 +27,7 @@ services:
   data-science-pipelines:
     build:
       context: .
-      dockerfile: Dockerfile.python
+      dockerfile: Dockerfile.pipelines
     image: ${IMAGE_REPO}:${IMAGE_TAG}
     environment: *pipeline-env
     command: /bin/sh -c exit 0
@@ -38,7 +38,7 @@ services:
       - DEPLOYMENT_ENV=ci
     build:
       context: .
-      dockerfile: Dockerfile.python
+      dockerfile: Dockerfile.pipelines
       args:
         install_dev: y
     image:  ${IMAGE_REPO}-dev:${IMAGE_TAG}
