@@ -333,7 +333,7 @@ ci-build-main-image:
 		build
 
 ci-test-exclude-e2e:
-	$(DOCKER_COMPOSE) run --rm data-science-pipelines ./run_test.sh
+	$(DOCKER_COMPOSE) run --rm data-science-pipelines-dev ./run_test.sh
 
 
 ci-build-and-test:
