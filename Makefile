@@ -57,7 +57,7 @@ dev-install:
 	$(PIP) install --disable-pip-version-check -r requirements.build.txt
 	$(PIP) install --disable-pip-version-check -r requirements.dev.txt
 	$(PIP) install --disable-pip-version-check -r requirements.jupyter.txt
-	$(PIP) install --disable-pip-version-check -r requirements.notebook.txt
+	$(PIP) install --disable-pip-version-check -r requirements.pipelines.txt
 	$(PIP) install --disable-pip-version-check -r requirements.prophet.txt
 	$(PIP) install --disable-pip-version-check -e . --no-deps
 
@@ -137,7 +137,7 @@ jupyter-exec:
 
 jupyter-container-update-dependencies:
 	$(JUPYTER_DOCKER_COMPOSE) exec jupyter \
-        pip install -r "$(PROJECT_FOLDER)/requirements.notebook.txt"
+        pip install -r "$(PROJECT_FOLDER)/requirements.pipelines.txt"
 
 
 jupyter-print-url:

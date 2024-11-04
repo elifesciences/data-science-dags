@@ -17,8 +17,8 @@ RUN pip install --disable-pip-version-check -r requirements.build.txt
 COPY requirements.jupyter.txt ./
 RUN pip install --disable-pip-version-check -r requirements.jupyter.txt
 
-COPY requirements.notebook.txt ./
-RUN pip install --disable-pip-version-check -r requirements.notebook.txt
+COPY requirements.pipelines.txt ./
+RUN pip install --disable-pip-version-check -r requirements.pipelines.txt
 
 COPY requirements.prophet.txt ./
 RUN pip install --disable-pip-version-check -r requirements.prophet.txt

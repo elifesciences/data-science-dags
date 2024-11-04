@@ -19,8 +19,8 @@ ENV PATH=/home/jovyan/.local/bin:${PATH}
 COPY requirements.build.txt ./
 RUN pip install --disable-pip-version-check -r requirements.build.txt
 
-COPY requirements.notebook.txt ./
-RUN pip install --disable-pip-version-check -r requirements.notebook.txt \
+COPY requirements.pipelines.txt ./
+RUN pip install --disable-pip-version-check -r requirements.pipelines.txt \
   && jupyter nbextension enable --py widgetsnbextension
 
 COPY requirements.prophet.txt ./
