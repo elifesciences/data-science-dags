@@ -3,7 +3,7 @@ version: '3.4'
 
 x-pipeline-volumes:
   &pipeline-volumes
-    - ./credentials.json:/root/credentials.json
+    - ./credentials.json:/root/.config/gcloud/credentials.json
     - ~/.aws/credentials:/root/.aws/credentials
 
 services:
