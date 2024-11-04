@@ -1,7 +1,6 @@
 elifePipeline {
     node('containers-jenkins-plugin') {
         def image_repo = 'elifesciences/data-science-dags'
-        def jenkins_image_building_ci_pipeline = 'process/process-data-hub-airflow-image-update-repo-list'
 
         def commit
         def commitShort
@@ -87,10 +86,6 @@ def withDataPipelineGcpCredentials(doSomething) {
     } finally {
         sh 'echo > credentials.json'
     }
-}
-
-def triggerImageBuild(jenkins_image_building_ci_pipeline, gitUrl, gitCommitRef){
-    build job: jenkins_image_building_ci_pipeline,  wait: false, parameters: [string(name: 'gitUrl', value: gitUrl), string(name: 'gitCommitRef', value: gitCommitRef)]
 }
 
 def getGitUrl() {
