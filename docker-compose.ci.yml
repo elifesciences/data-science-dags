@@ -3,8 +3,8 @@ version: '3.4'
 
 x-pipeline-volumes:
   &pipeline-volumes
-    - ./credentials.json:/tmp/credentials.json
-    - ~/.aws/credentials:/tmp/.aws-credentials
+    - ./credentials.json:/root/.config/gcloud/credentials.json
+    - ~/.aws/credentials:/root/.aws/credentials
 
 services:
   peerscout-api:

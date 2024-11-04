@@ -26,7 +26,7 @@ DATA_SCIENCE_OUTPUT_DATASET=my_dev
 ### PeerScout Build Reviewing Editor Profiles via Docker
 
 ```bash
-make data-hub-pipelines-run-peerscout-build-reviewing-editor-profiles
+make data-science-pipelines-run-peerscout-build-reviewing-editor-profiles
 ```
 
 This may take several minutes to run.
@@ -34,7 +34,7 @@ This may take several minutes to run.
 ### PeerScout Build Senior Editor Profiles via Docker
 
 ```bash
-make data-hub-pipelines-run-peerscout-build-senior-editor-profiles
+make data-science-pipelines-run-peerscout-build-senior-editor-profiles
 ```
 
 This may take several minutes to run.
@@ -42,7 +42,7 @@ This may take several minutes to run.
 ### PeerScout Get Editor Pubmed Papers via Docker
 
 ```bash
-make data-hub-pipelines-run-peerscout-get-editor-pubmed-papers MAX_MANUSCRIPTS=10
+make data-science-pipelines-run-peerscout-get-editor-pubmed-papers MAX_MANUSCRIPTS=10
 ```
 
 This may take several minutes to run.
@@ -50,13 +50,13 @@ This may take several minutes to run.
 ### PeerScout Recommend Reviewing Editors via Docker
 
 ```bash
-make data-hub-pipelines-run-peerscout-recommend-reviewing-editors MAX_MANUSCRIPTS=10
+make data-science-pipelines-run-peerscout-recommend-reviewing-editors MAX_MANUSCRIPTS=10
 ```
 
 ### PeerScout Recommend Senior Editors via Docker
 
 ```bash
-make data-hub-pipelines-run-peerscout-recommend-senior-editors MAX_MANUSCRIPTS=10
+make data-science-pipelines-run-peerscout-recommend-senior-editors MAX_MANUSCRIPTS=10
 ```
 
 ## PeerScout API

@@ -3,24 +3,22 @@ version: '3.4'
 
 x-pipeline-volumes:
   &pipeline-volumes
-    - ~/.config/gcloud/application_default_credentials.json:/tmp/credentials.json
-    - ~/.aws/credentials:/tmp/.aws-credentials
-    - ./notebooks:/opt/airflow/applications_file_directory/notebooks
-    - ./data_science_pipeline:/opt/airflow/data_science_pipeline
-    - ./tests:/opt/airflow/tests
+    - ~/.config/gcloud/application_default_credentials.json:/root/.config/gcloud/credentials.json
+    - ~/.aws/credentials:/root/.aws/credentials
+    - ./notebooks:/data_science_pipeline/notebooks
+    - ./data_science_pipeline:/data_science_pipeline/data_science_pipeline
+    - ./tests:/data_science_pipeline/tests
 
 
 services:
   test-client:
     volumes: *pipeline-volumes
 
-  data-hub-pipelines:
+  data-science-pipelines:
     volumes: *pipeline-volumes
     environment:
-      - GOOGLE_APPLICATION_CREDENTIALS=/tmp/credentials.json
-      - AWS_SHARED_CREDENTIALS_FILE=/tmp/.aws-credentials
-      - PYTHONPATH=/home/airflow/.local/lib/python3.8/site-packages
-    user: 0:0
+      - GOOGLE_APPLICATION_CREDENTIALS=/root/.config/gcloud/credentials.json
+      - AWS_SHARED_CREDENTIALS_FILE=/root/.aws/credentials
 
   jupyter:
     environment:

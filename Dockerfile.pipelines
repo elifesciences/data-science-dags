@@ -1,29 +1,24 @@
-FROM apache/airflow:2.7.1-python3.8
+FROM python:3.8-slim
 ARG install_dev=n
 
 USER root
 
-RUN sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 467B942D3A79BD29
-
 RUN apt-get update \
-  && apt-get install sudo pkg-config libicu-dev gcc g++ -yqq \
+  && apt-get install pkg-config libicu-dev gcc g++ -yqq \
   && rm -rf /var/lib/apt/lists/*
 
-RUN usermod -aG sudo airflow
-RUN echo "airflow ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+ENV PIP_NO_CACHE_DIR=1
 
-USER airflow
+WORKDIR /data_science_pipeline
+
 COPY requirements.build.txt ./
 RUN pip install --disable-pip-version-check -r requirements.build.txt
-
-COPY requirements.dag.txt ./
-RUN pip install --disable-pip-version-check -r requirements.dag.txt
 
 COPY requirements.jupyter.txt ./
 RUN pip install --disable-pip-version-check -r requirements.jupyter.txt
 
-COPY requirements.notebook.txt ./
-RUN pip install --disable-pip-version-check -r requirements.notebook.txt
+COPY requirements.pipelines.txt ./
+RUN pip install --disable-pip-version-check -r requirements.pipelines.txt
 
 COPY requirements.prophet.txt ./
 RUN pip install --disable-pip-version-check -r requirements.prophet.txt
@@ -32,10 +27,6 @@ COPY requirements.dev.txt ./
 RUN if [ "${install_dev}" = "y" ]; then \
     pip install --disable-pip-version-check --user -r requirements.dev.txt; \
   fi
-
-ENV PATH /home/airflow/.local/bin:$PATH
-
-ENV AIRFLOW_APPLICATIONS_DIRECTORY_PATH $AIRFLOW_HOME
 
 COPY data_science_pipeline ./data_science_pipeline
 COPY notebooks ./notebooks
@@ -46,8 +37,3 @@ RUN pip install --disable-pip-version-check -e . --user --no-dependencies
 COPY .pylintrc .flake8 mypy.ini ./
 COPY tests ./tests
 COPY run_test.sh ./
-
-RUN mkdir -p $AIRFLOW_HOME/serve
-RUN ln -s $AIRFLOW_HOME/logs $AIRFLOW_HOME/serve/log
-
-ENTRYPOINT []

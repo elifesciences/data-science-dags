@@ -3,9 +3,8 @@ version: '3.4'
 
 x-pipeline-env:
   &pipeline-env
-  - LOAD_EX=n
   - DEPLOYMENT_ENV=ci
-  - GOOGLE_APPLICATION_CREDENTIALS=/home/airflow/.config/gcloud/credentials.json
+  - GOOGLE_APPLICATION_CREDENTIALS=/root/.config/gcloud/credentials.json
   - DATA_SCIENCE_SOURCE_DATASET=${DATA_SCIENCE_SOURCE_DATASET}
   - DATA_SCIENCE_OUTPUT_DATASET=${DATA_SCIENCE_OUTPUT_DATASET}
   - DATA_SCIENCE_STATE_PATH=${DATA_SCIENCE_STATE_PATH}
@@ -28,8 +27,9 @@ services:
   data-science-pipelines:
     build:
       context: .
-      dockerfile: Dockerfile.airflow
+      dockerfile: Dockerfile.pipelines
     image: ${IMAGE_REPO}:${IMAGE_TAG}
+    environment: *pipeline-env
     command: /bin/sh -c exit 0
     entrypoint: []
 
@@ -38,7 +38,7 @@ services:
       - DEPLOYMENT_ENV=ci
     build:
       context: .
-      dockerfile: Dockerfile.airflow
+      dockerfile: Dockerfile.pipelines
       args:
         install_dev: y
     image:  ${IMAGE_REPO}-dev:${IMAGE_TAG}
@@ -49,29 +49,7 @@ services:
     image: ${IMAGE_REPO}-dev:${IMAGE_TAG}
     environment: *pipeline-env
     command: >
-      bash -c "sudo install -D /tmp/credentials.json -m 644 -t  /home/airflow/.config/gcloud
-      && sudo install -D /tmp/.aws-credentials -m 644 --no-target-directory /home/airflow/.aws/credentials
-      && ./run_test.sh with-end-to-end"
-
-  data-hub-pipelines:
-      image:  ${IMAGE_REPO}:${IMAGE_TAG}
-      environment: *pipeline-env
-
-  postgres:
-    image: postgres:15
-    environment:
-      - POSTGRES_USER=airflow
-      - POSTGRES_PASSWORD=airflow
-      - POSTGRES_DB=airflow
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U airflow"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-  redis:
-    image: redis:5.0.5
-    environment:
-        - ALLOW_EMPTY_PASSWORD=yes
+      bash -c "./run_test.sh with-end-to-end"
 
   peerscout-api:
     build:

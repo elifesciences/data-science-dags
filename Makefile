@@ -57,9 +57,8 @@ dev-install:
 	$(PIP) install --disable-pip-version-check -r requirements.build.txt
 	$(PIP) install --disable-pip-version-check -r requirements.dev.txt
 	$(PIP) install --disable-pip-version-check -r requirements.jupyter.txt
-	$(PIP) install --disable-pip-version-check -r requirements.notebook.txt
+	$(PIP) install --disable-pip-version-check -r requirements.pipelines.txt
 	$(PIP) install --disable-pip-version-check -r requirements.prophet.txt
-	$(PIP) install --disable-pip-version-check -r requirements.dag.txt
 	$(PIP) install --disable-pip-version-check -e . --no-deps
 
 
@@ -138,7 +137,7 @@ jupyter-exec:
 
 jupyter-container-update-dependencies:
 	$(JUPYTER_DOCKER_COMPOSE) exec jupyter \
-        pip install -r "$(PROJECT_FOLDER)/requirements.notebook.txt"
+        pip install -r "$(PROJECT_FOLDER)/requirements.pipelines.txt"
 
 
 jupyter-print-url:
@@ -236,31 +235,31 @@ shell-dev:
 	$(DOCKER_COMPOSE) run --rm data-science-pipelines-dev bash
 
 
-data-hub-pipelines-run-peerscout-build-reviewing-editor-profiles:
-	$(DOCKER_COMPOSE) run --rm data-hub-pipelines \
+data-science-pipelines-run-peerscout-build-reviewing-editor-profiles:
+	$(DOCKER_COMPOSE) run --rm data-science-pipelines \
 		python -m data_science_pipeline.cli.peerscout_build_reviewing_editor_profiles
 
 
-data-hub-pipelines-run-peerscout-build-senior-editor-profiles:
-	$(DOCKER_COMPOSE) run --rm data-hub-pipelines \
+data-science-pipelines-run-peerscout-build-senior-editor-profiles:
+	$(DOCKER_COMPOSE) run --rm data-science-pipelines \
 		python -m data_science_pipeline.cli.peerscout_build_senior_editor_profiles
 
 
-data-hub-pipelines-run-peerscout-get-editor-pubmed-papers:
-	$(DOCKER_COMPOSE) run --rm data-hub-pipelines \
+data-science-pipelines-run-peerscout-get-editor-pubmed-papers:
+	$(DOCKER_COMPOSE) run --rm data-science-pipelines \
 		python -m data_science_pipeline.cli.peerscout_get_editor_pubmed_papers \
 			--max-editors=$(MAX_EDITORS) \
 			--max-manuscripts=$(MAX_MANUSCRIPTS)
 
 
-data-hub-pipelines-run-peerscout-recommend-reviewing-editors:
-	$(DOCKER_COMPOSE) run --rm data-hub-pipelines \
+data-science-pipelines-run-peerscout-recommend-reviewing-editors:
+	$(DOCKER_COMPOSE) run --rm data-science-pipelines \
 		python -m data_science_pipeline.cli.peerscout_recommend_reviewing_editors \
 			--max-manuscripts=$(MAX_MANUSCRIPTS)
 
 
-data-hub-pipelines-run-peerscout-recommend-senior-editors:
-	$(DOCKER_COMPOSE) run --rm data-hub-pipelines \
+data-science-pipelines-run-peerscout-recommend-senior-editors:
+	$(DOCKER_COMPOSE) run --rm data-science-pipelines \
 		python -m data_science_pipeline.cli.peerscout_recommend_senior_editors \
 			--max-manuscripts=$(MAX_MANUSCRIPTS)
 
@@ -334,7 +333,7 @@ ci-build-main-image:
 		build
 
 ci-test-exclude-e2e:
-	$(DOCKER_COMPOSE) run --rm data-science-pipelines ./run_test.sh
+	$(DOCKER_COMPOSE) run --rm data-science-pipelines-dev ./run_test.sh
 
 
 ci-build-and-test:
