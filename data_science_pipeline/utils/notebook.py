@@ -11,8 +11,8 @@ LOGGER = logging.getLogger(__name__)
 DEPLOYMENT_ENV_ENV_NAME = "DEPLOYMENT_ENV"
 DEFAULT_DEPLOYMENT_ENV_VALUE = "ci"
 
-NOTEBOOKS_PATH_ENV_NAME = (
-    "NOTEBOOKS_PATH"
+AIRFLOW_APPLICATIONS_DIRECTORY_PATH_ENV_NAME = (
+    "AIRFLOW_APPLICATIONS_DIRECTORY_PATH"
 )
 
 APP_DIR_NAME_IN_AIRFLOW_APP_DIR = (
@@ -88,7 +88,7 @@ def get_combined_notebook_params(
 def get_notebook_path(notebook_filename: str) -> str:
     return str(Path(
         os.getenv(
-            NOTEBOOKS_PATH_ENV_NAME,
+            AIRFLOW_APPLICATIONS_DIRECTORY_PATH_ENV_NAME,
             ""
         )
     ).joinpath(
