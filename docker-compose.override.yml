@@ -5,7 +5,7 @@ x-pipeline-volumes:
   &pipeline-volumes
     - ~/.config/gcloud/application_default_credentials.json:/root/.config/gcloud/credentials.json
     - ~/.aws/credentials:/root/.aws/credentials
-    - ./notebooks:/notebooks
+    - ./notebooks:/data_science_pipeline/notebooks
     - ./data_science_pipeline:/data_science_pipeline/data_science_pipeline
     - ./tests:/data_science_pipeline/tests
 
