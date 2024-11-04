@@ -14,7 +14,7 @@ services:
   test-client:
     volumes: *pipeline-volumes
 
-  data-hub-pipelines:
+  data-science-pipelines:
     volumes: *pipeline-volumes
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=/root/.config/gcloud/credentials.json
