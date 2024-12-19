@@ -3,7 +3,7 @@ import os
 import json
 import logging
 import html
-from typing import NamedTuple, Optional
+from typing import Iterable, List, NamedTuple, Optional, Sequence
 from threading import Thread
 import jsonschema
 
@@ -417,9 +417,34 @@ def write_peerscout_api_response_to_bq_in_a_thread(
     thread.start()
 
 
+def get_keywords_from_api_for_text(
+    api_endpoint_url: str,
+    text: str
+) -> Sequence[str]:
+    response = requests.get(api_endpoint_url, params={'text': text})
+    response.raise_for_status()
+    return response['keywords']
+
+
+class SpaCyExtractKeywordWebApiKeywordExtractor(KeywordExtractor):
+    def __init__(self, api_endpoint_url: str):
+        self.api_endpoint_url = api_endpoint_url
+
+    def iter_extract_keywords(
+            self, text_list: Iterable[str]) -> Iterable[List[str]]:
+        for text in text_list:
+            yield get_keywords_from_api_for_text(
+                api_endpoint_url=self.api_endpoint_url,
+                text=text
+            )
+
+
 def create_app():
     app = Flask(__name__)
-    keyword_extractor = get_keyword_extractor(get_spacy_language_model_env())
+    # keyword_extractor = get_keyword_extractor(get_spacy_language_model_env())
+    keyword_extractor = SpaCyExtractKeywordWebApiKeywordExtractor(
+        api_endpoint_url='https://spacy-keyword-extraction-api.elifesciences.org/v1/extract-keywords'
+    )
 
     MODEL_PATH = get_model_path(get_deployment_env())
     senior_editor_model_dict = load_model(MODEL_PATH, SENIOR_EDITOR_MODEL_NAME)
