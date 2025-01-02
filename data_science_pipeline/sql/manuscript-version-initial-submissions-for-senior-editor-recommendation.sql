@@ -5,7 +5,6 @@
 
 WITH t_manuscript_version_abstract_keywords AS (
   SELECT
-    manuscript_abstract_keywords.manuscript_id AS manuscript_id,
     manuscript_abstract_keywords.version_id,
     manuscript_abstract_keywords.extracted_keywords,
     ROW_NUMBER() OVER (
