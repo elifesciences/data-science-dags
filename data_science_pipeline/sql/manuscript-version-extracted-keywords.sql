@@ -1,14 +1,17 @@
 WITH t_manuscript_version_abstract_keywords AS (
   SELECT
-    manuscript_abstract_keywords.manuscript_id,
-    manuscript_abstract_keywords.version_id,
-    manuscript_abstract_keywords.extracted_keywords,
+    manuscript_abstract_keywords_result.meta.version_id,
+    ARRAY(
+      SELECT keyword
+      FROM UNNEST(manuscript_abstract_keywords_result.attributes.keywords)
+    ) AS extracted_keywords,
     ROW_NUMBER() OVER (
-      PARTITION BY version_id
-      ORDER BY data_hub_imported_timestamp DESC
+      PARTITION BY manuscript_abstract_keywords_result.meta.version_id
+      ORDER BY imported_timestamp DESC
     ) AS version_id_row_number
-  FROM `{project}.{dataset}.manuscript_abstract_keywords` AS manuscript_abstract_keywords
-  WHERE ARRAY_LENGTH(extracted_keywords) > 0
+  FROM `{project}.{dataset}.keywords_from_manuscript_abstract_batch` AS manuscript_abstract_keywords_batch
+  JOIN UNNEST(manuscript_abstract_keywords_batch.data) AS manuscript_abstract_keywords_result
+  WHERE ARRAY_LENGTH(manuscript_abstract_keywords_result.attributes.keywords) > 0
 )
 
 SELECT
