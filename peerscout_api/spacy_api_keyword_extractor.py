@@ -11,8 +11,18 @@ from elife_data_hub_utils.keyword_extract.extract_keywords import (
 DEFAULT_TIMEOUT = 60
 
 
-def get_request_body(_text_list: Iterable[str]) -> dict:
-    return {}
+def get_request_body(text_list: Iterable[str]) -> dict:
+    return {
+        'data': [
+            {
+                'type': 'extract-keyword-request',
+                'attributes': {
+                    'content': text
+                }
+            }
+            for text in text_list
+        ]
+    }
 
 
 @dataclass(frozen=True)

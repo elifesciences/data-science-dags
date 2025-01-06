@@ -22,10 +22,22 @@ def _requests_post_mock(requests_mock: MagicMock) -> MagicMock:
     return requests_mock.post
 
 
+class TestGetRequestBody:
+    def test_should_return_keyword_request_body(self):
+        assert get_request_body(['text_1']) == {
+            'data': [{
+                'type': 'extract-keyword-request',
+                'attributes': {
+                    'content': 'text_1'
+                }
+            }]
+        }
+
+
 class TestSpaCyApiKeywordExtractor:
     def test_should_call_api(self, requests_post_mock: MagicMock):
         keyword_extractor = SpaCyApiKeywordExtractor(api_url=TEST_SPACY_API_URL_1)
-        keyword_extractor.iter_extract_keywords(text_list=['text1'])
+        keyword_extractor.iter_extract_keywords(text_list=['text_1'])
         requests_post_mock.assert_called_with(
             url=TEST_SPACY_API_URL_1,
             json=get_request_body(['text_1']),
