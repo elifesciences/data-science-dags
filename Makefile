@@ -121,6 +121,19 @@ dev-run-sample-notebook:
 		-p output_dataset $(OUTPUT_DATASET)
 
 
+dev-nlp-model-download:
+	$(PYTHON) -m spacy download en_core_web_sm
+
+
+dev-peerscout-api-start:
+	$(PYTHON) -m \
+		peerscout_api.main \
+		--reload \
+		--factory \
+		--host 127.0.0.1 \
+		--port 8000
+
+
 jupyter-build:
 	chmod a+w .
 	@if [ "$(NO_BUILD)" != "y" ]; then \
