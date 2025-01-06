@@ -5,7 +5,7 @@ from unittest.mock import ANY, MagicMock, patch
 import pytest
 
 import peerscout_api.spacy_api_keyword_extractor as target_module
-from peerscout_api.spacy_api_keyword_extractor import SpaCyApiKeywordExtractor
+from peerscout_api.spacy_api_keyword_extractor import SpaCyApiKeywordExtractor, get_request_body
 
 
 TEST_SPACY_API_URL_1 = 'http://example/spacy-url-1'
@@ -28,5 +28,6 @@ class TestSpaCyApiKeywordExtractor:
         keyword_extractor.iter_extract_keywords(text_list=['text1'])
         requests_post_mock.assert_called_with(
             url=TEST_SPACY_API_URL_1,
+            json=get_request_body(['text_1']),
             timeout=ANY
         )
