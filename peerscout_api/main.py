@@ -26,6 +26,7 @@ from peerscout_api.recommend_editor import (
 
 DEFAULT_SPACY_LANGUAGE_MODEL_NAME = "en_core_web_sm"
 SPACY_LANGUAGE_MODEL_NAME_ENV_VALUE = "SPACY_LANGUAGE_MODEL_NAME"
+SPACY_KEYWORD_EXTRACTION_API_URL_ENV_VALUE = "SPACY_KEYWORD_EXTRACTION_API_URL"
 
 PEERSCOUT_API_TARGET_DATASET_ENV_NAME = "PEERSCOUT_API_TARGET_DATASET"
 DEFAULT_PEERSCOUT_API_TARGET_DATASET_VALUE = "ci"
@@ -122,6 +123,12 @@ def get_spacy_language_model_env() -> str:
     return os.getenv(
         SPACY_LANGUAGE_MODEL_NAME_ENV_VALUE,
         DEFAULT_SPACY_LANGUAGE_MODEL_NAME
+    )
+
+
+def get_spacy_keyword_extraction_api_url() -> str:
+    return os.getenv(
+        SPACY_KEYWORD_EXTRACTION_API_URL_ENV_VALUE
     )
 
 

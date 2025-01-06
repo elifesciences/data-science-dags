@@ -10,6 +10,7 @@ import pandas as pd
 
 from peerscout_api.main import (
     NOT_PROVIDED,
+    SPACY_KEYWORD_EXTRACTION_API_URL_ENV_VALUE,
     create_app,
     get_html_text_for_recommended_person,
     get_html_text_for_author_suggested_person,
@@ -20,6 +21,7 @@ from peerscout_api.main import (
     NO_RECOMMENDATION_HTML,
     EDITOR_TYPE_FOR_REVIEWING_EDITOR,
     EDITOR_TYPE_FOR_SENIOR_EDITOR,
+    get_spacy_keyword_extraction_api_url,
     pick_person_id_from_bq_result
 )
 
@@ -197,6 +199,16 @@ def _test_client() -> FlaskClient:
 def _get_ok_json(response):
     assert response.status_code == 200
     return response.json
+
+
+class TestGetSpacyKeywordExtractionApiUrl:
+    def test_should_return_none_if_not_configured(self, mock_env: dict):
+        assert SPACY_KEYWORD_EXTRACTION_API_URL_ENV_VALUE not in mock_env
+        assert not get_spacy_keyword_extraction_api_url()
+
+    def test_should_return_configured_url(self, mock_env: dict):
+        mock_env[SPACY_KEYWORD_EXTRACTION_API_URL_ENV_VALUE] = 'url_1'
+        assert get_spacy_keyword_extraction_api_url() == 'url_1'
 
 
 class TestPickPersonIdFromBqResult:
