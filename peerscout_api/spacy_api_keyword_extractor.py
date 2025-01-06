@@ -25,6 +25,10 @@ def get_request_body(text_list: Iterable[str]) -> dict:
     }
 
 
+def get_batch_keywords_from_response(_response_json: dict) -> List[List[str]]:
+    return []
+
+
 @dataclass(frozen=True)
 class SpaCyApiKeywordExtractor(KeywordExtractor):
     api_url: str
