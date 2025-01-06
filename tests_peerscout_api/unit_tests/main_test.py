@@ -11,7 +11,6 @@ import pandas as pd
 from peerscout_api.main import (
     NOT_PROVIDED,
     SPACY_KEYWORD_EXTRACTION_API_URL_ENV_VALUE,
-    SpaCyApiKeywordExtractor,
     create_app,
     get_html_text_for_recommended_person,
     get_html_text_for_author_suggested_person,
@@ -28,6 +27,7 @@ from peerscout_api.main import (
 )
 
 import peerscout_api.main as target_module
+from peerscout_api.spacy_api_keyword_extractor import SpaCyApiKeywordExtractor
 
 
 LOGGER = logging.getLogger(__name__)

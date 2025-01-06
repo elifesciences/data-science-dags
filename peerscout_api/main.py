@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from datetime import datetime, timezone
 import os
 import json
@@ -25,6 +24,7 @@ from peerscout_api.recommend_editor import (
     load_model,
     get_editor_recommendations_for_api
 )
+from peerscout_api.spacy_api_keyword_extractor import SpaCyApiKeywordExtractor
 
 DEFAULT_SPACY_LANGUAGE_MODEL_NAME = "en_core_web_sm"
 SPACY_LANGUAGE_MODEL_NAME_ENV_VALUE = "SPACY_LANGUAGE_MODEL_NAME"
@@ -132,11 +132,6 @@ def get_spacy_keyword_extraction_api_url() -> Optional[str]:
     return os.getenv(
         SPACY_KEYWORD_EXTRACTION_API_URL_ENV_VALUE
     )
-
-
-@dataclass(frozen=True)
-class SpaCyApiKeywordExtractor():
-    api_url: str
 
 
 def get_keyword_extractor() -> KeywordExtractor:
