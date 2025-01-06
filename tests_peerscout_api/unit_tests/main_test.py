@@ -1,6 +1,6 @@
 import logging
 from typing import Iterable
-from unittest.mock import patch, MagicMock
+from unittest.mock import ANY, patch, MagicMock
 
 from flask.testing import FlaskClient
 
@@ -255,6 +255,22 @@ class TestPeerscoutAPI:
         test_client.post('/api/peerscout', json=INPUT_DATA_VALID)
         keyword_extractor_mock.iter_extract_keywords.assert_called_with(
             text_list=[INPUT_DATA_VALID['abstract']]
+        )
+
+    def test_should_pass_extracted_keywords_into_get_editor_recommendations_for_api_func(
+        self,
+        test_client: FlaskClient,
+        keyword_extractor_mock: MagicMock,
+        get_editor_recommendations_for_api_mock: MagicMock
+    ):
+        keyword_extractor_mock.iter_extract_keywords.return_value = iter(
+            [['keyword_1', 'keyword_2']]
+        )
+        test_client.post('/api/peerscout', json=INPUT_DATA_VALID)
+        get_editor_recommendations_for_api_mock.assert_called_with(
+                ANY,
+                [['keyword_1', 'keyword_2']],
+                ANY
         )
 
     def test_should_respond_with_recomendation(
