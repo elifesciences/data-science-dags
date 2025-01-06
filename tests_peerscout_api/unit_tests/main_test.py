@@ -177,6 +177,11 @@ def _get_keyword_extractor_mock() -> Iterable[MagicMock]:
         yield mock
 
 
+@pytest.fixture(name='keyword_extractor_mock', autouse=True)
+def _keyword_extractor_mock(get_keyword_extractor_mock: MagicMock) -> MagicMock:
+    return get_keyword_extractor_mock.return_value
+
+
 @pytest.fixture(name='load_model_mock', autouse=True)
 def _load_model_mock() -> Iterable[MagicMock]:
     with patch.object(target_module, 'load_model') as mock:
@@ -241,6 +246,16 @@ class TestPeerscoutAPI:
     ):
         response = test_client.post('/api/peerscout', json=INPUT_DATA_WTIH_WEAK_ABSTRACT)
         assert _get_ok_json(response) == get_valid_no_recommendation_response()
+
+    def test_should_pass_abstract_to_keyword_extractor(
+        self,
+        test_client: FlaskClient,
+        keyword_extractor_mock: MagicMock
+    ):
+        test_client.post('/api/peerscout', json=INPUT_DATA_VALID)
+        keyword_extractor_mock.iter_extract_keywords(
+            text_list=[INPUT_DATA_VALID['abstract']]
+        )
 
     def test_should_respond_with_recomendation(
         self,
