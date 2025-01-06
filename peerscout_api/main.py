@@ -13,7 +13,8 @@ from flask import Flask, jsonify, request
 from werkzeug.exceptions import BadRequest
 
 from elife_data_hub_utils.keyword_extract.extract_keywords import (
-    get_keyword_extractor as get_keyword_extractor_for_spacy_language_model
+    get_keyword_extractor as get_keyword_extractor_for_spacy_language_model,
+    KeywordExtractor
 )
 
 from data_science_pipeline.utils.json import remove_key_with_null_value
@@ -132,10 +133,14 @@ def get_spacy_keyword_extraction_api_url() -> Optional[str]:
     )
 
 
-def get_keyword_extractor():
+class SpaCyApiKeywordExtractor():
+    pass
+
+
+def get_keyword_extractor() -> KeywordExtractor:
     api_url = get_spacy_keyword_extraction_api_url()
     if api_url:
-        raise NotImplementedError('api_url not yet implemented')
+        return SpaCyApiKeywordExtractor()
     return get_keyword_extractor_for_spacy_language_model(get_spacy_language_model_env())
 
 

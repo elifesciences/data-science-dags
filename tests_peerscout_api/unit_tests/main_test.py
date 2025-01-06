@@ -11,6 +11,7 @@ import pandas as pd
 from peerscout_api.main import (
     NOT_PROVIDED,
     SPACY_KEYWORD_EXTRACTION_API_URL_ENV_VALUE,
+    SpaCyApiKeywordExtractor,
     create_app,
     get_html_text_for_recommended_person,
     get_html_text_for_author_suggested_person,
@@ -250,13 +251,13 @@ class TestGetKeywordExtractor:
         get_keyword_extractor()
         get_keyword_extractor_for_spacy_language_model_mock.assert_called()
 
-    def test_should_fail_with_api_url(
+    def test_should_return_spacy_api_keyword_extractor(
         self,
         mock_env: dict
     ):
         mock_env[SPACY_KEYWORD_EXTRACTION_API_URL_ENV_VALUE] = 'url_1'
-        with pytest.raises(NotImplementedError):
-            get_keyword_extractor()
+        result = get_keyword_extractor()
+        assert isinstance(result, SpaCyApiKeywordExtractor)
 
 
 class TestPeerscoutAPI:
