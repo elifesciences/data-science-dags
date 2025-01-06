@@ -253,7 +253,7 @@ class TestPeerscoutAPI:
         keyword_extractor_mock: MagicMock
     ):
         test_client.post('/api/peerscout', json=INPUT_DATA_VALID)
-        keyword_extractor_mock.iter_extract_keywords(
+        keyword_extractor_mock.iter_extract_keywords.assert_called_with(
             text_list=[INPUT_DATA_VALID['abstract']]
         )
 
