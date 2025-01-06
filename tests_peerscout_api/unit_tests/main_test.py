@@ -251,13 +251,14 @@ class TestGetKeywordExtractor:
         get_keyword_extractor()
         get_keyword_extractor_for_spacy_language_model_mock.assert_called()
 
-    def test_should_return_spacy_api_keyword_extractor(
+    def test_should_return_spacy_api_keyword_extractor_with_api_url(
         self,
         mock_env: dict
     ):
         mock_env[SPACY_KEYWORD_EXTRACTION_API_URL_ENV_VALUE] = 'url_1'
         result = get_keyword_extractor()
         assert isinstance(result, SpaCyApiKeywordExtractor)
+        assert result.api_url == 'url_1'
 
 
 class TestPeerscoutAPI:

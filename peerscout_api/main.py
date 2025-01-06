@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from datetime import datetime, timezone
 import os
 import json
@@ -133,14 +134,15 @@ def get_spacy_keyword_extraction_api_url() -> Optional[str]:
     )
 
 
+@dataclass(frozen=True)
 class SpaCyApiKeywordExtractor():
-    pass
+    api_url: str
 
 
 def get_keyword_extractor() -> KeywordExtractor:
     api_url = get_spacy_keyword_extraction_api_url()
     if api_url:
-        return SpaCyApiKeywordExtractor()
+        return SpaCyApiKeywordExtractor(api_url=api_url)
     return get_keyword_extractor_for_spacy_language_model(get_spacy_language_model_env())
 
 
