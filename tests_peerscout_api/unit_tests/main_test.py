@@ -14,6 +14,7 @@ from peerscout_api.main import (
     create_app,
     get_html_text_for_recommended_person,
     get_html_text_for_author_suggested_person,
+    get_keyword_extractor,
     get_list_of_author_suggested_person_details_with_html_text,
     PersonProps,
     get_recommendation_html,
@@ -179,6 +180,12 @@ def _get_keyword_extractor_mock() -> Iterable[MagicMock]:
         yield mock
 
 
+@pytest.fixture(name='get_keyword_extractor_for_spacy_language_model_mock', autouse=True)
+def _get_keyword_extractor_for_spacy_language_model_mock() -> Iterable[MagicMock]:
+    with patch.object(target_module, 'get_keyword_extractor_for_spacy_language_model') as mock:
+        yield mock
+
+
 @pytest.fixture(name='keyword_extractor_mock', autouse=True)
 def _keyword_extractor_mock(get_keyword_extractor_mock: MagicMock) -> MagicMock:
     return get_keyword_extractor_mock.return_value
@@ -231,6 +238,15 @@ class TestPickPersonIdFromBqResult:
             person_ids_to_pick=[BQ_RESPONSE_DICT_2['person_id'], BQ_RESPONSE_DICT_1['person_id']]
         )
         assert actual_response == [BQ_RESPONSE_DICT_2, BQ_RESPONSE_DICT_1]
+
+
+class TestGetKeywordExtractor:
+    def test_should_call_get_keyword_extractor_for_spacy_language_model(
+        self,
+        get_keyword_extractor_for_spacy_language_model_mock: MagicMock
+    ):
+        get_keyword_extractor()
+        get_keyword_extractor_for_spacy_language_model_mock.assert_called()
 
 
 class TestPeerscoutAPI:
