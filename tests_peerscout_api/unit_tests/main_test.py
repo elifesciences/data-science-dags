@@ -243,10 +243,20 @@ class TestPickPersonIdFromBqResult:
 class TestGetKeywordExtractor:
     def test_should_call_get_keyword_extractor_for_spacy_language_model(
         self,
-        get_keyword_extractor_for_spacy_language_model_mock: MagicMock
+        get_keyword_extractor_for_spacy_language_model_mock: MagicMock,
+        mock_env: dict
     ):
+        assert SPACY_KEYWORD_EXTRACTION_API_URL_ENV_VALUE not in mock_env
         get_keyword_extractor()
         get_keyword_extractor_for_spacy_language_model_mock.assert_called()
+
+    def test_should_fail_with_api_url(
+        self,
+        mock_env: dict
+    ):
+        mock_env[SPACY_KEYWORD_EXTRACTION_API_URL_ENV_VALUE] = 'url_1'
+        with pytest.raises(NotImplementedError):
+            get_keyword_extractor()
 
 
 class TestPeerscoutAPI:

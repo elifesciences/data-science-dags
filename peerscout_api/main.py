@@ -126,13 +126,16 @@ def get_spacy_language_model_env() -> str:
     )
 
 
-def get_spacy_keyword_extraction_api_url() -> str:
+def get_spacy_keyword_extraction_api_url() -> Optional[str]:
     return os.getenv(
         SPACY_KEYWORD_EXTRACTION_API_URL_ENV_VALUE
     )
 
 
 def get_keyword_extractor():
+    api_url = get_spacy_keyword_extraction_api_url()
+    if api_url:
+        raise NotImplementedError('api_url not yet implemented')
     return get_keyword_extractor_for_spacy_language_model(get_spacy_language_model_env())
 
 
