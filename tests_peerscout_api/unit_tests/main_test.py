@@ -181,12 +181,6 @@ def _get_keyword_extractor_mock() -> Iterable[MagicMock]:
         yield mock
 
 
-@pytest.fixture(name='get_keyword_extractor_for_spacy_language_model_mock', autouse=True)
-def _get_keyword_extractor_for_spacy_language_model_mock() -> Iterable[MagicMock]:
-    with patch.object(target_module, 'get_keyword_extractor_for_spacy_language_model') as mock:
-        yield mock
-
-
 @pytest.fixture(name='keyword_extractor_mock', autouse=True)
 def _keyword_extractor_mock(get_keyword_extractor_mock: MagicMock) -> MagicMock:
     return get_keyword_extractor_mock.return_value
