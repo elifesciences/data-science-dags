@@ -121,10 +121,6 @@ dev-run-sample-notebook:
 		-p output_dataset $(OUTPUT_DATASET)
 
 
-dev-nlp-model-download:
-	$(PYTHON) -m spacy download en_core_web_sm
-
-
 dev-peerscout-api-start:
 	$(PYTHON) -m \
 		peerscout_api.main \
