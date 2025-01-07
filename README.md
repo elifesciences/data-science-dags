@@ -76,7 +76,7 @@ make peerscout-api-start
 curl \
     --request POST \
     --data '@peerscout_api/example-data/peerscout-api-request1.json' \
-    http://localhost:8090/api/peerscout | jq .
+    http://localhost:8080/api/peerscout | jq .
 ```
 
 to test empty abstract response:
@@ -85,7 +85,7 @@ to test empty abstract response:
 curl \
     --request POST \
     --data '@peerscout_api/example-data/peerscout-api-request2.json' \
-    http://localhost:8090/api/peerscout  | jq .
+    http://localhost:8080/api/peerscout  | jq .
 ```
 
 to test if the author not provide any suggestion or exclution to display 'Not Provided'.
@@ -94,5 +94,5 @@ to test if the author not provide any suggestion or exclution to display 'Not Pr
 curl \
     --request POST \
     --data '@peerscout_api/example-data/peerscout-api-request3.json' \
-    http://localhost:8090/api/peerscout  | jq .
+    http://localhost:8080/api/peerscout  | jq .
 ```
