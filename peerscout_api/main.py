@@ -12,10 +12,6 @@ from google.cloud import bigquery
 from flask import Flask, jsonify, request
 from werkzeug.exceptions import BadRequest
 
-from elife_data_hub_utils.keyword_extract.extract_keywords import (
-    KeywordExtractor
-)
-
 from data_science_pipeline.utils.json import remove_key_with_null_value
 from data_science_pipeline.utils.bq import load_json_list_and_append_to_bq_table_with_auto_schema
 
@@ -23,7 +19,10 @@ from peerscout_api.recommend_editor import (
     load_model,
     get_editor_recommendations_for_api
 )
-from peerscout_api.spacy_api_keyword_extractor import SpaCyApiKeywordExtractor
+from peerscout_api.spacy_api_keyword_extractor import (
+    KeywordExtractor,
+    SpaCyApiKeywordExtractor
+)
 
 DEFAULT_SPACY_LANGUAGE_MODEL_NAME = "en_core_web_sm"
 SPACY_LANGUAGE_MODEL_NAME_ENV_VALUE = "SPACY_LANGUAGE_MODEL_NAME"
