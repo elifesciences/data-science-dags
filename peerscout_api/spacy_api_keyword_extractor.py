@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import logging
 from typing import Iterable, List
 
 import requests
@@ -6,6 +7,9 @@ import requests
 from elife_data_hub_utils.keyword_extract.extract_keywords import (
     KeywordExtractor
 )
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 DEFAULT_TIMEOUT = 60
@@ -43,6 +47,7 @@ class SpaCyApiKeywordExtractor(KeywordExtractor):
         self,
         text_list: Iterable[str]
     ) -> Iterable[List[str]]:
+        LOGGER.info('Extracting keywords using api_url: %r', self.api_url)
         response = requests.post(
             url=self.api_url,
             json=get_request_body(text_list),
