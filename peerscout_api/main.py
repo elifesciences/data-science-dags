@@ -127,7 +127,7 @@ def get_spacy_language_model_env() -> str:
     )
 
 
-def get_spacy_keyword_extraction_api_url() -> Optional[str]:
+def get_spacy_keyword_extraction_api_url() -> str:
     return os.environ[SPACY_KEYWORD_EXTRACTION_API_URL_ENV_VALUE]
 
 
