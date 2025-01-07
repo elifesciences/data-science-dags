@@ -2,7 +2,10 @@
 
 from typing import Iterable
 from unittest.mock import ANY, MagicMock, patch
+
 import pytest
+
+import requests
 
 import peerscout_api.spacy_api_keyword_extractor as target_module
 from peerscout_api.spacy_api_keyword_extractor import (
@@ -84,3 +87,9 @@ class TestSpaCyApiKeywordExtractor:
         response_mock.json.return_value = SAMPLE_SPACY_API_RESPONSE_1
         extracted_keywords = list(keyword_extractor.iter_extract_keywords(text_list=['text_1']))
         assert extracted_keywords == get_batch_keywords_from_response(SAMPLE_SPACY_API_RESPONSE_1)
+
+    def test_should_raise_exception_for_error_response(self, response_mock: MagicMock):
+        keyword_extractor = SpaCyApiKeywordExtractor(api_url=TEST_SPACY_API_URL_1)
+        with pytest.raises(requests.exceptions.RequestException):
+            response_mock.raise_for_status.side_effect = requests.exceptions.RequestException
+            list(keyword_extractor.iter_extract_keywords(text_list=['text_1']))

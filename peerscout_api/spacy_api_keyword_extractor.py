@@ -48,4 +48,5 @@ class SpaCyApiKeywordExtractor(KeywordExtractor):
             json=get_request_body(text_list),
             timeout=DEFAULT_TIMEOUT
         )
+        response.raise_for_status()
         return get_batch_keywords_from_response(response.json())
