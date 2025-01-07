@@ -61,6 +61,11 @@ make data-science-pipelines-run-peerscout-recommend-senior-editors MAX_MANUSCRIP
 
 ## PeerScout API
 
+For sample requests also see:
+
+- [docs/peerscout-api-requests-localhost.http](docs/peerscout-api-requests-localhost.http)
+- [docs/peerscout-api-requests-deployed.http](docs/peerscout-api-requests-deployed.http)
+
 To test the api
 
 ```bash
