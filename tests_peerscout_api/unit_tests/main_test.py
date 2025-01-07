@@ -210,9 +210,10 @@ def _get_ok_json(response):
 
 
 class TestGetSpacyKeywordExtractionApiUrl:
-    def test_should_return_none_if_not_configured(self, mock_env: dict):
+    def test_should_fail_if_not_configured(self, mock_env: dict):
         assert SPACY_KEYWORD_EXTRACTION_API_URL_ENV_VALUE not in mock_env
-        assert not get_spacy_keyword_extraction_api_url()
+        with pytest.raises(KeyError):
+            get_spacy_keyword_extraction_api_url()
 
     def test_should_return_configured_url(self, mock_env: dict):
         mock_env[SPACY_KEYWORD_EXTRACTION_API_URL_ENV_VALUE] = 'url_1'
@@ -242,15 +243,6 @@ class TestPickPersonIdFromBqResult:
 
 
 class TestGetKeywordExtractor:
-    def test_should_call_get_keyword_extractor_for_spacy_language_model(
-        self,
-        get_keyword_extractor_for_spacy_language_model_mock: MagicMock,
-        mock_env: dict
-    ):
-        assert SPACY_KEYWORD_EXTRACTION_API_URL_ENV_VALUE not in mock_env
-        get_keyword_extractor()
-        get_keyword_extractor_for_spacy_language_model_mock.assert_called()
-
     def test_should_return_spacy_api_keyword_extractor_with_api_url(
         self,
         mock_env: dict
