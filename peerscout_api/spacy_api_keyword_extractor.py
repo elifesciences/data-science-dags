@@ -1,12 +1,9 @@
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 import logging
 from typing import Iterable, List
 
 import requests
-
-from elife_data_hub_utils.keyword_extract.extract_keywords import (
-    KeywordExtractor
-)
 
 
 LOGGER = logging.getLogger(__name__)
@@ -37,6 +34,13 @@ def get_batch_keywords_from_response(response_json: dict) -> List[List[str]]:
         ]
         for keyword_result in response_json['data']
     ]
+
+
+class KeywordExtractor(ABC):
+    @abstractmethod
+    def iter_extract_keywords(
+            self, text_list: Iterable[str]) -> Iterable[List[str]]:
+        pass
 
 
 @dataclass(frozen=True)
