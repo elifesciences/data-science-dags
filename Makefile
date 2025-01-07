@@ -301,7 +301,7 @@ peerscout-api-stop:
 	$(PEERSCOUT_API_DOCKER_COMPOSE) down
 
 peerscout-api-dev-start: 
-	$(PEERSCOUT_API_DOCKER_COMPOSE) run --rm -p '8090:8080' -e FLASK_ENV=development peerscout-api
+	$(PEERSCOUT_API_DOCKER_COMPOSE) run --rm -p '8080:8080' -e FLASK_ENV=development peerscout-api
 
 peerscout-api-dev-build:
 	$(PEERSCOUT_API_DOCKER_COMPOSE) build peerscout-api-dev

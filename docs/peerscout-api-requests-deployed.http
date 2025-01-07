@@ -1,0 +1,16 @@
+# Sample Requests using the REST Client VS Code Extension
+# https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+
+# You need to configure a `.env` file. See `.env.sample` for the format.
+
+POST http://peerscout.elifesciences.org/api/peerscout HTTP/1.1
+Authorization: {{$dotenv PEERSCOUT_PROD_AUTHORIZATION_TOKEN}}
+
+< ./peerscout_api/example-data/peerscout-api-request1.json
+
+###
+
+POST http://peerscout--test.elifesciences.org/api/peerscout HTTP/1.1
+Authorization: {{$dotenv PEERSCOUT_TEST_AUTHORIZATION_TOKEN}}
+
+< ./peerscout_api/example-data/peerscout-api-request1.json

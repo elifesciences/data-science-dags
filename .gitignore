@@ -17,6 +17,7 @@ launch_*.py
 
 *.pyc
 .env.local
+docs/.env
 .python-version
 
 # github actions related

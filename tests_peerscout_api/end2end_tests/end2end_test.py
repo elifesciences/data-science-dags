@@ -5,7 +5,7 @@ import requests
 LOGGER = logging.getLogger(__name__)
 
 PEERSCOUT_API_URL_ENV_NAME = "PEERSCOUT_API_URL"
-DEFAULT_PEERSCOUT_API_URL_ENV_VALUE = "http://localhost:8090/api/peerscout"
+DEFAULT_PEERSCOUT_API_URL_ENV_VALUE = "http://localhost:8080/api/peerscout"
 
 
 def get_api_url_env() -> str:

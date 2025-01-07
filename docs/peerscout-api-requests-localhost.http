@@ -1,0 +1,14 @@
+# Sample Requests using the REST Client VS Code Extension
+# https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+
+
+POST http://localhost:8080/api/peerscout HTTP/1.1
+
+< ./peerscout_api/example-data/peerscout-api-request1.json
+
+
+###
+
+POST http://localhost:8080/api/peerscout HTTP/1.1
+
+< ./peerscout_api/example-data/peerscout-api-request2.json
