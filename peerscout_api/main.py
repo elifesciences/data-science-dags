@@ -13,7 +13,8 @@ from flask import Flask, jsonify, request
 from werkzeug.exceptions import BadRequest
 
 from elife_data_hub_utils.keyword_extract.extract_keywords import (
-    get_keyword_extractor
+    get_keyword_extractor as get_keyword_extractor_for_spacy_language_model,
+    KeywordExtractor
 )
 
 from data_science_pipeline.utils.json import remove_key_with_null_value
@@ -23,9 +24,11 @@ from peerscout_api.recommend_editor import (
     load_model,
     get_editor_recommendations_for_api
 )
+from peerscout_api.spacy_api_keyword_extractor import SpaCyApiKeywordExtractor
 
 DEFAULT_SPACY_LANGUAGE_MODEL_NAME = "en_core_web_sm"
 SPACY_LANGUAGE_MODEL_NAME_ENV_VALUE = "SPACY_LANGUAGE_MODEL_NAME"
+SPACY_KEYWORD_EXTRACTION_API_URL_ENV_VALUE = "SPACY_KEYWORD_EXTRACTION_API_URL"
 
 PEERSCOUT_API_TARGET_DATASET_ENV_NAME = "PEERSCOUT_API_TARGET_DATASET"
 DEFAULT_PEERSCOUT_API_TARGET_DATASET_VALUE = "ci"
@@ -123,6 +126,19 @@ def get_spacy_language_model_env() -> str:
         SPACY_LANGUAGE_MODEL_NAME_ENV_VALUE,
         DEFAULT_SPACY_LANGUAGE_MODEL_NAME
     )
+
+
+def get_spacy_keyword_extraction_api_url() -> Optional[str]:
+    return os.getenv(
+        SPACY_KEYWORD_EXTRACTION_API_URL_ENV_VALUE
+    )
+
+
+def get_keyword_extractor() -> KeywordExtractor:
+    api_url = get_spacy_keyword_extraction_api_url()
+    if api_url:
+        return SpaCyApiKeywordExtractor(api_url=api_url)
+    return get_keyword_extractor_for_spacy_language_model(get_spacy_language_model_env())
 
 
 def get_model_path(deployment_env: str) -> str:
@@ -419,7 +435,7 @@ def write_peerscout_api_response_to_bq_in_a_thread(
 
 def create_app():
     app = Flask(__name__)
-    keyword_extractor = get_keyword_extractor(get_spacy_language_model_env())
+    keyword_extractor = get_keyword_extractor()
 
     MODEL_PATH = get_model_path(get_deployment_env())
     senior_editor_model_dict = load_model(MODEL_PATH, SENIOR_EDITOR_MODEL_NAME)

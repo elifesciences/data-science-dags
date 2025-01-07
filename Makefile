@@ -59,6 +59,7 @@ dev-install:
 	$(PIP) install --disable-pip-version-check -r requirements.jupyter.txt
 	$(PIP) install --disable-pip-version-check -r requirements.pipelines.txt
 	$(PIP) install --disable-pip-version-check -r requirements.prophet.txt
+	$(PIP) install --disable-pip-version-check -r requirements.api.txt
 	$(PIP) install --disable-pip-version-check -e . --no-deps
 
 
@@ -118,6 +119,19 @@ dev-run-sample-notebook:
 		./notebooks/example.ipynb \
 		/tmp/example-output.ipynb \
 		-p output_dataset $(OUTPUT_DATASET)
+
+
+dev-nlp-model-download:
+	$(PYTHON) -m spacy download en_core_web_sm
+
+
+dev-peerscout-api-start:
+	$(PYTHON) -m \
+		peerscout_api.main \
+		--reload \
+		--factory \
+		--host 127.0.0.1 \
+		--port 8000
 
 
 jupyter-build:
