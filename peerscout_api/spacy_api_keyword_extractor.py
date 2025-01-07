@@ -25,8 +25,14 @@ def get_request_body(text_list: Iterable[str]) -> dict:
     }
 
 
-def get_batch_keywords_from_response(_response_json: dict) -> List[List[str]]:
-    return []
+def get_batch_keywords_from_response(response_json: dict) -> List[List[str]]:
+    return [
+        [
+            keyword_dict['keyword']
+            for keyword_dict in keyword_result['attributes']['keywords']
+        ]
+        for keyword_result in response_json['data']
+    ]
 
 
 @dataclass(frozen=True)
@@ -37,9 +43,9 @@ class SpaCyApiKeywordExtractor(KeywordExtractor):
         self,
         text_list: Iterable[str]
     ) -> Iterable[List[str]]:
-        requests.post(
+        response = requests.post(
             url=self.api_url,
             json=get_request_body(text_list),
             timeout=DEFAULT_TIMEOUT
         )
-        return []
+        return get_batch_keywords_from_response(response.json())

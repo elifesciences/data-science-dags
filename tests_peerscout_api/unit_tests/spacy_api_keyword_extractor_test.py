@@ -14,6 +14,26 @@ from peerscout_api.spacy_api_keyword_extractor import (
 
 TEST_SPACY_API_URL_1 = 'http://example/spacy-url-1'
 
+SAMPLE_SPACY_API_RESPONSE_1 = {
+    'data': [{
+        'type': 'extract-keyword-result',
+        'attributes': {
+            'keywords': [
+                {
+                    'keyword': 'biochemistry',
+                    'count': 1
+                },
+                {
+                    'keyword': 'neuroscience',
+                    'count': 1
+                }
+            ]
+        },
+    }]
+}
+
+SAMPLE_EXTRACTED_KEYWORDS_1 = [['biochemistry', 'neuroscience']]
+
 
 @pytest.fixture(name='requests_mock', autouse=True)
 def _requests_mock() -> Iterable[MagicMock]:
@@ -43,6 +63,12 @@ class TestGetRequestBody:
         }
 
 
+class TestGetBatchKeywordsFromResponse:
+    def test_should_return_keywords_from_api_response(self):
+        extracted_keywords = get_batch_keywords_from_response(SAMPLE_SPACY_API_RESPONSE_1)
+        assert extracted_keywords == SAMPLE_EXTRACTED_KEYWORDS_1
+
+
 class TestSpaCyApiKeywordExtractor:
     def test_should_call_api(self, requests_post_mock: MagicMock):
         keyword_extractor = SpaCyApiKeywordExtractor(api_url=TEST_SPACY_API_URL_1)
@@ -55,6 +81,6 @@ class TestSpaCyApiKeywordExtractor:
 
     def test_should_get_keywords_from_response(self, response_mock: MagicMock):
         keyword_extractor = SpaCyApiKeywordExtractor(api_url=TEST_SPACY_API_URL_1)
-        response_mock.json.return_value = {}
+        response_mock.json.return_value = SAMPLE_SPACY_API_RESPONSE_1
         extracted_keywords = list(keyword_extractor.iter_extract_keywords(text_list=['text_1']))
-        assert extracted_keywords == get_batch_keywords_from_response({})
+        assert extracted_keywords == get_batch_keywords_from_response(SAMPLE_SPACY_API_RESPONSE_1)
