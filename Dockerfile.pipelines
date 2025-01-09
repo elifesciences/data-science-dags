@@ -3,16 +3,9 @@ ARG install_dev=n
 
 USER root
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    pkg-config \
-    libicu-dev \
-    gcc \
-    g++ \
-    libatlas-base-dev \
-    gfortran \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+  && apt-get install pkg-config libicu-dev gcc g++ -yqq \
+  && rm -rf /var/lib/apt/lists/*
 
 ENV PIP_NO_CACHE_DIR=1
 
@@ -25,8 +18,7 @@ COPY requirements.jupyter.txt ./
 RUN pip install --disable-pip-version-check -r requirements.jupyter.txt
 
 COPY requirements.pipelines.txt ./
-RUN pip install --no-cache-dir --only-binary=:all: --disable-pip-version-check -r requirements.pipelines.txt || \
-    pip install --no-cache-dir --disable-pip-version-check -r requirements.pipelines.txt
+RUN pip install --disable-pip-version-check -r requirements.pipelines.txt
 
 COPY requirements.prophet.txt ./
 RUN pip install --disable-pip-version-check -r requirements.prophet.txt
