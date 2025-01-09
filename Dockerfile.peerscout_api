@@ -1,4 +1,4 @@
-FROM python:3.8 AS base
+FROM python:3.11.7-slim AS base
 
 USER root
 
