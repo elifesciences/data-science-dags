@@ -214,7 +214,7 @@ notebook-nbstripout-check:
 
 
 unittest:
-	$(DEV_RUN) pytest -p no:cacheprovider $(ARGS) tests/unit_test
+	$(DEV_RUN) python -m pytest -p no:cacheprovider $(ARGS) tests/unit_test
 
 
 unittest-not-slow:
