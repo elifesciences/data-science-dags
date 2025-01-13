@@ -172,14 +172,14 @@ jupyter-stop:
 
 
 pylint:
-	$(DEV_RUN) pylint data_science_pipeline peerscout_api tests setup.py
+	$(DEV_RUN) python -m pylint data_science_pipeline peerscout_api tests setup.py
 
 
 mypy:
-	$(DEV_RUN) mypy data_science_pipeline peerscout_api tests setup.py
+	$(DEV_RUN) python -m mypy data_science_pipeline peerscout_api tests setup.py
 
 flake8:
-	$(DEV_RUN) flake8 data_science_pipeline peerscout_api tests setup.py
+	$(DEV_RUN) python -m flake8 data_science_pipeline peerscout_api tests setup.py
 
 
 notebook-lint:
