@@ -14,7 +14,7 @@ PyICU==2.7.4
 google-cloud-bigquery>=2.26.0
 db-dtypes==1.0.1
 s3path==0.3.2
-scikit-learn==1.0.1
+scikit-learn==1.5.0
 six==1.16.0
 convertdate==2.3.2
 matplotlib==3.4.2
