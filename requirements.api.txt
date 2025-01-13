@@ -8,4 +8,4 @@ boto3==1.24.59
 google-cloud-bigquery==2.23.2
 bigquery-schema-generator==1.5
 Werkzeug==3.0.6
-urllib3<1.27, >=1.25.4
+urllib3>=1.25.4, <2.4
