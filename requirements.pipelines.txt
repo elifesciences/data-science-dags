@@ -9,7 +9,7 @@ ipywidgets==7.6.3
 joblib==1.2.0
 lxml==4.9.1
 pandas-gbq==0.15.0
-pyarrow==4.0.1
+pyarrow==14.0.1
 PyICU==2.7.4
 google-cloud-bigquery>=2.26.0
 db-dtypes==1.0.1
