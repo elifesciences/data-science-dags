@@ -4,6 +4,6 @@ pylint==2.15.6
 pytest==7.1.2
 pytest-watch==4.2.0
 requests==2.32.2
-mypy==1.5.1
+mypy==1.14.1
 types-requests==2.31.0.2
 types-PyYAML
