@@ -114,6 +114,10 @@ dev-watch:
 dev-test: dev-lint dev-unittest
 
 
+dev-run-peerscout-build-senior-editor-profiles:
+	$(PYTHON) -m data_science_pipeline.cli.peerscout_build_senior_editor_profiles
+
+
 dev-run-sample-notebook:
 	$(PYTHON) -m papermill.cli \
 		./notebooks/example.ipynb \
