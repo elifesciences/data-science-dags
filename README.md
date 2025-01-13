@@ -8,6 +8,33 @@ Then, add this to the PATH in the file `~/.zshrc` using the command below:
 
 `export PATH="/usr/local/opt/icu4c/bin:$PATH"`
 
+## Running Pipelines via Virtual Environment
+
+To run pipelines via a virtual environment make sure the virtual environment is created and dev dependencies are installed:
+
+```bash
+make dev-venv
+```
+
+To update:
+
+```bash
+make dev-install
+```
+
+Some environment variables can be set to be able to run the pipelines with real data:
+
+```bash
+DATA_SCIENCE_SOURCE_DATASET=my_dev
+DATA_SCIENCE_OUTPUT_DATASET=my_dev
+```
+
+### PeerScout Build Senior Editor Profiles via Virtual Environment
+
+```bash
+make dev-run-peerscout-build-senior-editor-profiles
+```
+
 ## Running Pipelines via Docker
 
 To run pipelines via docker, the non-dev image need to be built first via:

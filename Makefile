@@ -114,6 +114,10 @@ dev-watch:
 dev-test: dev-lint dev-unittest
 
 
+dev-run-peerscout-build-senior-editor-profiles:
+	$(PYTHON) -m data_science_pipeline.cli.peerscout_build_senior_editor_profiles
+
+
 dev-run-sample-notebook:
 	$(PYTHON) -m papermill.cli \
 		./notebooks/example.ipynb \
@@ -168,14 +172,14 @@ jupyter-stop:
 
 
 pylint:
-	$(DEV_RUN) pylint data_science_pipeline peerscout_api tests setup.py
+	$(DEV_RUN) python -m pylint data_science_pipeline tests setup.py
 
 
 mypy:
-	$(DEV_RUN) mypy data_science_pipeline peerscout_api tests setup.py
+	$(DEV_RUN) python -m mypy data_science_pipeline tests setup.py
 
 flake8:
-	$(DEV_RUN) flake8 data_science_pipeline peerscout_api tests setup.py
+	$(DEV_RUN) python -m flake8 data_science_pipeline tests setup.py
 
 
 notebook-lint:
@@ -210,7 +214,7 @@ notebook-nbstripout-check:
 
 
 unittest:
-	$(DEV_RUN) pytest -p no:cacheprovider $(ARGS) tests/unit_test
+	$(DEV_RUN) python -m pytest -p no:cacheprovider $(ARGS) tests/unit_test
 
 
 unittest-not-slow:
