@@ -1,8 +1,13 @@
 WITH t_paper_extracted_keywords AS (
   SELECT
-    *,
-    ROW_NUMBER() OVER(PARTITION BY pmid ORDER BY data_hub_imported_timestamp DESC) AS pmid_row_number
-  FROM `{project}.{dataset}.data_science_disambiguated_editor_papers_abstract_keywords`
+    CAST(editor_paper_abstract_keywords_result.meta.pmid AS STRING) AS pmid,
+    ARRAY(
+      SELECT keyword
+      FROM UNNEST(editor_paper_abstract_keywords_result.attributes.keywords)
+    ) AS extracted_keywords,
+    ROW_NUMBER() OVER(PARTITION BY editor_paper_abstract_keywords_result.meta.pmid ORDER BY imported_timestamp DESC) AS pmid_row_number
+  FROM `{project}.{dataset}.keywords_from_disambiguated_editor_papers_abstract_batch` AS editor_paper_abstract_keywords_batch
+  JOIN UNNEST(editor_paper_abstract_keywords_batch.data) AS editor_paper_abstract_keywords_result
 ),
 
 t_paper_summary AS (

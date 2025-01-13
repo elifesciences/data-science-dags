@@ -12,10 +12,6 @@ RUN pip install --disable-pip-version-check -r requirements.build.txt
 COPY requirements.api.txt ./
 RUN pip install --disable-pip-version-check -r requirements.api.txt
 
-# download spaCy language models
-RUN python -m spacy download en_core_web_lg
-RUN python -m spacy download en_core_web_sm
-
 
 FROM base AS runtime
 

@@ -60,6 +60,7 @@ services:
     environment:
       - PEERSCOUT_API_TARGET_DATASET=ci
       - PEERSCOUT_API_URL=http://peerscout-api:8080/api/peerscout
+      - SPACY_KEYWORD_EXTRACTION_API_URL=https://spacy-keyword-extraction-api.elifesciences.org/v1/batch-extract-keywords
 
   peerscout-api-dev:
     build:

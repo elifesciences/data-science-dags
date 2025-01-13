@@ -59,6 +59,7 @@ dev-install:
 	$(PIP) install --disable-pip-version-check -r requirements.jupyter.txt
 	$(PIP) install --disable-pip-version-check -r requirements.pipelines.txt
 	$(PIP) install --disable-pip-version-check -r requirements.prophet.txt
+	$(PIP) install --disable-pip-version-check -r requirements.api.txt
 	$(PIP) install --disable-pip-version-check -e . --no-deps
 
 
@@ -118,6 +119,15 @@ dev-run-sample-notebook:
 		./notebooks/example.ipynb \
 		/tmp/example-output.ipynb \
 		-p output_dataset $(OUTPUT_DATASET)
+
+
+dev-peerscout-api-start:
+	$(PYTHON) -m \
+		peerscout_api.main \
+		--reload \
+		--factory \
+		--host 127.0.0.1 \
+		--port 8000
 
 
 jupyter-build:
@@ -291,7 +301,7 @@ peerscout-api-stop:
 	$(PEERSCOUT_API_DOCKER_COMPOSE) down
 
 peerscout-api-dev-start: 
-	$(PEERSCOUT_API_DOCKER_COMPOSE) run --rm -p '8090:8080' -e FLASK_ENV=development peerscout-api
+	$(PEERSCOUT_API_DOCKER_COMPOSE) run --rm -p '8080:8080' -e FLASK_ENV=development peerscout-api
 
 peerscout-api-dev-build:
 	$(PEERSCOUT_API_DOCKER_COMPOSE) build peerscout-api-dev

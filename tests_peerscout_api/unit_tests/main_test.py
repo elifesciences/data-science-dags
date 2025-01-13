@@ -1,6 +1,6 @@
 import logging
 from typing import Iterable
-from unittest.mock import patch, MagicMock
+from unittest.mock import ANY, patch, MagicMock
 
 from flask.testing import FlaskClient
 
@@ -10,9 +10,11 @@ import pandas as pd
 
 from peerscout_api.main import (
     NOT_PROVIDED,
+    SPACY_KEYWORD_EXTRACTION_API_URL_ENV_VALUE,
     create_app,
     get_html_text_for_recommended_person,
     get_html_text_for_author_suggested_person,
+    get_keyword_extractor,
     get_list_of_author_suggested_person_details_with_html_text,
     PersonProps,
     get_recommendation_html,
@@ -20,10 +22,12 @@ from peerscout_api.main import (
     NO_RECOMMENDATION_HTML,
     EDITOR_TYPE_FOR_REVIEWING_EDITOR,
     EDITOR_TYPE_FOR_SENIOR_EDITOR,
+    get_spacy_keyword_extraction_api_url,
     pick_person_id_from_bq_result
 )
 
 import peerscout_api.main as target_module
+from peerscout_api.spacy_api_keyword_extractor import SpaCyApiKeywordExtractor
 
 
 LOGGER = logging.getLogger(__name__)
@@ -177,6 +181,11 @@ def _get_keyword_extractor_mock() -> Iterable[MagicMock]:
         yield mock
 
 
+@pytest.fixture(name='keyword_extractor_mock', autouse=True)
+def _keyword_extractor_mock(get_keyword_extractor_mock: MagicMock) -> MagicMock:
+    return get_keyword_extractor_mock.return_value
+
+
 @pytest.fixture(name='load_model_mock', autouse=True)
 def _load_model_mock() -> Iterable[MagicMock]:
     with patch.object(target_module, 'load_model') as mock:
@@ -192,6 +201,17 @@ def _test_client() -> FlaskClient:
 def _get_ok_json(response):
     assert response.status_code == 200
     return response.json
+
+
+class TestGetSpacyKeywordExtractionApiUrl:
+    def test_should_fail_if_not_configured(self, mock_env: dict):
+        assert SPACY_KEYWORD_EXTRACTION_API_URL_ENV_VALUE not in mock_env
+        with pytest.raises(KeyError):
+            get_spacy_keyword_extraction_api_url()
+
+    def test_should_return_configured_url(self, mock_env: dict):
+        mock_env[SPACY_KEYWORD_EXTRACTION_API_URL_ENV_VALUE] = 'url_1'
+        assert get_spacy_keyword_extraction_api_url() == 'url_1'
 
 
 class TestPickPersonIdFromBqResult:
@@ -214,6 +234,17 @@ class TestPickPersonIdFromBqResult:
             person_ids_to_pick=[BQ_RESPONSE_DICT_2['person_id'], BQ_RESPONSE_DICT_1['person_id']]
         )
         assert actual_response == [BQ_RESPONSE_DICT_2, BQ_RESPONSE_DICT_1]
+
+
+class TestGetKeywordExtractor:
+    def test_should_return_spacy_api_keyword_extractor_with_api_url(
+        self,
+        mock_env: dict
+    ):
+        mock_env[SPACY_KEYWORD_EXTRACTION_API_URL_ENV_VALUE] = 'url_1'
+        result = get_keyword_extractor()
+        assert isinstance(result, SpaCyApiKeywordExtractor)
+        assert result.api_url == 'url_1'
 
 
 class TestPeerscoutAPI:
@@ -241,6 +272,32 @@ class TestPeerscoutAPI:
     ):
         response = test_client.post('/api/peerscout', json=INPUT_DATA_WTIH_WEAK_ABSTRACT)
         assert _get_ok_json(response) == get_valid_no_recommendation_response()
+
+    def test_should_pass_abstract_to_keyword_extractor(
+        self,
+        test_client: FlaskClient,
+        keyword_extractor_mock: MagicMock
+    ):
+        test_client.post('/api/peerscout', json=INPUT_DATA_VALID)
+        keyword_extractor_mock.iter_extract_keywords.assert_called_with(
+            text_list=[INPUT_DATA_VALID['abstract']]
+        )
+
+    def test_should_pass_extracted_keywords_into_get_editor_recommendations_for_api_func(
+        self,
+        test_client: FlaskClient,
+        keyword_extractor_mock: MagicMock,
+        get_editor_recommendations_for_api_mock: MagicMock
+    ):
+        keyword_extractor_mock.iter_extract_keywords.return_value = iter(
+            [['keyword_1', 'keyword_2']]
+        )
+        test_client.post('/api/peerscout', json=INPUT_DATA_VALID)
+        get_editor_recommendations_for_api_mock.assert_called_with(
+                ANY,
+                [['keyword_1', 'keyword_2']],
+                ANY
+        )
 
     def test_should_respond_with_recomendation(
         self,
