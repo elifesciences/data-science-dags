@@ -24,10 +24,15 @@ RUN pip install --disable-pip-version-check -r requirements.pipelines.txt \
   && jupyter nbextension enable --py widgetsnbextension
 
 COPY requirements.prophet.txt ./
-RUN pip install --disable-pip-version-check -r requirements.prophet.txt
+RUN pip install --disable-pip-version-check \
+    -r requirements.pipelines.txt \
+    -r requirements.prophet.txt
 
 COPY requirements.jupyter.ext.txt ./
-RUN pip install --disable-pip-version-check -r requirements.jupyter.ext.txt \
+RUN pip install --disable-pip-version-check \
+    -r requirements.pipelines.txt \
+    -r requirements.prophet.txt \
+    -r requirements.jupyter.ext.txt \
   && jupyter serverextension enable --py nbresuse --sys-prefix \
   && jupyter nbextension install --py nbresuse --sys-prefix \
   && jupyter nbextension enable --py nbresuse --sys-prefix
@@ -38,7 +43,11 @@ RUN pip install --disable-pip-version-check -e . --no-deps --user
 ARG install_dev=y
 COPY requirements.dev.txt ./
 RUN if [ "${install_dev}" = "y" ]; then \
-    pip install --disable-pip-version-check --user -r requirements.dev.txt; \
+    pip install --disable-pip-version-check --user \
+        -r requirements.pipelines.txt \
+        -r requirements.prophet.txt \
+        -r requirements.jupyter.ext.txt \
+        -r requirements.dev.txt; \
   fi
 
 COPY data_science_pipeline ./data_science_pipeline
