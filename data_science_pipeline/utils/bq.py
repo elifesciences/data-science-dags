@@ -132,7 +132,7 @@ def load_file_into_bq_with_auto_schema(
         project_id: str,
         dataset_name: str,
         table_name: str,
-        write_mode: WriteDisposition = WriteDisposition.WRITE_APPEND,
+        write_mode: str = WriteDisposition.WRITE_APPEND,
         **kwargs):
     if write_mode == WriteDisposition.WRITE_APPEND:
         dataset_name, table_name = get_validated_dataset_name_table_name(
@@ -205,7 +205,7 @@ def load_json_list_and_append_to_bq_table_with_auto_schema(*args, **kwargs):
     )
 
 
-def get_bq_write_disposition(if_exists: str) -> WriteDisposition:
+def get_bq_write_disposition(if_exists: str) -> str:
     if if_exists == 'replace':
         return WriteDisposition.WRITE_TRUNCATE
     if if_exists == 'append':
