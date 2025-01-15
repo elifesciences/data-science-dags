@@ -132,7 +132,7 @@ def load_file_into_bq_with_auto_schema(
         project_id: str,
         dataset_name: str,
         table_name: str,
-        write_mode: str = WriteDisposition.WRITE_APPEND,
+        write_mode: WriteDisposition = WriteDisposition.WRITE_APPEND,
         **kwargs):
     if write_mode == WriteDisposition.WRITE_APPEND:
         dataset_name, table_name = get_validated_dataset_name_table_name(
