@@ -108,11 +108,15 @@ dev-unittest:
 	$(PYTHON) -m pytest -p no:cacheprovider $(ARGS) tests/unit_test
 
 
+dev-peerscout-api-unittest:
+	$(PYTHON) -m pytest -p no:cacheprovider $(ARGS) tests_peerscout_api/unit_tests
+
+
 dev-watch:
 	$(PYTHON) -m pytest_watch -- -p no:cacheprovider $(ARGS) $(PYTEST_WATCH_MODULES)
 
 
-dev-test: dev-lint dev-unittest
+dev-test: dev-lint dev-unittest dev-peerscout-api-unittest
 
 
 dev-run-peerscout-build-senior-editor-profiles:
