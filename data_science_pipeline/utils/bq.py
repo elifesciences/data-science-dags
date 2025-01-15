@@ -205,7 +205,7 @@ def load_json_list_and_append_to_bq_table_with_auto_schema(*args, **kwargs):
     )
 
 
-def get_bq_write_disposition(if_exists: str) -> WriteDisposition:
+def get_bq_write_disposition(if_exists: str) -> str:
     if if_exists == 'replace':
         return WriteDisposition.WRITE_TRUNCATE
     if if_exists == 'append':

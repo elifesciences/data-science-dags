@@ -1,4 +1,4 @@
-FROM jupyter/base-notebook:python-3.9.13
+FROM jupyter/base-notebook:python-3.10.11
 
 USER root
 

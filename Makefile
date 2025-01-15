@@ -55,11 +55,12 @@ venv-create:
 
 dev-install:
 	$(PIP) install --disable-pip-version-check -r requirements.build.txt
-	$(PIP) install --disable-pip-version-check -r requirements.dev.txt
-	$(PIP) install --disable-pip-version-check -r requirements.jupyter.txt
-	$(PIP) install --disable-pip-version-check -r requirements.pipelines.txt
-	$(PIP) install --disable-pip-version-check -r requirements.prophet.txt
-	$(PIP) install --disable-pip-version-check -r requirements.api.txt
+	$(PIP) install --disable-pip-version-check \
+		-r requirements.dev.txt \
+		-r requirements.jupyter.txt \
+		-r requirements.pipelines.txt \
+		-r requirements.prophet.txt \
+		-r requirements.api.txt
 	$(PIP) install --disable-pip-version-check -e . --no-deps
 
 
@@ -107,11 +108,15 @@ dev-unittest:
 	$(PYTHON) -m pytest -p no:cacheprovider $(ARGS) tests/unit_test
 
 
+dev-peerscout-api-unittest:
+	$(PYTHON) -m pytest -p no:cacheprovider $(ARGS) tests_peerscout_api/unit_tests
+
+
 dev-watch:
 	$(PYTHON) -m pytest_watch -- -p no:cacheprovider $(ARGS) $(PYTEST_WATCH_MODULES)
 
 
-dev-test: dev-lint dev-unittest
+dev-test: dev-lint dev-unittest dev-peerscout-api-unittest
 
 
 dev-run-peerscout-build-senior-editor-profiles:
