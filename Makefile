@@ -55,11 +55,12 @@ venv-create:
 
 dev-install:
 	$(PIP) install --disable-pip-version-check -r requirements.build.txt
-	$(PIP) install --disable-pip-version-check -r requirements.dev.txt
-	$(PIP) install --disable-pip-version-check -r requirements.jupyter.txt
-	$(PIP) install --disable-pip-version-check -r requirements.pipelines.txt
-	$(PIP) install --disable-pip-version-check -r requirements.prophet.txt
-	$(PIP) install --disable-pip-version-check -r requirements.api.txt
+	$(PIP) install --disable-pip-version-check \
+		-r requirements.dev.txt \
+		-r requirements.jupyter.txt \
+		-r requirements.pipelines.txt \
+		-r requirements.prophet.txt \
+		-r requirements.api.txt
 	$(PIP) install --disable-pip-version-check -e . --no-deps
 
 
