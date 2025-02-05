@@ -4,7 +4,6 @@ from typing import Iterable
 from unittest.mock import patch
 
 import pytest
-from py._path.local import LocalPath
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -14,9 +13,8 @@ def setup_logging():
 
 
 @pytest.fixture
-def temp_dir(tmpdir: LocalPath):
-    # convert to standard Path
-    return Path(str(tmpdir))
+def temp_dir(tmp_path: Path):
+    return tmp_path
 
 
 @pytest.fixture()
