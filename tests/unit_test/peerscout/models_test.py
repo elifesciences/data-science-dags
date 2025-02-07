@@ -7,14 +7,11 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from data_science_pipeline.utils.misc import identity_fn
-
 from data_science_pipeline.peerscout.models import (
     WeightedKeywordModel
 )
 
-
 LOGGER = logging.getLogger(__name__)
-
 
 NAME_1 = 'name 1'
 NAME_2 = 'name 2'
@@ -227,17 +224,19 @@ class TestWeightedKeywordModel:
             tokenizer=identity_fn,
             lowercase=False
         )
-        choices_tf_idf = vectorizer.fit_transform([
+        choices_tf_idf = np.asarray(vectorizer.fit_transform([
             [KEYWORD_1, KEYWORD_1, KEYWORD_2],
             [KEYWORD_2, KEYWORD_3, KEYWORD_3]
-        ]).todense()
+        ]).todense())
         LOGGER.debug('choices_tf_idf: %s', choices_tf_idf)
         query_keywords_list = [
             [KEYWORD_1, KEYWORD_2],
             [KEYWORD_2, KEYWORD_3],
             [KEYWORD_3]
         ]
-        query_tf_idf = vectorizer.transform(query_keywords_list).todense()
+        query_tf_idf = np.asarray(
+            vectorizer.transform([query_keywords_list]).todense()
+        )
         LOGGER.debug('query_tf_idf: %s', query_tf_idf)
         _prev_norm = vectorizer.norm
         vectorizer.norm = False
@@ -254,6 +253,6 @@ class TestWeightedKeywordModel:
         LOGGER.debug('similarity: %s', similarity)
         LOGGER.debug('proba_matrix: %s', result.proba_matrix)
         np.testing.assert_allclose(
-            np.asmatrix(result.proba_matrix),
-            np.asmatrix(similarity)
+            np.asarray(result.proba_matrix),
+            similarity
         )
