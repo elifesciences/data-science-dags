@@ -51,7 +51,7 @@ class Vectorizer(ABC):
         pass
 
     @abstractmethod
-    def get_feature_names(self) -> List[str]:
+    def get_feature_names_out(self) -> List[str]:
         pass
 
 
@@ -94,7 +94,7 @@ def get_weighted_keywords_list_for_vectorizer(
         return get_count_weighted_keywords_list(keywords_list)
     return get_weighted_keywords_list_for_tf_matrix(
         vectorizer.transform(keywords_list).todense(),
-        vectorizer.get_feature_names()
+        vectorizer.get_feature_names_out()
     )
 
 
@@ -222,7 +222,7 @@ class WeightedKeywordModel:
             choices = list(range(len(tf_matrix)))
         if tf_keywords is None:
             if vectorizer is not None:
-                tf_keywords = vectorizer.get_feature_names()
+                tf_keywords = vectorizer.get_feature_names_out()
             else:
                 raise ValueError('at least tf_keywords or vectorizer required')
         weighted_keywords_list = get_weighted_keywords_list_for_tf_matrix(
