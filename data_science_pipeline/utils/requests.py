@@ -7,7 +7,7 @@ def requests_retry_session(
         retries=10,
         backoff_factor=0.3,
         status_forcelist=(429, 500, 502, 504),
-        method_whitelist=('GET', 'HEAD', 'OPTIONS'),
+        allowed_methods=('GET', 'HEAD', 'OPTIONS'),
         session=None,
         **kwargs):
     session = session or requests.Session()
@@ -17,7 +17,7 @@ def requests_retry_session(
         connect=retries,
         backoff_factor=backoff_factor,
         status_forcelist=status_forcelist,
-        method_whitelist=method_whitelist,
+        allowed_methods=allowed_methods,
         **kwargs
     )
     adapter = requests.adapters.HTTPAdapter(max_retries=retry)
