@@ -261,11 +261,11 @@ class EuropePMCApi:
 def europepmc_requests_retry_session(
         *args,
         status_forcelist=EUROPEPMC_RETRY_STATUS_CODE_LIST,
-        method_whitelist=EUROPEPMC_RETRY_METHOD_LIST,
+        allowed_methods=EUROPEPMC_RETRY_METHOD_LIST,
         **kwargs):
     return _requests_retry_session(
         *args,
         status_forcelist=status_forcelist,
-        method_whitelist=method_whitelist,
+        allowed_methods=allowed_methods,
         **kwargs
     )
