@@ -176,6 +176,7 @@ class EuropePMCApi:
         self.params = params or {}
         self.on_error = on_error
 
+    # pylint: disable=too-many-positional-arguments
     def query_page(
             self,
             query: str,

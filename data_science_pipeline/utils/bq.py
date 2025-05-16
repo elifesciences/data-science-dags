@@ -85,6 +85,7 @@ def get_validated_dataset_name_table_name(
     return dataset_name, table_name
 
 
+# pylint: disable=too-many-positional-arguments
 def load_file_into_bq(
         filename: Path,
         project_id: str,
