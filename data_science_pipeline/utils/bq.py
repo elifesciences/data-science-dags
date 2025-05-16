@@ -227,8 +227,12 @@ def iter_json_without_null_from_df(df: pd.DataFrame, batch_size: int = 5000) -> 
 @contextmanager
 def df_as_jsonl_file_without_null(df: pd.DataFrame, **kwargs) -> Iterator[Path]:
     json_iterable = iter_json_without_null_from_df(df)
-    with json_list_as_jsonl_file(json_iterable, **kwargs) as jsonl_file:
+    context_manager = json_list_as_jsonl_file(json_iterable, **kwargs)
+    jsonl_file = context_manager.__enter__()
+    try:
         yield jsonl_file
+    finally:
+        context_manager.__exit__(None, None, None)
 
 
 def to_gbq(
