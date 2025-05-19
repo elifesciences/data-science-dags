@@ -63,6 +63,7 @@ def read_csv(
     return pd.read_csv(StringIO(data.decode(encoding=encoding)), sep=sep, **kwargs)
 
 
+# pylint: disable=too-many-positional-arguments
 def to_csv(
         df: pd.DataFrame,
         filepath: str,

@@ -1,9 +1,9 @@
-flake8==3.9.2
+flake8==7.2.0
 nbstripout==0.8.1
-pylint==2.15.6
-pytest==8.3.4
+pylint==3.3.7
+pytest==8.3.5
 pytest-watch==4.2.0
-requests==2.32.2
-mypy==1.14.1
-types-requests==2.31.0.2
+requests==2.32.3
+mypy==1.15.0
+types-requests==2.32.0.20250515
 types-PyYAML
