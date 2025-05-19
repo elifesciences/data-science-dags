@@ -85,6 +85,7 @@ def get_validated_dataset_name_table_name(
     return dataset_name, table_name
 
 
+# pylint: disable=too-many-positional-arguments
 def load_file_into_bq(
         filename: Path,
         project_id: str,
@@ -226,7 +227,9 @@ def iter_json_without_null_from_df(df: pd.DataFrame, batch_size: int = 5000) -> 
 @contextmanager
 def df_as_jsonl_file_without_null(df: pd.DataFrame, **kwargs) -> Iterator[Path]:
     json_iterable = iter_json_without_null_from_df(df)
-    with json_list_as_jsonl_file(json_iterable, **kwargs) as jsonl_file:
+    with json_list_as_jsonl_file(  # pylint: disable=contextmanager-generator-missing-cleanup
+        json_iterable, **kwargs
+    ) as jsonl_file:
         yield jsonl_file
 
 
