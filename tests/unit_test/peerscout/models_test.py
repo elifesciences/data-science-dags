@@ -235,7 +235,7 @@ class TestWeightedKeywordModel:
             [KEYWORD_3]
         ]
         query_tf_idf = np.asarray(
-            vectorizer.transform([query_keywords_list]).todense()
+            vectorizer.transform(query_keywords_list).todense()
         )
         LOGGER.debug('query_tf_idf: %s', query_tf_idf)
         _prev_norm = vectorizer.norm
