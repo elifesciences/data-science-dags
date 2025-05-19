@@ -3,7 +3,7 @@ jsonschema==4.23.0
 numpy==2.2.6
 pandas==2.2.3
 s3path==0.6.2
-scikit-learn==1.0.2
+scikit-learn==1.6.1
 boto3==1.38.18
 google-cloud-bigquery>=2.26.0
 bigquery-schema-generator==1.6.1
