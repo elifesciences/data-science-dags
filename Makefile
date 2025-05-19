@@ -123,6 +123,11 @@ dev-run-peerscout-build-senior-editor-profiles:
 	$(PYTHON) -m data_science_pipeline.cli.peerscout_build_senior_editor_profiles
 
 
+dev-run-peerscout-recommend-senior-editors:
+	$(PYTHON) -m data_science_pipeline.cli.peerscout_recommend_senior_editors \
+		--max-manuscripts=$(MAX_MANUSCRIPTS)
+
+
 dev-run-sample-notebook:
 	$(PYTHON) -m papermill.cli \
 		./notebooks/example.ipynb \
