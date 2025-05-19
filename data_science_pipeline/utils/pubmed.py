@@ -4,7 +4,7 @@ from urllib.parse import urlparse, parse_qs, urlencode, urljoin
 from typing import Any, Iterable, Iterator, List, Optional
 
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 
 
 LOGGER = logging.getLogger(__name__)
@@ -143,14 +143,16 @@ def combined_page_url_href(base_url: str, page_href) -> str:
 
 
 class PubmedBibliographyNextPageLink:
-    def __init__(self, next_page_soup: BeautifulSoup):
+    def __init__(self, next_page_soup: Optional[Tag]):
         self.next_page_soup = next_page_soup
 
     @property
     def href(self) -> Optional[str]:
         if not self.next_page_soup:
             return None
-        return self.next_page_soup['href']
+        href_value = self.next_page_soup['href']
+        assert isinstance(href_value, str)
+        return href_value
 
     def get_href(self, base_url: str) -> Optional[str]:
         if not self.next_page_soup:
@@ -175,6 +177,7 @@ class PubmedBibliographyPage:
     @property
     def pmids(self) -> List[Optional[str]]:
         citations_soup = self.page_soup.find('div', class_='citations')
+        assert isinstance(citations_soup, Tag)
         pmid_soups = citations_soup.find_all(class_='pmid')
         return [self.parse_pmid_text(e.text) for e in pmid_soups]
 
