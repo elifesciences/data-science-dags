@@ -18,8 +18,8 @@ scikit-learn==1.6.1
 six==1.17.0
 convertdate==2.4.0
 matplotlib==3.10.0
-numpy==1.26.4
-pandas==1.5.3
+numpy==2.2.6
+pandas==2.2.3
 tqdm==4.67.1
 LunarCalendar==0.0.9
 holidays==0.73
