@@ -26,7 +26,7 @@ elifePipeline {
                         sh "make IMAGE_TAG=${commit} REVISION=${commit} \
                             DATA_SCIENCE_SOURCE_DATASET=staging \
                             DATA_SCIENCE_OUTPUT_DATASET=ci \
-                            DATA_SCIENCE_STATE_PATH_ENV_NAME=s3://ci-elife-data-pipeline/airflow-config/data-science/state \
+                            DATA_SCIENCE_STATE_PATH=s3://ci-elife-data-pipeline/airflow-config/data-science/state \
                             ci-build-and-test"
                     }
                 } finally {
