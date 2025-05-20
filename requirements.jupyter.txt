@@ -1,2 +1,2 @@
-jupyterlab==4.3.4
+jupyterlab==4.4.2
 papermill==2.6.0
