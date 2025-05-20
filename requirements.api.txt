@@ -4,7 +4,7 @@ numpy==1.26.4
 pandas==1.5.3
 s3path==0.6.2
 scikit-learn==1.6.1
-boto3==1.38.18
+boto3==1.38.19
 google-cloud-bigquery>=2.26.0
 bigquery-schema-generator==1.6.1
 werkzeug==3.1.3
