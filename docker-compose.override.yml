@@ -35,8 +35,6 @@ services:
       - ./peerscout_api:/app/api/peerscout_api
       - ~/.aws/credentials:/root/.aws/credentials
       - ~/.config/gcloud:/root/.config/gcloud
-    environment:
-      - DEPLOYMENT_ENV=staging
     ports:
       - "${DATA_SCIENCE_DAGS_PEERSCOUT_API_PORT}:8080"
 

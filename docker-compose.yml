@@ -62,6 +62,8 @@ services:
       - PEERSCOUT_API_URL=http://peerscout-api:8080/api/peerscout
       - SPACY_KEYWORD_EXTRACTION_API_URL=https://spacy-keyword-extraction-api.elifesciences.org/v1/batch-extract-keywords
       - DATA_SCIENCE_STATE_PATH=${DATA_SCIENCE_STATE_PATH}
+      # For the PeerScout API we are using `staging` because of there is no data in `ci`
+      - DEPLOYMENT_ENV=staging
 
   peerscout-api-dev:
     build:
