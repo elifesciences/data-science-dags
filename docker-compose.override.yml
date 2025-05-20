@@ -37,6 +37,7 @@ services:
       - ~/.config/gcloud:/root/.config/gcloud
     environment:
       - DEPLOYMENT_ENV=staging
+      - DATA_SCIENCE_STATE_PATH=${DATA_SCIENCE_STATE_PATH}
     ports:
       - "${DATA_SCIENCE_DAGS_PEERSCOUT_API_PORT}:8080"
 
