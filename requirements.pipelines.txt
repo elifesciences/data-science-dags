@@ -17,7 +17,7 @@ s3path==0.6.2
 scikit-learn==1.6.1
 six==1.17.0
 convertdate==2.4.0
-matplotlib==3.10.0
+matplotlib==3.10.3
 numpy==2.2.6
 pandas==2.2.3
 tqdm==4.67.1
