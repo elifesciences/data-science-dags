@@ -1,2 +1,2 @@
-prophet==1.1.6
+prophet==1.1.7
 pystan==3.10.0
