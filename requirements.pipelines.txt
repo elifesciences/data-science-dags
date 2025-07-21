@@ -1,7 +1,7 @@
 beautifulsoup4==4.13.4
 bigquery-schema-generator==1.6.1
 boto3==1.38.46
-botocore==1.38.46
+botocore==1.39.9
 cattrs==25.1.1
 cloudpickle==3.1.1
 Cython==3.1.2
