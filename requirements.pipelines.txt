@@ -25,5 +25,5 @@ LunarCalendar==0.0.9
 holidays==0.81
 bigquery-views-manager==1.0.18
 Jinja2>=3.0.0,<3.2.0
-MarkupSafe==3.0.2
+MarkupSafe==3.0.3
 urllib3>=2, <3
