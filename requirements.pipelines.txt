@@ -22,7 +22,7 @@ numpy==2.2.6
 pandas==2.3.3
 tqdm==4.67.1
 LunarCalendar==0.0.9
-holidays==0.83
+holidays==0.84
 bigquery-views-manager==1.0.18
 Jinja2>=3.0.0,<3.2.0
 MarkupSafe==3.0.3
