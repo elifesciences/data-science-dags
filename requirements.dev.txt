@@ -1,7 +1,7 @@
 flake8==7.3.0
 nbstripout==0.8.1
 pylint==4.0.2
-pytest==9.0.0
+pytest==9.0.1
 pytest-watch==4.2.0
 requests==2.32.5
 mypy==1.18.2
