@@ -41,6 +41,7 @@ service:
   port: 80
 
 ingress:
+  # ingressClassName: traefik
   enabled: false
   annotations:
     nginx.ingress.kubernetes.io/proxy-send-timeout: "180"
