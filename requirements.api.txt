@@ -2,7 +2,7 @@ flask==3.1.2
 jsonschema==4.26.0
 numpy==2.2.6
 pandas==2.3.3
-s3path==0.6.4
+s3path==0.6.5
 scikit-learn==1.7.2
 boto3==1.38.46
 google-cloud-bigquery>=2.26.0
