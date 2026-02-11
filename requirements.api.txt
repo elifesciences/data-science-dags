@@ -7,5 +7,5 @@ scikit-learn==1.7.2
 boto3==1.38.46
 google-cloud-bigquery>=2.26.0
 bigquery-schema-generator==1.6.1
-werkzeug==3.1.4
+werkzeug==3.1.5
 urllib3>=2, <3
