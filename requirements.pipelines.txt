@@ -23,7 +23,7 @@ pandas==2.3.3
 tqdm==4.67.3
 LunarCalendar==0.0.9
 holidays==0.93
-bigquery-views-manager==1.0.19
+bigquery-views-manager==1.0.20
 Jinja2>=3.0.0,<3.2.0
 MarkupSafe==3.0.3
 urllib3>=2, <3
