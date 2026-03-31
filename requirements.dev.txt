@@ -3,7 +3,7 @@ nbstripout==0.9.1
 pylint==4.0.5
 pytest==9.0.2
 pytest-watch==4.2.0
-requests==2.33.0
+requests==2.33.1
 mypy==1.19.1
 types-requests==2.33.0.20260327
 types-PyYAML
