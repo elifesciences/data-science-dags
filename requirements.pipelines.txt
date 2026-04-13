@@ -7,7 +7,7 @@ cloudpickle==3.1.2
 Cython==3.2.4
 ipywidgets==8.1.8
 joblib==1.5.3
-lxml==6.0.3
+lxml==6.0.4
 pandas-gbq==0.35.0
 pyarrow==23.0.1
 PyICU==2.16.2
