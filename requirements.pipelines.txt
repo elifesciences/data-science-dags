@@ -26,4 +26,4 @@ holidays==0.95
 bigquery-views-manager==1.0.20
 Jinja2>=3.1.6,<3.2.0
 MarkupSafe==3.0.3
-urllib3>=2, <3
+urllib3>=2.6.3, <3
