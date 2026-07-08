@@ -20,7 +20,7 @@ convertdate==2.4.1
 matplotlib==3.10.9
 numpy==2.2.6
 pandas==2.3.3
-tqdm==4.68.3
+tqdm==4.68.4
 LunarCalendar==0.0.9
 holidays==0.100
 bigquery-views-manager==1.0.20
