@@ -12,7 +12,7 @@ pandas-gbq==0.35.0
 pyarrow==24.0.0
 PyICU==2.16.2
 google-cloud-bigquery>=3.42.2
-db-dtypes==1.7.0
+db-dtypes==1.7.1
 s3path==0.6.5
 scikit-learn==1.7.2
 six==1.17.0
