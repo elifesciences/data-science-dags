@@ -11,7 +11,7 @@ lxml==6.1.2
 pandas-gbq==0.35.1
 pyarrow==25.0.1
 PyICU==2.16.2
-google-cloud-bigquery>=3.43.0
+google-cloud-bigquery>=3.44.0
 db-dtypes==1.7.1
 s3path==0.6.5
 scikit-learn==1.7.2
