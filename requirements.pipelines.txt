@@ -8,7 +8,7 @@ Cython==3.3.0
 ipywidgets==8.1.9
 joblib==1.5.3
 lxml==6.1.2
-pandas-gbq==0.35.1
+pandas-gbq==0.35.2
 pyarrow==25.0.1
 PyICU==2.16.2
 google-cloud-bigquery>=3.43.0
